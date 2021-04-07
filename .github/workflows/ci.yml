@@ -11,13 +11,13 @@ on:
 
 jobs:
   PR_lint:
-    name: General linting
+    name: Pull Request style check
     runs-on: ubuntu-latest
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     steps:
-      - name: Pull Request StyleCheck
+      - name: Pull Request Style Check
         # You may pin to the exact commit or the version.
         # uses: maximbircu/pull-request-checkstyle@c28d5560bc74eb67e7a6fd431c3169f5908b8682
         uses: maximbircu/pull-request-checkstyle@v1.0.0
