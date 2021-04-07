@@ -4,13 +4,13 @@
 name: CI/CD
 
 on:
-  push:
-    branches: [master]
+  # push:
+  #   branches: [master]
   pull_request:
     branches: [master]
 
 jobs:
-  lint:
+  PR_lint:
     name: General linting
     runs-on: ubuntu-latest
     env:
@@ -35,13 +35,30 @@ jobs:
           # Max branch name length
           branch-name-max-length: 72 # optional, default is 72
 
+  code_lint:
+    name: Lint Code Base
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+        with:
+          # Full git history is needed to get a proper list of changed files within `super-linter`
+          fetch-depth: 0
+
+      - name: Lint Code Base
+        uses: github/super-linter@v3.15.5
+        env:
+          VALIDATE_ALL_CODEBASE: false
+          DEFAULT_BRANCH: master
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
   build:
     name: Builds and test app
-    # needs: lint
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [12.x, 14.x, 15.x]
+        node-version: [14.x, 15.x]
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
     steps:
