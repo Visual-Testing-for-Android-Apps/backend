@@ -11,6 +11,8 @@ INSERT INTO JOB_STATUS(jstat_id, jstat_name) VALUES
 CREATE TABLE IF NOT EXISTS JOB(
     job_id      BIGINT GENERATED ALWAYS AS IDENTITY,
     job_email   TEXT NOT NULL,
+    job_start   TIMESTAMPTZ NOT NULL,
+    job_end     TIMESTAMPTZ,
     job_image   INTEGER NOT NULL DEFAULT 0,
     job_video   INTEGER NOT NULL DEFAULT 0,
 
@@ -22,8 +24,7 @@ CREATE TABLE IF NOT EXISTS JOB(
     CONSTRAINT fk_job_video
         FOREIGN KEY(job_video)
         REFERENCES JOB_STATUS(jstat_id)
-        ON DELETE SET DEFAULT,
-    UNIQUE(job_email)
+        ON DELETE SET DEFAULT
 );
 
 
