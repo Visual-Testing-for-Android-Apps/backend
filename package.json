@@ -4,9 +4,12 @@
   "description": " Visual testing for android apps ",
   "main": "index.js",
   "scripts": {
-    "service1": "cd service1 && npm start",
-    "service2": "cd service2 && npm start",
-    "build": "npm-run-all --parallel service1 service2"
+    "start-service1": "cd service1 && npm start",
+    "build-service1": "cd service1 && npm install && npm run build --if-present",
+    "start-service2": "cd service2 && npm start",
+    "build-service2": "cd service2 && npm install && npm run build --if-present",
+    "build": "npm-run-all --parallel build-service1 build-service2",
+    "start": "npm-run-all --parallel start-service1 start-service2"
   },
   "repository": {
     "type": "git",
