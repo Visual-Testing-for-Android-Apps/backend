@@ -26,4 +26,4 @@ Connecting an external service to the database can be done using the resulting u
 ```heroku config:get DATABASE_URL -a fit3170-project1-database```
 
 in the folder set up above. This can be done on deployment, but ideally should be run at application start on the server
-(the example given by Heroku is: ```DATABASE_URL=$(heroku config:get DATABASE_URL -a your-app) your_process```).
+(the example given by Heroku is: ```DATABASE_URL=$(heroku config:get DATABASE_URL -a fit3170-project1-database) your_process```).
