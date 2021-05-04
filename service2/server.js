@@ -8,7 +8,7 @@ const PORT = process.env.PORT || 3001;
 app.get("/aRoute", (req, res) => {
   // This will perform a GET request to service1
   axios
-    .get("http://localhost:3000/aRoute")
+    .get(process.env.SERVICE_ADDRESS)
     .then((resp) => {
       console.log(resp.data); // Will print 'Result'
     })
