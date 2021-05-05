@@ -3,13 +3,13 @@ const axios = require("axios");
 const app = express();
 
 const PORT = process.env.PORT || 3001;
-const SERVICE_PORT = process.env.SERVICE_ADDRESS || 3000;
+const SERVICE_ADDRESS = process.env.SERVICE_ADDRESS || "http://localhost:3000/aRoute";
 
 // This says to listen for a GET request on the route /aRoute'
 app.get("/aRoute", (req, res) => {
   // This will perform a GET request to service1
   axios
-    .get(SERVICE_PORT)
+    .get(SERVICE_ADDRESS)
     .then((resp) => {
       console.log(resp.data); // Will print 'Result'
     })
