@@ -20,5 +20,5 @@ app.post("/anotherRoute", (req, res) => {});
 
 // Start the server and listen on the port for incoming http requests
 app.listen(PORT, () => {
-  console.log("Listening on port: ${PORT} ");
+  console.log(`Listening on port: ${PORT}`);
 });
