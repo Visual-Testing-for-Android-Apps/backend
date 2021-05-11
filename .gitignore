@@ -3,6 +3,8 @@
 # Created by https://www.toptal.com/developers/gitignore/api/visualstudiocode,linux,macos,node,osx,pycharm,python,vscode,windows
 # Edit at https://www.toptal.com/developers/gitignore?templates=visualstudiocode,linux,macos,node,osx,pycharm,python,vscode,windows
 
+# not push the model 
+
 ### Linux ###
 *~
 
