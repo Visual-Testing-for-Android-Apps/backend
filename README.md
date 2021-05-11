@@ -44,3 +44,7 @@ if res.status_code == 200:
 
 ## Future improvement 
 Instead of return back the heatmap directly, we need to store it to the S3 bucket. 
+
+## Others 
+* I didn't push the model file to the repo since it's too large 
+* don't try to run the code, I will fail. 
