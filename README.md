@@ -1,4 +1,9 @@
 # Owl Eye API 
+
+## Declaimer
+
+I am and AWS and API noob. My goal is just want to make it work. Don't quote on what I wrote here cuz they might be wrong. 
+
 ## Author 
 Rebecca Chen
 
