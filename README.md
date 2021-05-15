@@ -1,4 +1,9 @@
 # Owl Eye API 
+
+## Declaimer
+
+I am and AWS and API noob. Don't quote on what I wrote here cuz they might be wrong. 
+
 ## Author 
 Rebecca Chen
 
@@ -51,7 +56,7 @@ Instead of return back the heatmap directly, we need to store it to the S3 bucke
 
 
 # Instruction on setting up API 
-## High-level process 
+## High-level steps 
 1. working code which is envoked by called the function handler(event, context). The input is in the event argument in json format.  
 2. put the working code + the model to the docker image 
 3. upload the docker image to AWS ECR ( Think this is just a place to store the code and the model. ) 
@@ -66,7 +71,7 @@ In the API call,  `event` is what the front-end sent to us. The return of this f
 
 * requirements.txt - this will be read by the Dockerfile
 
-* the model - not upload to repo because it is too big. 
+* the model - not been uploaded to repo because it is too big. 
 
 
 
@@ -83,7 +88,7 @@ Hence we need to,
 **owl-eye-docker-lambda-v3/template.yaml** 
 
 By typing `sam build` in the command line. It reads this file. 
-This file is essentially
+This file essentially,
 1. build the docker image by following the Dockerfile 
 2. create/update the lambda function 
 3. create the API endpoint. 
@@ -119,7 +124,7 @@ deactivate
 
 The biggest challenge I was facing when deploying the code is to when I tried to get rid to the local read/write of the image files. Also, encode and decode the image so that they can be sent as json. 
 
-Fortunately, for encoding/decoding image the python code in the above section do the job. 
+Fortunately, for encoding/decoding image the python code in the above section does the job. 
 
 ## local testing 
 
