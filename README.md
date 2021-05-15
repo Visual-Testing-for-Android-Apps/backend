@@ -94,6 +94,27 @@ This file is essentially
 Use `pip freeze  > requirements.txt` to create the requirements.txt file. 
 This makes sure we only install packages that is relevent to the script.  
 
+create the python venv folder
+```bash
+python3 -m venv <NEW_FODLER_NAME>
+```
+Activate the venv 
+```bash
+source <NEW_FODLER_NAME>/bin/activate
+```
+Install packages. (for example requests)
+```bash
+pip install requests 
+```
+create the requirements.txt
+```bash
+pip freeze > requirements.txt
+```
+Exit the venv
+```bash
+deactivate 
+```
+
 ## Anticipated Challenges 
 
 The biggest challenge I was facing when deploying the code is to when I tried to get rid to the local read/write of the image files. Also, encode and decode the image so that they can be sent as json. 
