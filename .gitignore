@@ -481,3 +481,5 @@ $RECYCLE.BIN/
 
 
 .idea/
+
+owl-eye-docker-lambda-v3/hello_world/app/opt/

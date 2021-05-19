@@ -429,6 +429,7 @@ def handler(event, context):
 
         bug_type = []  # contain the type of the bugs
         out1 = []
+        idx = 0
 
         img_res_str = ''
         for model_file in models:
@@ -468,15 +469,22 @@ def handler(event, context):
 
                 out3 = np.array(out1)
 
-                if out3[0, 0] > out3[0, 1]:  # found a bug
+
+
+                if out3[idx, 0] > out3[idx, 1]:  # found a bug
                     if model_file == 'null-model.pth':
                         bug_type.append('Null value')
+
+
 
                     if model_file == 'image-model.pth':
                         bug_type.append('Missing image')
 
+
                     if model_file == 'comp-model.pth':
                         bug_type.append('Component occlusion')
+
+                idx += 1
 
         return {
             'statusCode': 200,
@@ -502,18 +510,18 @@ def handler(event, context):
             )
         }
 
-if __name__ == '__main__':
-    with open('2144.jpg', 'rb') as open_file:
-        byte_content = open_file.read()
-    base64_bytes = base64.b64encode(byte_content)
-    base64_string = base64_bytes.decode('utf-8')
-    raw_data = base64_string
-
-    MY_FILE_STRING = raw_data
-
-    event = {'body' :  MY_FILE_STRING}
-
-    print(handler(event,0))
+# if __name__ == '__main__':
+#     with open('bug.4006.jpg', 'rb') as open_file:
+#         byte_content = open_file.read()
+#     base64_bytes = base64.b64encode(byte_content)
+#     base64_string = base64_bytes.decode('utf-8')
+#     raw_data = base64_string
+#
+#     MY_FILE_STRING = raw_data
+#
+#     event = {'body' :  MY_FILE_STRING}
+#
+#     print(handler(event,0))
 
 
 
