@@ -2,7 +2,8 @@ import base64
 import json
 from io import BytesIO
 import torch
-from PIL import Image,ImageFile
+from PIL import Image, ImageFile
+
 ImageFile.LOAD_TRUNCATED_IMAGES = True
 import os
 import torch.utils.data as data
@@ -10,7 +11,9 @@ import torchvision.transforms as transforms
 import cv2
 import numpy as np
 from torch.autograd import Function, Variable
+
 ImageFile.LOAD_TRUNCATED_IMAGES = True
+import torch.nn.functional as F
 import torch.nn as nn
 
 # image_transforms = torchvision.transforms.Compose([
@@ -47,12 +50,14 @@ import torch.nn as nn
 #         return F.softmax(self.smax(x), dim=-1)
 
 
-model_file = '/opt/ml/model.pth'
+multi_model_directory = '/opt/ml/'  # this directory will contain 4 models
+
+# model_file = '/opt/ml/model.pth'
 # model = Net()
 # model.load_state_dict(torch.load(model_file))
 # model.eval()
 
-#---------------------------------- Network.py -----------------------------------------------------#
+# ---------------------------------- Network.py -----------------------------------------------------#
 
 cfg = [16, 16, 'M', 16, 16, 'M', 32, 32, 'M', 64, 64, 'M', 128, 128, 'M', 128, 128, 'M']
 
@@ -105,14 +110,13 @@ def make_layers(cfg):
     return nn.Sequential(*layers)
 
 
-
-#-----------------------------getdata.py ---------------------------------------------------------------------#
+# -----------------------------getdata.py ---------------------------------------------------------------------#
 
 IMAGE_H = 768
 IMAGE_W = 448
 
 dataTransform = transforms.Compose([
-    transforms.Resize((IMAGE_H,IMAGE_W)),
+    transforms.Resize((IMAGE_H, IMAGE_W)),
     transforms.CenterCrop((IMAGE_H, IMAGE_W)),
     transforms.ToTensor()
 ])
@@ -129,7 +133,7 @@ class Dataset(data.Dataset):
         if self.mode == 'train':
             dir = dir + '/train/'
             for file in os.listdir(dir):
-                #print(file)
+                # print(file)
                 self.list_img.append(dir + file)
                 self.data_size += 1
                 name = file.split(sep='.')
@@ -161,10 +165,10 @@ class Dataset(data.Dataset):
         return self.data_size
 
 
-#----------------------------------------------------------------------------------------------------#
+# ----------------------------------------------------------------------------------------------------#
 
 
-#----------------------------- Localization.py -----------------------------------------------#
+# ----------------------------- Localization.py -----------------------------------------------#
 
 
 class FeatureExtractor():
@@ -222,17 +226,18 @@ class ModelOutputs():
 #     imgs_data = torch.stack(imgs_data)
 #     input = Variable(imgs_data, requires_grad = True)
 #     return input
-def preprocess_image(img):
-
-
+def preprocess_image(img, heatmap=False):
     imgs_data = []
-    #img = Image.open(image_file)
+    # img = Image.open(image_file)
     img_data = dataTransform(img)
 
     imgs_data.append(img_data)
     imgs_data = torch.stack(imgs_data)
-    input = Variable(imgs_data, requires_grad = True)
-    return input
+    if heatmap:  # for heatmap model
+        input = Variable(imgs_data, requires_grad=True)
+        return input
+    else:  # for other model
+        return imgs_data
 
 
 def show_cam_on_image(img, mask):
@@ -333,7 +338,7 @@ class GuidedBackpropReLUModel:
 
     def forward(self, input):
         res = self.model.module(input)
-        #print(res)
+        # print(res)
         print('forward get res')
         return res
 
@@ -385,22 +390,22 @@ def deprocess_image(img):
     img = img + 0.5
     img = np.clip(img, 0, 1)
     return np.uint8(img * 255)
-#----------------------------------------------------------------------------------------------------#
 
+
+# ----------------------------------------------------------------------------------------------------#
 
 
 def handler(event, context):
-
-    #image_bytes = event['body']
+    # image_bytes = event['body']
     # print(image_bytes)
     # image = Image.open(BytesIO(base64.b64decode(image_bytes))).convert(mode='L')
-    #load = json.loads(image_bytes)
+    # load = json.loads(image_bytes)
     try:
-        image_bytes = event['body'].encode('utf-8')
-        image = Image.open(BytesIO(base64.b64decode(image_bytes)))
+        image_bytes = event['body'].encode('utf-8')  # here is where the app get the image data in string
+        image = Image.open(BytesIO(base64.b64decode(image_bytes)))  # decode the image string
 
-        #image_name = "/tmp/out.jpg"
-        #image.save(image_name)
+        # image_name = "/tmp/out.jpg"
+        # image.save(image_name)
 
         # probabilities = model.forward(image_transforms(np.array(image)).reshape(-1, 1, 28, 28))
         # label = torch.argmax(probabilities).item()
@@ -420,45 +425,67 @@ def handler(event, context):
         # image_name = image_dir + file
         # args = get_args()
 
-        model = Net()
-        # model.cuda()
-        model = nn.DataParallel(model)
-        model.load_state_dict(torch.load(model_file))  # TODO : model is in the S3 bucket
+        models = os.listdir(multi_model_directory)  # get each model
 
-        grad_cam = GradCam(model=model, target_layer_names=["40"], use_cuda=False)
+        bug_type = []  # contain the type of the bugs
+        out1 = []
 
-        #img = cv2.imread(image_name, 1)
-        #img = np.float32(cv2.resize(img, (448, 768))) / 255
-        #print(np.array(image))
+        img_res_str = ''
+        for model_file in models:
 
-        img = np.array(image)
-        img = np.float32(cv2.resize(img, (448, 768))) / 255
+            model = Net()
+            # model.cuda()
+            model = nn.DataParallel(model)
 
-        input = preprocess_image(image)
-        #print(input.dim())
-        target_index = None
-        mask = grad_cam(input, target_index)
-        img_res = show_cam_on_image(img, mask)
-        img_res_str = cv2.imencode('.jpg', img_res)[1].tobytes()
-        #imdata = pickle.dumps(img_res)
-        print("process finish")
-        # gb_model = GuidedBackpropReLUModel(model=model, use_cuda=False)
-        # gb = gb_model(input, index=target_index)
-        #
-        # gb = gb.transpose((1, 2, 0))
-        #
-        # cam_mask = cv2.merge([mask, mask, mask])
-        # cam_gb = deprocess_image(cam_mask * gb)
-        # gb = deprocess_image(gb)
+            # now the algorithm can run the gpu model
+            model.load_state_dict(torch.load(model_file, torch.device('cpu')))  # TODO : model is in the S3 bucket
 
+            if model_file == '0model.pth':  # this model is use to detect all the bug in side the image and generate the heatmap
+                grad_cam = GradCam(model=model, target_layer_names=["40"], use_cuda=False)
+                img = np.array(image)
+                img = np.float32(cv2.resize(img, (448, 768))) / 255
+
+                input = preprocess_image(image, True)
+                # print(input.dim())
+                target_index = None
+                mask = grad_cam(input, target_index)
+                img_res = show_cam_on_image(img, mask)
+                img_res_str = cv2.imencode('.jpg', img_res)[1].tobytes()
+
+                print("process finish")
+
+            else:  # the rest model is to detect type of bugs
+                model.eval()
+                img_data = preprocess_image(image)
+
+                out = model(img_data)
+                out = F.softmax(out, dim=1)
+                out = out.data.cpu().numpy()
+                out2 = out[0]
+                out1.append(out2)
+                imgs_data = []
+
+                out3 = np.array(out1)
+
+                if out3[0, 0] > out3[0, 1]:  # found a bug
+                    if model_file == 'null-model.pth':
+                        bug_type.append('Null value')
+
+                    if model_file == 'image-model.pth':
+                        bug_type.append('Missing image')
+
+                    if model_file == 'comp-model.pth':
+                        bug_type.append('Component occlusion')
 
         return {
             'statusCode': 200,
             'body': json.dumps(
                 {
                     "predicted_label": 'placeholder',
-                    'res_img' : base64.b64encode(img_res_str).decode('utf-8')
-                    #'res_img' : img_res_str
+                    "original_img": image_bytes, # this is the original image
+                    'res_img': base64.b64encode(img_res_str).decode('utf-8'), # this is the heat map
+                    'bug_type': bug_type # contain bug. Currently only have three type of bug
+                    # 'res_img' : img_res_str
                 }
             )
         }
@@ -469,12 +496,10 @@ def handler(event, context):
             'body': json.dumps(
                 {
                     "predicted_label": 'placeholder',
-                    "error_msg" : str(e)
+                    "error_msg": str(e)
                 }
             )
         }
-
-   
 
 # if __name__ == '__main__':
 
@@ -487,4 +512,3 @@ def handler(event, context):
 
 #     grad_cam = GradCam(model=model, target_layer_names=["40"], use_cuda=False)
 #     print('model load')
-
