@@ -50,7 +50,7 @@ import torch.nn as nn
 #         return F.softmax(self.smax(x), dim=-1)
 
 
-multi_model_directory = '/opt/ml/'  # this directory will contain 4 models
+multi_model_directory = './opt/ml/'  # this directory will contain 4 models
 
 # model_file = '/opt/ml/model.pth'
 # model = Net()
@@ -433,12 +433,13 @@ def handler(event, context):
         img_res_str = ''
         for model_file in models:
 
+            model_path = multi_model_directory + model_file
             model = Net()
             # model.cuda()
             model = nn.DataParallel(model)
 
             # now the algorithm can run the gpu model
-            model.load_state_dict(torch.load(model_file, torch.device('cpu')))  # TODO : model is in the S3 bucket
+            model.load_state_dict(torch.load(model_path, torch.device('cpu')))  # TODO : model is in the S3 bucket
 
             if model_file == '0model.pth':  # this model is use to detect all the bug in side the image and generate the heatmap
                 grad_cam = GradCam(model=model, target_layer_names=["40"], use_cuda=False)
@@ -482,7 +483,7 @@ def handler(event, context):
             'body': json.dumps(
                 {
                     "predicted_label": 'placeholder',
-                    "original_img": image_bytes, # this is the original image
+                    "original_img": event['body'], # this is the original image
                     'res_img': base64.b64encode(img_res_str).decode('utf-8'), # this is the heat map
                     'bug_type': bug_type # contain bug. Currently only have three type of bug
                     # 'res_img' : img_res_str
@@ -501,7 +502,21 @@ def handler(event, context):
             )
         }
 
-# if __name__ == '__main__':
+if __name__ == '__main__':
+    with open('2144.jpg', 'rb') as open_file:
+        byte_content = open_file.read()
+    base64_bytes = base64.b64encode(byte_content)
+    base64_string = base64_bytes.decode('utf-8')
+    raw_data = base64_string
+
+    MY_FILE_STRING = raw_data
+
+    event = {'body' :  MY_FILE_STRING}
+
+    print(handler(event,0))
+
+
+
 
 #     print('test running ')
 #     # load model
