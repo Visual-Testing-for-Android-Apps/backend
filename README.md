@@ -1,16 +1,19 @@
-# Owl Eye API 
+# Owl Eye API (multiple models version)
 
 ## Declaimer
 
-I am and AWS and API noob. Don't quote on what I wrote here cuz they might be wrong. 
+Base on Rebecca Chen's code
 
 ## Author 
-Rebecca Chen
+Yinghao Ma
 
 Let me know if you have any question or find any bug
 
-## End Point 
-POST https://8uxam9kkod.execute-api.ap-southeast-2.amazonaws.com/Prod/owleye/
+
+
+# ****It has not been deployed on AWS
+
+
 
 ## Access example 
 
@@ -18,7 +21,6 @@ POST https://8uxam9kkod.execute-api.ap-southeast-2.amazonaws.com/Prod/owleye/
 1. Select the `binary` option. 
 2. upload the image file 
 
-![image info](./owl-eye-docker-lambda-v3/postman_example.jpg)
 
 ### Approach 2: Python 
 1. Encoding the image 
@@ -48,19 +50,15 @@ if res.status_code == 200:
 ```
 
 ## Future improvement 
-Instead of return back the heatmap directly, we need to store it to the S3 bucket. 
+
+May wait the text-overlap model.
 
 ## Others 
-* I didn't push the model file to the repo since it's too large 
-* don't try to run the code, I will fail. 
+
 
 
 # Instruction on setting up API 
-## High-level steps 
-1. working code which is envoked by called the function handler(event, context). The input is in the event argument in json format.  
-2. put the working code + the model to the docker image 
-3. upload the docker image to AWS ECR ( Think this is just a place to store the code and the model. ) 
-4. AWS Lamdba + AWS API endpoint together serves the code in the cloud. 
+
 
 ## Important files 
 **owl-eye-docker-lambda-v3/hello_world/app**
@@ -74,24 +72,6 @@ In the API call,  `event` is what the front-end sent to us. The return of this f
 * the model - not been uploaded to repo because it is too big. 
 
 
-
-**owl-eye-docker-lambda-v3/hello_world/Dockerfile**
-
-
-This file provide instruction to build the docker image.  
-Think the docker image as a separate computer that your code will run on. You need to put everything required for the model to run to a docker image. 
-
-Hence we need to, 
-1. copy the files over to the new computer 
-2. install the required packages 
-
-**owl-eye-docker-lambda-v3/template.yaml** 
-
-By typing `sam build` in the command line. It reads this file. 
-This file essentially,
-1. build the docker image by following the Dockerfile 
-2. create/update the lambda function 
-3. create the API endpoint. 
 
 ## What to do with the code 
 1. Read the input image/video through the `event` argument in the `handler` function. Instead of open local image/video files. 
@@ -120,28 +100,44 @@ Exit the venv
 deactivate 
 ```
 
-## Anticipated Challenges 
+## Local testing 
 
-The biggest challenge I was facing when deploying the code is to when I tried to get rid to the local read/write of the image files. Also, encode and decode the image so that they can be sent as json. 
 
-Fortunately, for encoding/decoding image the python code in the above section does the job. 
+First you need to set the `opt/ml`directory under the `app` directory
+and move the model into the `ml` directory
 
-## local testing 
+![img.png](img.png)
 
-I highly recommend to test the modified code locally. 
-To do that, create `local_test.py` file and simulate how will function will be called. 
+You can drag image you want to test to the `app` directory
+
+![img_1.png](img_1.png)
+
+
+You can uncomment the ```pythonif __name__ == "__main__" ```part
+
+and change the `THE_IMAGE_YOU_WANT_TO_TEST` to the image name you want to test
+
+
+
 ```python
-import app
 
-if __name__ == "__main__":
-    # 1. TODO read a local video/image file
+if __name__ == '__main__':
+    with open(THE_IMAGE_YOU_WANT_TO_TEST, 'rb') as open_file:
+        byte_content = open_file.read()
+    base64_bytes = base64.b64encode(byte_content)
+    base64_string = base64_bytes.decode('utf-8')
+    raw_data = base64_string
 
-    # 2. TODO encode the video/image and pass it
+    MY_FILE_STRING = raw_data
 
-    # 3. put encoding information to a event json object. 
     event = {'body' :  MY_FILE_STRING}
-    # 4. call the handler function 
-    print(app.handler(event, None))
+
+    print(handler(event,0))
 
 ```
 
+The return json with `statusCode == 200` should contain four part
+`predicted_label`,
+`original_img`,
+`res_img`,
+`bug_type`
