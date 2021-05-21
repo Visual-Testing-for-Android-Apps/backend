@@ -145,3 +145,44 @@ if __name__ == "__main__":
 
 ```
 
+# More detail on Setting Up AWS 
+
+## Pre-steps 
+1. install AWS Cli
+2. configure AWS Cli
+3. intall Sam 
+4. Install docker desktop 
+
+(default region : ap-southeast-2) 
+
+## SAM deploy commands 
+
+1. create ecr 
+This will create a ecr resource. The resource identifer will be outputed to the terminal. Please save the Uri of the resource for the deployment step 
+```bash 
+aws ecr create-repository --repository-name REPO_NAME --image-scanning-configuration scanOnPush=true
+```
+2. build image 
+this step build the image locally 
+```bash
+sam build # in the folder that contains the template.yml file 
+```
+3. Test locally - optional
+This command start the api local. You can test the api with postman. 
+```bash
+sam local start-api 
+```
+
+4. deploy to the cloud
+If you are deploy this app for the first time. use `--guided` option. This will guide you through the steps. One of the step would require you to enter a ECR Uri which was mentioned earlier. For all the yes or no question, choose yes. 
+```bash
+sam deploy --guided
+```
+
+5. Enable CORS mannually 
+Ask me later. 
+
+
+
+
+
