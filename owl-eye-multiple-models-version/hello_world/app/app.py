@@ -49,8 +49,9 @@ import torch.nn as nn
 #
 #         return F.softmax(self.smax(x), dim=-1)
 
-
-multi_model_directory = './opt/ml/'  # this directory will contain 4 models
+multi_model_directory = './opt/ml/'
+# multi_model_directory = os.get_env("MODEL_DIR",'./opt/ml/' )
+  # this directory will contain 4 models
 
 # model_file = '/opt/ml/model.pth'
 # model = Net()
@@ -241,9 +242,11 @@ def preprocess_image(img, heatmap=False):
 
 
 def show_cam_on_image(img, mask):
-    heatmap = cv2.applyColorMap(np.uint8(255 * mask), cv2.COLORMAP_JET)
+    heatmap = np.uint8(255 * mask) #cv2.applyColorMap(np.uint8(255 * mask), cv2.COLORMAP_JET)
     heatmap = np.float32(heatmap) / 255
-    cam = heatmap + np.float32(img)
+
+    cam = heatmap #+ np.float32(img)
+
     cam = cam / np.max(cam)
     return np.uint8(255 * cam)
     # TODO: store image to s3 bucket
@@ -451,7 +454,9 @@ def handler(event, context):
                 # print(input.dim())
                 target_index = None
                 mask = grad_cam(input, target_index)
+                # print(mask)
                 img_res = show_cam_on_image(img, mask)
+                # print(img_res)
                 img_res_str = cv2.imencode('.jpg', img_res)[1].tobytes()
 
                 print("process finish")
