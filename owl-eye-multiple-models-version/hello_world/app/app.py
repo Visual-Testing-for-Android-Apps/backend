@@ -49,8 +49,8 @@ import torch.nn as nn
 #
 #         return F.softmax(self.smax(x), dim=-1)
 
-multi_model_directory = './opt/ml/'
-# multi_model_directory = os.get_env("MODEL_DIR",'./opt/ml/' )
+#multi_model_directory = './opt/ml/'
+multi_model_directory = os.getenv("MODEL_DIR",'./opt/ml/' )
   # this directory will contain 4 models
 
 # model_file = '/opt/ml/model.pth'

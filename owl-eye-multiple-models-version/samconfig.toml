@@ -3,9 +3,9 @@ version = 0.1
 [default.deploy]
 [default.deploy.parameters]
 stack_name = "owl-eye-docker-lambda-v3"
-s3_bucket = "aws-sam-cli-managed-default-samclisourcebucket-126yqm61u6qk8"
+s3_bucket = "aws-sam-cli-managed-default-samclisourcebucket-5154aovimy7e"
 s3_prefix = "owl-eye-docker-lambda-v3"
 region = "ap-southeast-2"
 confirm_changeset = true
 capabilities = "CAPABILITY_IAM"
-image_repositories = ["OwlEyeFunctionv3=556709552225.dkr.ecr.ap-southeast-2.amazonaws.com/owl-eye-docker-lamdba-repo-v3"]
+image_repositories = ["OwlEyeFunctionv3=769821509923.dkr.ecr.ap-southeast-2.amazonaws.com/owl_eyes"]
