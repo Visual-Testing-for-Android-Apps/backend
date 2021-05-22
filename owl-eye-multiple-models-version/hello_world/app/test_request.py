@@ -27,7 +27,7 @@ def json2im(jstr):
 # Create solid red image
 #red = np.full((480, 640, 3), [0, 0, 255], dtype=np.uint8)
 if __name__ == "__main__":
-    IMAGE_NAME = "bug.4003.jpg"
+    IMAGE_NAME = "bug.4006.jpg"
     with open(IMAGE_NAME, 'rb') as open_file:
         byte_content = open_file.read()
 
@@ -49,8 +49,7 @@ if __name__ == "__main__":
     # with open(file_name) as f:
     #     data = json.load(f)
 
-    #url = 'https://0d8ut70il9.execute-api.ap-southeast-2.amazonaws.com/Prod/hello'
-    url= 'https://8uxam9kkod.execute-api.ap-southeast-2.amazonaws.com/Prod/owleye/'
+    url= 'https://ekh9wzayy6.execute-api.ap-southeast-2.amazonaws.com/Prod/owleye/'
     res = requests.post(url, data=raw_data, timeout=5000)
     print(res.status_code)
     print(res.json())

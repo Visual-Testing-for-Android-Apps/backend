@@ -16,47 +16,6 @@ ImageFile.LOAD_TRUNCATED_IMAGES = True
 import torch.nn.functional as F
 import torch.nn as nn
 
-# image_transforms = torchvision.transforms.Compose([
-#     torchvision.transforms.ToTensor(),
-#     torchvision.transforms.Normalize((0.1307,), (0.3081,))])
-
-#
-# class Net(nn.Module):
-#     def __init__(self):
-#         super(Net, self).__init__()
-#         self.conv1 = nn.Conv2d(1, 20, kernel_size=5)
-#         self.conv2 = nn.Conv2d(20, 20, kernel_size=5)
-#         self.conv2_drop = nn.Dropout2d()
-#
-#         self.fc1 = nn.Linear(320, 100)
-#         self.bn1 = nn.BatchNorm1d(100)
-#
-#         self.fc2 = nn.Linear(100, 100)
-#         self.bn2 = nn.BatchNorm1d(100)
-#
-#         self.smax = nn.Linear(100, 10)
-#
-#     def forward(self, x):
-#         x = F.relu(F.max_pool2d(self.conv1(x), 2))
-#         x = F.relu(F.max_pool2d(self.conv2_drop(self.conv2(x)), 2))
-#
-#         x = x.view(-1, 320)
-#         x = self.bn1(F.relu(self.fc1(x)))
-#         x = F.dropout(x, training=self.training)
-#
-#         x = self.bn2(F.relu(self.fc2(x)))
-#         x = F.dropout(x, training=self.training)
-#
-#         return F.softmax(self.smax(x), dim=-1)
-
-#multi_model_directory = './opt/ml/'
-multi_model_directory = os.getenv("MODEL_DIR",'./opt/ml/' )
-  # this directory will contain 4 models
-
-# model_file = '/opt/ml/model.pth'
-# model = Net()
-# model.load_state_dict(torch.load(model_file))
-# model.eval()
 
 # ---------------------------------- Network.py -----------------------------------------------------#
 
@@ -216,17 +175,6 @@ class ModelOutputs():
         return target_activations, output
 
 
-# def preprocess_image(image_file):
-
-
-#     imgs_data = []
-#     img = Image.open(image_file)
-#     img_data = dataTransform(img)
-
-#     imgs_data.append(img_data)
-#     imgs_data = torch.stack(imgs_data)
-#     input = Variable(imgs_data, requires_grad = True)
-#     return input
 def preprocess_image(img, heatmap=False):
     imgs_data = []
     # img = Image.open(image_file)
@@ -242,10 +190,10 @@ def preprocess_image(img, heatmap=False):
 
 
 def show_cam_on_image(img, mask):
-    heatmap = np.uint8(255 * mask) #cv2.applyColorMap(np.uint8(255 * mask), cv2.COLORMAP_JET)
+    heatmap = np.uint8(255 * mask)
     heatmap = np.float32(heatmap) / 255
 
-    cam = heatmap #+ np.float32(img)
+    cam = heatmap
 
     cam = cam / np.max(cam)
     return np.uint8(255 * cam)
@@ -369,21 +317,6 @@ class GuidedBackpropReLUModel:
         return output
 
 
-# def get_args():
-#     parser = argparse.ArgumentParser()
-#     parser.add_argument('--use-cuda', action='store_true', default=False,
-#                         help='Use NVIDIA GPU acceleration')
-#     parser.add_argument('--image-path', type=str, default='./examples/211.jpg',
-#                         help='Input image path')
-#     args = parser.parse_args()
-
-#     args.use_cuda = args.use_cuda and torch.cuda.is_available()
-#     if args.use_cuda:
-#         print("Using GPU for acceleration")
-#     else:
-#         print("Using CPU for computation")
-
-#     return args
 
 def deprocess_image(img):
     """ see https://github.com/jacobgil/keras-grad-cam/blob/master/grad-cam.py#L65 """
@@ -399,19 +332,12 @@ def deprocess_image(img):
 
 
 def handler(event, context):
-    # image_bytes = event['body']
-    # print(image_bytes)
-    # image = Image.open(BytesIO(base64.b64decode(image_bytes))).convert(mode='L')
-    # load = json.loads(image_bytes)
+
     try:
         image_bytes = event['body'].encode('utf-8')  # here is where the app get the image data in string
         image = Image.open(BytesIO(base64.b64decode(image_bytes)))  # decode the image string
 
-        # image_name = "/tmp/out.jpg"
-        # image.save(image_name)
 
-        # probabilities = model.forward(image_transforms(np.array(image)).reshape(-1, 1, 28, 28))
-        # label = torch.argmax(probabilities).item()
         """ python grad_cam.py <path_to_image>
             1. Loads an image with opencv.
             2. Preprocesses it for VGG19 and converts to a pytorch variable.
@@ -427,6 +353,9 @@ def handler(event, context):
         # image_num = filename
         # image_name = image_dir + file
         # args = get_args()
+
+        multi_model_directory = os.getenv("MODEL_DIR", './opt/ml/')
+        # this directory will contain 4 models
 
         models = os.listdir(multi_model_directory)  # get each model
 
