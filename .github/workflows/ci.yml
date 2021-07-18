@@ -60,6 +60,7 @@ jobs:
           VALIDATE_PYTHON_MYPY: false
           VALIDATE_PYTHON_PYLINT: false
           VALIDATE_MARKDOWN: false
+          VALIDATE_SQL: false
           # Flag to have the linter complete with exit code 0 even if errors were detected.
           # DISABLE_ERRORS: true
 
