@@ -21,6 +21,5 @@ export const handler = async (event: ApiGatewayEvent): Promise<ApiGatewayRespons
     console.log("region",process.env['AWS_REGION'])
 
     await createNewJob()
-    console.log('Running uploadHandler');
     return {statusCode: 200, body: event.body}
 };

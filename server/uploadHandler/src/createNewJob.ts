@@ -1,7 +1,7 @@
 import { addNewJobToDb } from "./service/dynamodbService";
 
 export const createNewJob = async () => {
-
+    console.log('Running uploadHandler');
     // 1. upload files to S3
 
     // 2. save job to DB

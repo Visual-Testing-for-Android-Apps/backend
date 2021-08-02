@@ -14,8 +14,7 @@ import { Agent } from "https";
 
 const awsRegion = process.env.AWS_REGION
 
-// The reason of using DynamoDB directly, see:
-// https://github.com/aws/aws-sdk-js/issues/3578
+
 const dynamoDb = new DynamoDB({
   apiVersion: "2012-08-10",
   httpOptions: { agent: new Agent({ maxSockets: 200 }) },
