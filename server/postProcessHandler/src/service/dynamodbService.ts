@@ -17,8 +17,8 @@
 //           videoFiles,
 //           imageFiles,
 //           updatedAt: new Date().toISOString()
-//       } 
+//       }
 //     } as PutItemInput
-  
+
 //     await putItem(newJobItem)
 //   }
