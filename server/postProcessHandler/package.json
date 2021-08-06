@@ -1,8 +1,6 @@
 {
-  "name": "web_template",
+  "name": "vtaa",
   "version": "1.0.0",
-  "author": "SAM CLI",
-  "license": "MIT",
   "scripts": {
     "fast-compile": "tsc",
     "compile": "eslint . --ext .ts && tsc",
