@@ -5,7 +5,7 @@ Description: >-
 # Transform section specifies one or more macros that AWS CloudFormation uses to process your template
 # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/transform-section-structure.html
 Transform:
-- AWS::Serverless-2016-10-31
+  - AWS::Serverless-2016-10-31
 
 # Resources declares the AWS resources that you want to include in the stack
 # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/resources-section-structure.html
@@ -49,7 +49,7 @@ Resources:
       BuildMethod: makefile
     Properties:
       CodeUri: postProcessHandler/
-      Handler: dist/index.handler # TODO 
+      Handler: dist/index.handler # TODO
       Runtime: nodejs12.x
       MemorySize: 128
       Timeout: 100
@@ -70,8 +70,40 @@ Resources:
           Type: SQS
           Properties:
             Queue: !GetAtt PostProcessHandlerQueue.Arn
+            BatchSize: 1
 
-    
+  SeenomalyFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      PackageType: Image
+      Timeout: 900
+      MemorySize: 5000
+      Events:
+        Api:
+          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Properties:
+            Path: /Seenomaly
+            Method: post
+            BinaryMediaTypes:
+              - video/mp4
+        SQSQueueEvent:
+          Type: SQS
+          Properties:
+            Queue: !GetAtt SeenomalyQueue.Arn
+            BatchSize: 1
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref JobTable
+        - S3CrudPolicy:
+            BucketName: !Ref SrcBucket
+      Environment:
+        Variables:
+          SRC_BUCKET: !Ref SrcBucket
+    Metadata:
+      Dockerfile: Dockerfile
+      DockerContext: ./seenomaly
+      DockerTag: python3.7-v1
+
   # This is an SQS queue with all default configuration properties. To learn more about the available options, see
   # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-sqs-queues.html
   PostProcessHandlerQueue:
@@ -80,6 +112,11 @@ Resources:
       VisibilityTimeout: 1000
     Type: AWS::SQS::Queue
 
+  SeenomalyQueue:
+    Properties:
+      ReceiveMessageWaitTimeSeconds: 5
+      VisibilityTimeout: 1000
+    Type: AWS::SQS::Queue
 
   # DynamoDB table to store job information
   JobTable:
@@ -91,12 +128,11 @@ Resources:
       ProvisionedThroughput:
         ReadCapacityUnits: 2
         WriteCapacityUnits: 2
-  
-  # S3 bucket 
+
+  # S3 bucket
   SrcBucket:
     Type: AWS::S3::Bucket
 
-    
 Outputs:
   UploadHandlerEndpoint:
     Description: "API Gateway endpoint URL for Prod stage"
@@ -111,5 +147,3 @@ Outputs:
   #   Value: !Ref JobTable
   # PostProcessHandlerQueue:
   #   Value
-  
-
