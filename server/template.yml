@@ -1,13 +1,35 @@
 AWSTemplateFormatVersion: 2010-09-09
 Description: >-
-  sam-app
+  android-visual-testing
 
 # Transform section specifies one or more macros that AWS CloudFormation uses to process your template
 # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/transform-section-structure.html
 Transform:
   - AWS::Serverless-2016-10-31
 
-# Resources declares the AWS resources that you want to include in the stack
+Parameters:
+  deployOwlEye:
+    Type: String
+    AllowedValues:
+      - true
+      - false
+    Default: true
+  deploySeenomaly:
+    Type: String
+    AllowedValues:
+      - true
+      - false
+    Default: true
+
+Conditions:
+  ifDeployOwlEye: !Equals
+    - !Ref deployOwlEye
+    - true
+  ifDeploySeenomaly: !Equals
+    - !Ref deploySeenomaly
+    - true
+
+  # Resources declares the AWS resources that you want to include in the stack
 # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/resources-section-structure.html
 Resources:
   # Each Lambda function is defined by properties:
@@ -42,6 +64,7 @@ Resources:
           Properties:
             Path: /job
             Method: POST
+            RestApiId: !Ref ApiGateway
 
   PostProcessHandler:
     Type: AWS::Serverless::Function
@@ -74,6 +97,7 @@ Resources:
 
   SeenomalyFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Condition: ifDeploySeenomaly
     Properties:
       PackageType: Image
       Timeout: 900
@@ -84,8 +108,7 @@ Resources:
           Properties:
             Path: /Seenomaly
             Method: post
-            BinaryMediaTypes:
-              - video/mp4
+            RestApiId: !Ref ApiGateway
         SQSQueueEvent:
           Type: SQS
           Properties:
@@ -99,6 +122,8 @@ Resources:
       Environment:
         Variables:
           SRC_BUCKET: !Ref SrcBucket
+          JOB_TABLE: !Ref JobTable
+          POST_PROCESS_HANDLER_QUEUE: !Ref PostProcessHandlerQueue
     Metadata:
       Dockerfile: Dockerfile
       DockerContext: ./seenomaly
@@ -133,10 +158,30 @@ Resources:
   SrcBucket:
     Type: AWS::S3::Bucket
 
+  ApiGateway:
+    Properties:
+      Cors:
+        AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+        AllowMethods: "'OPTIONS,POST,GET,DELETE'"
+        AllowCredentials: false
+        AllowOrigin: "'*'"
+      MethodSettings:
+        - DataTraceEnabled: true
+          HttpMethod: "*"
+          LoggingLevel: INFO
+          MetricsEnabled: true
+          ResourcePath: /*
+      # Set OpenApiVersion to suppress awslabs/serverless-application-model#191 (SAM generates an extra "Stage" stage).
+      # Ref: https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-resource-api.html#sam-api-openapiversion
+      # https://github.com/awslabs/serverless-application-model/issues/191#issuecomment-551051431
+      OpenApiVersion: "2.0"
+      StageName: v1
+    Type: AWS::Serverless::Api
+
 Outputs:
   UploadHandlerEndpoint:
     Description: "API Gateway endpoint URL for Prod stage"
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
+    Value: !Sub "https://${RestApiId: !Ref ApiGateway}.execute-api.${AWS::Region}.amazonaws.com/v1/"
   UploadHandlerFunction:
     Value: !Ref UploadHandler
   PostProcessHandlerFuntion:

@@ -3,10 +3,10 @@ import io
 import base64
 import numpy as np
 
-def fromJson(res):
+def fromJson(vid):
     #print(res.status_code)
     #print(len(res.json()))
-    vid = res["body"]
+    #vid = res["body"]
 
     tmp = io.BytesIO(base64.b64decode(vid.encode("utf-8")))
     video = av.open(tmp, "r")
