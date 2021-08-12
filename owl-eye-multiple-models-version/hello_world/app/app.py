@@ -329,7 +329,12 @@ def deprocess_image(img):
 
 
 # ----------------------------------------------------------------------------------------------------#
-
+# needed for CORS, since Lambda Integration is enabled for API Gateway's Integration Request
+CORS_HEADER = {
+            'Access-Control-Allow-Headers': '*',
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': 'OPTIONS,POST,GET'
+        }
 
 def handler(event, context):
 
@@ -422,6 +427,7 @@ def handler(event, context):
 
         return {
             'statusCode': 200,
+            'headers': CORS_HEADER,
             'body': json.dumps(
                 {
                     "predicted_label": 'placeholder',
@@ -436,6 +442,7 @@ def handler(event, context):
     except Exception as e:
         return {
             'statusCode': 502,
+            'headers': CORS_HEADER,
             'body': json.dumps(
                 {
                     "predicted_label": 'placeholder',
