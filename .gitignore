@@ -483,3 +483,7 @@ $RECYCLE.BIN/
 .idea/
 
 owl-eye-multiple-models-version/hello_world/app/opt/
+
+owl-eye-multiple-models-version/samconfig.toml
+
+owl-eye-multiple-models-version/.aws-sam/build.toml
