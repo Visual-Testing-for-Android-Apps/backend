@@ -7,6 +7,24 @@ Description: >-
 Transform:
   - AWS::Serverless-2016-10-31
 
+Globals:
+  Api:
+    Cors:
+      AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+      AllowMethods: "'OPTIONS,POST,GET,DELETE'"
+      AllowCredentials: false
+      AllowOrigin: "'*'"
+    MethodSettings:
+      - DataTraceEnabled: true
+        HttpMethod: "*"
+        LoggingLevel: INFO
+        MetricsEnabled: true
+        ResourcePath: /*
+    # Set OpenApiVersion to suppress awslabs/serverless-application-model#191 (SAM generates an extra "Stage" stage).
+    # Ref: https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-resource-api.html#sam-api-openapiversion
+    # https://github.com/awslabs/serverless-application-model/issues/191#issuecomment-551051431
+    OpenApiVersion: "2.0"
+
 Parameters:
   deployOwlEye:
     Type: String
@@ -19,7 +37,7 @@ Parameters:
     AllowedValues:
       - true
       - false
-    Default: true
+    Default: false
 
 Conditions:
   ifDeployOwlEye: !Equals
@@ -64,7 +82,6 @@ Resources:
           Properties:
             Path: /job
             Method: POST
-            RestApiId: !Ref ApiGateway
 
   PostProcessHandler:
     Type: AWS::Serverless::Function
@@ -108,7 +125,6 @@ Resources:
           Properties:
             Path: /Seenomaly
             Method: post
-            RestApiId: !Ref ApiGateway
         SQSQueueEvent:
           Type: SQS
           Properties:
@@ -158,30 +174,10 @@ Resources:
   SrcBucket:
     Type: AWS::S3::Bucket
 
-  ApiGateway:
-    Properties:
-      Cors:
-        AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
-        AllowMethods: "'OPTIONS,POST,GET,DELETE'"
-        AllowCredentials: false
-        AllowOrigin: "'*'"
-      MethodSettings:
-        - DataTraceEnabled: true
-          HttpMethod: "*"
-          LoggingLevel: INFO
-          MetricsEnabled: true
-          ResourcePath: /*
-      # Set OpenApiVersion to suppress awslabs/serverless-application-model#191 (SAM generates an extra "Stage" stage).
-      # Ref: https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-resource-api.html#sam-api-openapiversion
-      # https://github.com/awslabs/serverless-application-model/issues/191#issuecomment-551051431
-      OpenApiVersion: "2.0"
-      StageName: v1
-    Type: AWS::Serverless::Api
-
 Outputs:
   UploadHandlerEndpoint:
     Description: "API Gateway endpoint URL for Prod stage"
-    Value: !Sub "https://${RestApiId: !Ref ApiGateway}.execute-api.${AWS::Region}.amazonaws.com/v1/"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/v1/"
   UploadHandlerFunction:
     Value: !Ref UploadHandler
   PostProcessHandlerFuntion:

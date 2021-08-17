@@ -3,6 +3,7 @@ import preprocess
 import os
 import json
 import boto3
+import base64
 
 netName = "gan"
 checkpoint = 29471
@@ -11,7 +12,8 @@ def handleRequestFromAPIGateway(event):
     try:
 
         print("start")
-        (x, msg) = use.main(netName, checkpoint, modelDir, preprocess.fromJson(event['body']))
+        videoBytes = base64.b64decode(event['body'].encode("utf-8"))
+        (x, msg) = use.main(netName, checkpoint, modelDir, preprocess.fromJson(videoBytes))
         return {
             "statusCode": 200,
             'headers': {
@@ -43,7 +45,6 @@ def handleRequestFromAPIGateway(event):
 def handleRequestFromSQS(event):
     try:
         # get file location, jobID
-        print(os.environ)
         body = json.loads(event["Records"][0]["body"])
         print("body",body)
         # get file from S3 
@@ -52,9 +53,11 @@ def handleRequestFromSQS(event):
         print("SRC_BUCKET",os.getenv("SRC_BUCKET"))
         key = body["fileKey"]
         response = s3.get_object(Bucket=bucket, Key=key)
-        (x, msg) = use.main(netName, checkpoint, modelDir, preprocess.fromJson(response["Body"]))
+        print(response["Body"])
+        videoBytes = response["Body"].read()
+        (x, msg) = use.main(netName, checkpoint, modelDir, preprocess.fromJson(videoBytes))
         print("msg:" + msg)
-        print("clarification:"+ x)
+        print("clarification:"+ str(x))
         result = {"msg":"a message", "filename":"filename.mp4"}
         # save result to database 
         saveResultToDb(result)
