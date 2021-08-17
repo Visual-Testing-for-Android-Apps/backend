@@ -128,7 +128,21 @@ Resources:
       Dockerfile: Dockerfile
       DockerContext: ./seenomaly
       DockerTag: python3.7-v1
-
+      
+  OwlEyeFunctionv3:
+      Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+      Properties:
+        PackageType: Image
+        Events:
+          HelloWorld:
+            Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+            Properties:
+              Path: /owleye
+              Method: post
+      Metadata:
+        Dockerfile: Dockerfile
+        DockerContext: ./owlEye
+        DockerTag: python3.7-v1
   # This is an SQS queue with all default configuration properties. To learn more about the available options, see
   # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-sqs-queues.html
   PostProcessHandlerQueue:

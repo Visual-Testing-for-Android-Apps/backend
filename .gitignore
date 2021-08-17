@@ -493,3 +493,11 @@ owl-eye-multiple-models-version/hello_world/app/opt/
 owl-eye-multiple-models-version/samconfig.toml
 
 owl-eye-multiple-models-version/.aws-sam/build.toml
+
+server/owl-eye-multiple-models-version/owlEye/app/opt/ml/0model.pth
+
+server/owl-eye-multiple-models-version/owlEye/app/opt/ml/comp-model.pth
+
+server/owl-eye-multiple-models-version/owlEye/app/opt/ml/image-model.pth
+
+server/owl-eye-multiple-models-version/owlEye/app/opt/ml/null-model.pth
