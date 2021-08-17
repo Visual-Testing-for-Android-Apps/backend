@@ -1,0 +1,194 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: >-
+  android-visual-testing
+
+# Transform section specifies one or more macros that AWS CloudFormation uses to process your template
+# https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/transform-section-structure.html
+Transform:
+  - AWS::Serverless-2016-10-31
+
+Parameters:
+  deployOwlEye:
+    Type: String
+    AllowedValues:
+      - true
+      - false
+    Default: true
+  deploySeenomaly:
+    Type: String
+    AllowedValues:
+      - true
+      - false
+    Default: true
+
+Conditions:
+  ifDeployOwlEye: !Equals
+    - !Ref deployOwlEye
+    - true
+  ifDeploySeenomaly: !Equals
+    - !Ref deploySeenomaly
+    - true
+
+  # Resources declares the AWS resources that you want to include in the stack
+# https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/resources-section-structure.html
+Resources:
+  # Each Lambda function is defined by properties:
+  # https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+
+  # This is a Lambda function - uploaderHandler
+  UploadHandler:
+    Type: AWS::Serverless::Function
+    Metadata:
+      BuildMethod: makefile
+    Properties:
+      CodeUri: uploadHandler/
+      Handler: dist/index.handler # TODO
+      Runtime: nodejs12.x
+      MemorySize: 128
+      Timeout: 100
+      Description: Endpoint for uploading image and videos
+      Policies:
+        # Give Create/Read/Update/Delete Permissions to the SampleTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref JobTable
+        - S3CrudPolicy:
+            BucketName: !Ref SrcBucket
+      Environment:
+        Variables:
+          # Make table name accessible as environment variable from function code during execution
+          JOB_TABLE: !Ref JobTable
+          SRC_BUCKET: !Ref SrcBucket
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /job
+            Method: POST
+            RestApiId: !Ref ApiGateway
+
+  PostProcessHandler:
+    Type: AWS::Serverless::Function
+    Metadata:
+      BuildMethod: makefile
+    Properties:
+      CodeUri: postProcessHandler/
+      Handler: dist/index.handler # TODO
+      Runtime: nodejs12.x
+      MemorySize: 128
+      Timeout: 100
+      Description: Endpoint for post processing results
+      Policies:
+        # Give Create/Read/Update/Delete Permissions to the SampleTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref JobTable
+        - S3CrudPolicy:
+            BucketName: !Ref SrcBucket
+      Environment:
+        Variables:
+          # Make table name accessible as environment variable from function code during execution
+          JOB_TABLE: !Ref JobTable
+          SRC_BUCKET: !Ref SrcBucket
+      Events:
+        SQSQueueEvent:
+          Type: SQS
+          Properties:
+            Queue: !GetAtt PostProcessHandlerQueue.Arn
+            BatchSize: 1
+
+  SeenomalyFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Condition: ifDeploySeenomaly
+    Properties:
+      PackageType: Image
+      Timeout: 900
+      MemorySize: 5000
+      Events:
+        Api:
+          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Properties:
+            Path: /Seenomaly
+            Method: post
+            RestApiId: !Ref ApiGateway
+        SQSQueueEvent:
+          Type: SQS
+          Properties:
+            Queue: !GetAtt SeenomalyQueue.Arn
+            BatchSize: 1
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref JobTable
+        - S3CrudPolicy:
+            BucketName: !Ref SrcBucket
+      Environment:
+        Variables:
+          SRC_BUCKET: !Ref SrcBucket
+          JOB_TABLE: !Ref JobTable
+          POST_PROCESS_HANDLER_QUEUE: !Ref PostProcessHandlerQueue
+    Metadata:
+      Dockerfile: Dockerfile
+      DockerContext: ./seenomaly
+      DockerTag: python3.7-v1
+
+  # This is an SQS queue with all default configuration properties. To learn more about the available options, see
+  # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-sqs-queues.html
+  PostProcessHandlerQueue:
+    Properties:
+      ReceiveMessageWaitTimeSeconds: 5
+      VisibilityTimeout: 1000
+    Type: AWS::SQS::Queue
+
+  SeenomalyQueue:
+    Properties:
+      ReceiveMessageWaitTimeSeconds: 5
+      VisibilityTimeout: 1000
+    Type: AWS::SQS::Queue
+
+  # DynamoDB table to store job information
+  JobTable:
+    Type: AWS::Serverless::SimpleTable
+    Properties:
+      PrimaryKey:
+        Name: id
+        Type: String
+      ProvisionedThroughput:
+        ReadCapacityUnits: 2
+        WriteCapacityUnits: 2
+
+  # S3 bucket
+  SrcBucket:
+    Type: AWS::S3::Bucket
+
+  ApiGateway:
+    Properties:
+      Cors:
+        AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+        AllowMethods: "'OPTIONS,POST,GET,DELETE'"
+        AllowCredentials: false
+        AllowOrigin: "'*'"
+      MethodSettings:
+        - DataTraceEnabled: true
+          HttpMethod: "*"
+          LoggingLevel: INFO
+          MetricsEnabled: true
+          ResourcePath: /*
+      # Set OpenApiVersion to suppress awslabs/serverless-application-model#191 (SAM generates an extra "Stage" stage).
+      # Ref: https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-resource-api.html#sam-api-openapiversion
+      # https://github.com/awslabs/serverless-application-model/issues/191#issuecomment-551051431
+      OpenApiVersion: "2.0"
+      StageName: v1
+    Type: AWS::Serverless::Api
+
+Outputs:
+  UploadHandlerEndpoint:
+    Description: "API Gateway endpoint URL for Prod stage"
+    Value: !Sub "https://${RestApiId: !Ref ApiGateway}.execute-api.${AWS::Region}.amazonaws.com/v1/"
+  UploadHandlerFunction:
+    Value: !Ref UploadHandler
+  PostProcessHandlerFuntion:
+    Value: !Ref PostProcessHandler
+  # SrcBucket:
+  #   Value: !Ref SrcBucket
+  # JobTableName:
+  #   Value: !Ref JobTable
+  # PostProcessHandlerQueue:
+  #   Value

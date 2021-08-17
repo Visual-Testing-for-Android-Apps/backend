@@ -60,6 +60,8 @@ jobs:
           VALIDATE_PYTHON_MYPY: false
           VALIDATE_PYTHON_PYLINT: false
           VALIDATE_MARKDOWN: false
+          VALIDATE_SQL: false
+          FILTER_REGEX_EXCLUDE: .*.husky.*
           # Flag to have the linter complete with exit code 0 even if errors were detected.
           # DISABLE_ERRORS: true
 
@@ -88,7 +90,6 @@ jobs:
 
       # - name: Test
       #   run: npm run test --if-present
-
 #   deploy:
 #     name: Deploy to heroku
 #     needs: build

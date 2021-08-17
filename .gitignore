@@ -29,6 +29,12 @@
 # Icon must end with two \r
 Icon
 
+# server
+server/.aws-sam 
+server/samconfig.toml
+
+
+
 
 # Thumbnails
 ._*
