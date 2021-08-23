@@ -6,17 +6,17 @@ jest.mock("./service/dynamodbService");
 
 const mockAddNewJobToDb = addNewJobToDb as jest.Mock;
 describe("main", () => {
-  beforeEach(() => {
-    mockAddNewJobToDb.mockImplementation(() => {
-      return;
-    });
-  });
-  afterEach(() => jest.clearAllMocks());
+	beforeEach(() => {
+		mockAddNewJobToDb.mockImplementation(() => {
+			return;
+		});
+	});
+	afterEach(() => jest.clearAllMocks());
 
-  it("Main", async () => {
-    const mockApiEvent = {} as ApiGatewayEvent;
-    const res = await handler(mockApiEvent);
+	it("Main", async () => {
+		const mockApiEvent = {} as ApiGatewayEvent;
+		const res = await handler(mockApiEvent);
 
-    expect(res).toEqual({ statusCode: 500 });
-  });
+		expect(res).toEqual({ statusCode: 500 });
+	});
 });

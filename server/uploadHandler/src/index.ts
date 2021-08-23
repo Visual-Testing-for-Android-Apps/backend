@@ -1,5 +1,5 @@
-import { createNewJob } from "./createNewJob"
-import { ApiGatewayEvent, ApiGatewayResponse } from "./service/apigateway"
+import { createNewJob } from "./createNewJob";
+import { ApiGatewayEvent, ApiGatewayResponse } from "./service/apigateway";
 
 /**
  * Sample Lambda function which creates an instance of a PostApp and executes it.
@@ -10,20 +10,16 @@ import { ApiGatewayEvent, ApiGatewayResponse } from "./service/apigateway"
  * @returns {Object} object - Object containing the TodoItem stored.
  *
  */
-export const handler = async (
-  event: ApiGatewayEvent
-): Promise<ApiGatewayResponse> => {
-  if (!process.env["JOB_TABLE"]) {
-    console.log(
-      "Lambda environment variables is missing the JOB_TABLE variable is required."
-    );
-    return { statusCode: 500 };
-  }
+export const handler = async (event: ApiGatewayEvent): Promise<ApiGatewayResponse> => {
+	if (!process.env["JOB_TABLE"]) {
+		console.log("Lambda environment variables is missing the JOB_TABLE variable is required.");
+		return { statusCode: 500 };
+	}
 
-  console.log("job_table", process.env["JOB_TABLE"]);
-  console.log("src_bucket", process.env["SRC_BUCKET"]);
-  console.log("region", process.env["AWS_REGION"]);
+	console.log("job_table", process.env["JOB_TABLE"]);
+	console.log("src_bucket", process.env["SRC_BUCKET"]);
+	console.log("region", process.env["AWS_REGION"]);
 
-  await createNewJob(event.body);
-  return { statusCode: 200, body: event.body };
+	await createNewJob(event.body);
+	return { statusCode: 200, body: event.body };
 };
