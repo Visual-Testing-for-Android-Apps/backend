@@ -91,7 +91,7 @@ Resources:
       BuildMethod: makefile
     Properties:
       CodeUri: postProcessHandler/
-      Handler: dist/index.handler # TODO
+      Handler: dist/index.handler # TODO 
       Runtime: nodejs12.x
       MemorySize: 128
       Timeout: 100
@@ -147,6 +147,8 @@ Resources:
   #     DockerContext: ./seenomaly
   #     DockerTag: python3.7-v1
 
+
+    
   # This is an SQS queue with all default configuration properties. To learn more about the available options, see
   # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-sqs-queues.html
   PostProcessHandlerQueue:
@@ -179,7 +181,7 @@ Resources:
 Outputs:
   UploadHandlerEndpoint:
     Description: "API Gateway endpoint URL for Prod stage"
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/v1/"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/prod/"
   UploadHandlerFunction:
     Value: !Ref UploadHandler
   PostProcessHandlerFuntion:
