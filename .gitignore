@@ -30,6 +30,7 @@ Icon
 # server
 server/.aws-sam 
 server/samconfig.toml
+server/seenomaly/lambda/models
 
 
 

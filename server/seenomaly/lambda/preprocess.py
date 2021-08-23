@@ -11,8 +11,8 @@ def fromJson(videoBytes):
     tmp = io.BytesIO(videoBytes)
     video = av.open(tmp, "r")
 
-    print(video)
-    print(video.duration)
+    print("video",video)
+    print("video duration",video.duration)
     step = video.duration//8
     cur = step//2
 

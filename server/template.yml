@@ -24,6 +24,8 @@ Globals:
     # Ref: https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-resource-api.html#sam-api-openapiversion
     # https://github.com/awslabs/serverless-application-model/issues/191#issuecomment-551051431
     OpenApiVersion: "2.0"
+    BinaryMediaTypes:
+      - video/mp4
 
 Parameters:
   deployOwlEye:

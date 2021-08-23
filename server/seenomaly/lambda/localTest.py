@@ -5,7 +5,7 @@ import boto3
 import preprocess
 import use
 
-TEST_VIDEO = "./data/test.mp4"
+TEST_VIDEO = "outfile.mp4"
 
 class testPacket:
     def __init__(self, data):

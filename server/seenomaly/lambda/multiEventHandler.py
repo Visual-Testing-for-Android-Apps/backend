@@ -12,7 +12,7 @@ def handleRequestFromAPIGateway(event):
     try:
 
         print("start")
-        videoBytes = base64.b64decode(event['body'].encode("utf-8"))
+        videoBytes = base64.b64decode(event["body"].encode("utf-8"))
         (x, msg) = use.main(netName, checkpoint, modelDir, preprocess.fromJson(videoBytes))
         return {
             "statusCode": 200,
@@ -27,6 +27,7 @@ def handleRequestFromAPIGateway(event):
             )
         }
     except Exception as e:
+        print(e)
         return {
             "statusCode": 502,
             'headers': {
@@ -56,7 +57,7 @@ def handleRequestFromSQS(event):
         print(response["Body"])
         videoBytes = response["Body"].read()
         (x, msg) = use.main(netName, checkpoint, modelDir, preprocess.fromJson(videoBytes))
-        print("msg:" + msg)
+        print("msg:" + str(msg))
         print("clarification:"+ str(x))
         result = {"msg":"a message", "filename":"filename.mp4"}
         # save result to database 
@@ -66,7 +67,7 @@ def handleRequestFromSQS(event):
         return "successful"
     except Exception as e:
         print(e)
-        return str(e)
+        return e
 
 
 
