@@ -32,12 +32,35 @@ function generate_vid_report(index: number, algResult: number) {
     return res;
 }
 
-function generate_img_report(index: number, filePath: string, algResultPath: string) {
-    // Input: index of img in batch, filepath to original img, filepath to heatmap outputted from Seenomally alg
-    // Output: html string containing image and heatmap
+
+/**
+ * Generates a html report for a given image issue
+ * 
+ * @param index - index of original image in batch
+ * @param filePath - filepath to original image
+ * @param algResultPath - filepath to heatmap outputted from OwlEyes algorithm
+ * @param algResult - issue type code
+ * @returns html string containing image, heatmap, and description
+ */
+function generate_img_report(index: number, filePath: string, algResultPath: string, algResult: number) {
+    let titles: string[] = [
+        "General issue heatmap",  
+        "Null value",
+        "Missing image",
+        "Component occlusion"
+        // no models for blurred screen or text overlap, so no description is needed
+    ]
+    let desc: string[] = [
+        "Heatmap highlights all potential issues",
+        "NULL text is being displayed, instead of the correct information",
+        "A placeholder 'missing/broken image' symbol is displayed, instead of an intended image",
+        "Text is overlapped or obscured by other components"
+    ]
+
     let res = "<h2>Item " + (index) + "</h2>";
     res += "<image src='" + filePath + "'>";
     res += "<image src='" + algResultPath + "'>";
+    res += "<p>" + titles[algResult] + ".<br>" + desc[algResult] + "</p>";
     return res;
 }
 
@@ -55,7 +78,7 @@ function main(jsonString: string) {
         let result = results[i];
 
         if (file.fileType == "image") {
-            res += generate_img_report(i, file.fileReferenceInS3Bucket, result.resultFileReference);
+            res += generate_img_report(i, file.fileReferenceInS3Bucket, result.resultFileReference, result.resultCode);
         } else if (file.fileType == "video") {
             res += generate_vid_report(i, result.resultCode);
         }
