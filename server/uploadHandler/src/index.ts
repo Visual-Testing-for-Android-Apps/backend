@@ -1,5 +1,5 @@
-import { createNewJob } from "./createNewJob";
-import { ApiGatewayEvent, ApiGatewayResponse } from "./service/apigateway";
+import { createNewJob } from "./createNewJob"
+import { ApiGatewayEvent, ApiGatewayResponse } from "./service/apigateway"
 
 /**
  * Sample Lambda function which creates an instance of a PostApp and executes it.
@@ -15,7 +15,7 @@ export const handler = async (
 ): Promise<ApiGatewayResponse> => {
   if (!process.env["JOB_TABLE"]) {
     console.log(
-      "Lambda environment variables is missing the SAMPLE_TABLE variable required."
+      "Lambda environment variables is missing the JOB_TABLE variable is required."
     );
     return { statusCode: 500 };
   }
@@ -24,6 +24,6 @@ export const handler = async (
   console.log("src_bucket", process.env["SRC_BUCKET"]);
   console.log("region", process.env["AWS_REGION"]);
 
-  await createNewJob();
+  await createNewJob(event.body);
   return { statusCode: 200, body: event.body };
 };

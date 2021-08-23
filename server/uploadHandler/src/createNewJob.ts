@@ -1,8 +1,10 @@
-import { addNewJobToDb } from "./service/dynamodbService";
+import { addNewJobToDb } from "./service/dynamodbService"
 
-export const createNewJob = async () => {
+export const createNewJob = async (eventBody: string) => {
+  // TODO differentiate image body and video body 
   console.log("Running uploadHandler");
   // 1. upload files to S3
+  
 
   // 2. save job to DB
   await addNewJobToDb("sample@gmail.com", ["src/v1"], ["src/v2"]);
