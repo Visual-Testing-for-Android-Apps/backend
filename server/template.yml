@@ -114,38 +114,38 @@ Resources:
             Queue: !GetAtt PostProcessHandlerQueue.Arn
             BatchSize: 1
 
-  SeenomalyFunction:
-    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
-    Condition: ifDeploySeenomaly
-    Properties:
-      PackageType: Image
-      Timeout: 900
-      MemorySize: 5000
-      Events:
-        Api:
-          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
-          Properties:
-            Path: /Seenomaly
-            Method: post
-        SQSQueueEvent:
-          Type: SQS
-          Properties:
-            Queue: !GetAtt SeenomalyQueue.Arn
-            BatchSize: 1
-      Policies:
-        - DynamoDBCrudPolicy:
-            TableName: !Ref JobTable
-        - S3CrudPolicy:
-            BucketName: !Ref SrcBucket
-      Environment:
-        Variables:
-          SRC_BUCKET: !Ref SrcBucket
-          JOB_TABLE: !Ref JobTable
-          POST_PROCESS_HANDLER_QUEUE: !Ref PostProcessHandlerQueue
-    Metadata:
-      Dockerfile: Dockerfile
-      DockerContext: ./seenomaly
-      DockerTag: python3.7-v1
+  # SeenomalyFunction:
+  #   Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+  #   Condition: ifDeploySeenomaly
+  #   Properties:
+  #     PackageType: Image
+  #     Timeout: 900
+  #     MemorySize: 5000
+  #     Events:
+  #       Api:
+  #         Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+  #         Properties:
+  #           Path: /Seenomaly
+  #           Method: post
+  #       SQSQueueEvent:
+  #         Type: SQS
+  #         Properties:
+  #           Queue: !GetAtt SeenomalyQueue.Arn
+  #           BatchSize: 1
+  #     Policies:
+  #       - DynamoDBCrudPolicy:
+  #           TableName: !Ref JobTable
+  #       - S3CrudPolicy:
+  #           BucketName: !Ref SrcBucket
+  #     Environment:
+  #       Variables:
+  #         SRC_BUCKET: !Ref SrcBucket
+  #         JOB_TABLE: !Ref JobTable
+  #         POST_PROCESS_HANDLER_QUEUE: !Ref PostProcessHandlerQueue
+  #   Metadata:
+  #     Dockerfile: Dockerfile
+  #     DockerContext: ./seenomaly
+  #     DockerTag: python3.7-v1
 
   # This is an SQS queue with all default configuration properties. To learn more about the available options, see
   # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-sqs-queues.html
