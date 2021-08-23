@@ -1,3 +1,6 @@
+# ####################################################
+# File for testing locally, will not be uploaded to AWS
+# ####################################################
 import app
 import json
 import base64
