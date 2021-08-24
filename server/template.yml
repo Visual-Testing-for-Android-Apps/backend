@@ -130,7 +130,6 @@ Outputs:
   FileCompressApi:
     Description: "API Gateway endpoint URL for Prod stage for file compression function"
     Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/fileCompress/"
-
   # SrcBucket:
   #   Value: !Ref SrcBucket
   # JobTableName:
