@@ -9,10 +9,10 @@ import shutil
 
 def lambda_handler(event, context):
     # Define the constants
-    TABLE_NAME = "test_table"
-    BUCKET_NAME = "visiontestbucket1337"
-    PRIMARY_KEY = "batch_id"
-    LOOKUP_BATCH_ID = event["queryStringParameters"]["batch_id"]
+    TABLE_NAME = os.environ["JOB_TABLE"]
+    BUCKET_NAME = os.environ["SRC_BUCKET"]
+    PRIMARY_KEY = "id"
+    LOOKUP_BATCH_ID = event["queryStringParameters"]["id"]
 
     # Create table and bucket reference
     table = boto3.resource("dynamodb").Table(TABLE_NAME)
