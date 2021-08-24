@@ -9,7 +9,7 @@ export interface file {
 	fileReference: string;
 	fileType: FileType;
 	finishTime: string;
-	fileStatus: fileStatus;
+	fileStatus: FileStatus;
 	resultCode: number;
 	resultFileReference: string;
 }
@@ -19,7 +19,7 @@ export enum FileType {
 	IMAGE = "IMAGE",
 }
 
-export enum fileStatus {
+export enum FileStatus {
 	NEW = "NEW",
 	CRASHED = "CRASHED",
 	DONE = "DONE",
