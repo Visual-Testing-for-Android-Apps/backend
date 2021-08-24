@@ -25,37 +25,45 @@ def lambda_handler(event, context):
     files_json = response["Item"]["files"]
 
     # Create zip file
-    zip_file_path = os.path.join("/tmp/", 'temp_zip.zip')
-    temp_zip = zipfile.ZipFile(zip_file_path, 'w')
+    zip_file_path = os.path.join("/tmp/", "temp_zip.zip")
+    temp_zip = zipfile.ZipFile(zip_file_path, "w")
 
     # Go through each file
     for file in files_json:
 
-        # Get file path for s3 bucket and create file path to store in tmp 
+        # Get file path for s3 bucket and create file path to store in tmp
         file_ref_s3 = file["fileRef"]
-        file_ref_tmp = "/tmp/" + file["fileRef"].split('/')[-1]
+        file_ref_tmp = "/tmp/" + file["fileRef"].split("/")[-1]
 
         # Download the uploaded file
         bucket.download_file(file_ref_s3, file_ref_tmp)
 
         # Add it to the zip file in the uploaded section
-        temp_zip.write(file_ref_tmp, 'uploaded/' + file["fileRef"].split('/')[-1], compress_type = zipfile.ZIP_DEFLATED)
+        temp_zip.write(
+            file_ref_tmp,
+            "uploaded/" + file["fileRef"].split("/")[-1],
+            compress_type=zipfile.ZIP_DEFLATED,
+        )
 
         # Delete the upload file
         os.remove(file_ref_tmp)
 
         # Download the result file is it exists
-        if file['finished']:
+        if file["finished"]:
 
             # Get file path references
             file_ref_s3 = file["resultFileReference"]
-            file_ref_tmp = "/tmp/" + file["resultFileReference"].split('/')[-1]
+            file_ref_tmp = "/tmp/" + file["resultFileReference"].split("/")[-1]
 
             # Download the results file
             bucket.download_file(file_ref_s3, file_ref_tmp)
 
             # Add it to the zip file in the results section
-            temp_zip.write(file_ref_tmp, 'results/' + file["resultFileReference"].split('/')[-1], compress_type = zipfile.ZIP_DEFLATED)
+            temp_zip.write(
+                file_ref_tmp,
+                "results/" + file["resultFileReference"].split("/")[-1],
+                compress_type=zipfile.ZIP_DEFLATED,
+            )
 
             # Delete the results file
             os.remove(file_ref_tmp)
@@ -68,7 +76,7 @@ def lambda_handler(event, context):
     bucket.upload_file(zip_file_path, file_ref_zip_s3)
 
     # Clean out tmp folder
-    for root, dirs, files in os.walk('/tmp'):
+    for root, dirs, files in os.walk("/tmp"):
         for f in files:
             os.unlink(os.path.join(root, f))
         for d in dirs:
@@ -83,8 +91,8 @@ def lambda_handler(event, context):
         Params={"Bucket": BUCKET_NAME, "Key": file_ref_zip_s3},
         ExpiresIn=432000,
     )
-    
-    # Send it 
+
+    # Send it
     return {
         "statusCode": 200,
         "body": json.dumps(
