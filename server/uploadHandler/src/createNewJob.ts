@@ -13,7 +13,7 @@ export const createNewJob = async (eventBody: string, jobID?:string) => {
   await uploadToS3(fileName, stream)
 	// 2. save job to DB
   const id = jobID ?jobID : uuidv4
-	await addNewJobToDb();
+   await addNewJobToDb("sample@gmail.com", ["src/v1"], ["src/v2"]);
 
 	// 3. trigger the seenomaly/owleye lamdbas
 };
