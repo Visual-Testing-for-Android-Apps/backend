@@ -2,9 +2,14 @@
 Script for sending email to user of job results
 code referencing: https://www.cloudmailin.com/blog/sending_and_receiving_email_in_node_2021 
 
+*note when using function you need to add catch for error, 
+i.e. sendMail(<string>, <string>).catch(console.error)
+
 */
 
-import {credentials} from './credentials';
+// import {credentials} from './credentials';
+import dotenv from 'dotenv';
+dotenv.config();
 
 async function sendEmail(emailString: string, htmlResult: string) {
     
@@ -18,8 +23,8 @@ async function sendEmail(emailString: string, htmlResult: string) {
         secure: true,
         requireTLS: true,
         auth: {
-            user: credentials.email,
-            pass: credentials.password,
+            user: process.env.EMAIL,
+            pass: process.env.PASSWORD,
         },
         logger: true
     });
@@ -40,7 +45,7 @@ async function sendEmail(emailString: string, htmlResult: string) {
     // send email with define transport object
     // currently test email
     const info = await transporter.sendMail({
-        from: credentials.email,
+        from: process.env.EMAIL,
         to: emailString,
         subject: "Vision Job Results",
         text: "",

@@ -128,6 +128,7 @@ typings/
 .yarn-integrity
 
 # dotenv environment variables file
+./server/postProcessHandler/env
 .env
 .env.test
 .env*.local
