@@ -36,8 +36,7 @@ def lambda_handler(event, context):
 
         # Get file path for s3 bucket and create file path to store in tmp
         file_ref_s3 = file["fileRef"]
-        file_ref_tmp = os.path.join(
-            tmp_dir_path, os.path.split(file["fileRef"])[-1])
+        file_ref_tmp = os.path.join(tmp_dir_path, os.path.split(file["fileRef"])[-1])
 
         # Download the uploaded file
         bucket.download_file(file_ref_s3, file_ref_tmp)
@@ -55,7 +54,8 @@ def lambda_handler(event, context):
         # Get file path references
         file_ref_s3 = file["resultFileReference"]
         file_ref_tmp = os.path.join(
-            tmp_dir_path, os.path.split(file["resultFileReference"])[-1])
+            tmp_dir_path, os.path.split(file["resultFileReference"])[-1]
+        )
 
         # Download the results file
         bucket.download_file(file_ref_s3, file_ref_tmp)
@@ -82,13 +82,9 @@ def lambda_handler(event, context):
 
     # Update DynamoDB
     table.update_item(
-        Key={
-            PRIMARY_KEY: LOOKUP_BATCH_ID
-        },
+        Key={PRIMARY_KEY: LOOKUP_BATCH_ID},
         UpdateExpression="SET isCompressed = :bool1",
-        ExpressionAttributeValues={
-            ":bool1": True
-        }
+        ExpressionAttributeValues={":bool1": True},
     )
 
     # Clean out tmp folder
