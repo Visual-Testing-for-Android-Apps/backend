@@ -12,7 +12,7 @@ def lambda_handler(event, context):
     BUCKET_NAME = os.environ["SRC_BUCKET"]
     PRIMARY_KEY = "id"
     LOOKUP_BATCH_ID = event["queryStringParameters"]["id"]
-    PRESIGNED_LINK_DURATION = 432000
+    PRESIGNED_LINK_DURATION = 432000 # seconds (up to max of 7 days)
 
     # Create table and bucket reference
     table = boto3.resource("dynamodb").Table(TABLE_NAME)
