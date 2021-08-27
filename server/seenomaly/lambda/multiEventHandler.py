@@ -5,6 +5,13 @@ import json
 import boto3
 import base64
 
+
+CORS_HEADER = {
+            'Access-Control-Allow-Headers': '*',
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': 'OPTIONS,POST,GET'
+        }
+
 netName = "gan"
 checkpoint = 29471
 modelDir = os.getenv("MODEL_DIR", "./models/gan") # local env default to ./models
@@ -16,9 +23,7 @@ def handleRequestFromAPIGateway(event):
         (x, msg) = use.main(netName, checkpoint, modelDir, preprocess.fromJson(videoBytes))
         return {
             "statusCode": 200,
-            'headers': {
-                'Access-Control-Allow-Origin': '*'
-            },
+            "headers": CORS_HEADER,
             "body": json.dumps(
                 {
                     "classification": str(x),
@@ -30,9 +35,7 @@ def handleRequestFromAPIGateway(event):
         print(e)
         return {
             "statusCode": 502,
-            'headers': {
-                'Access-Control-Allow-Origin': '*'
-            },
+            "headers": CORS_HEADER,
             "body": json.dumps(
                 {
                     "classification": "",
