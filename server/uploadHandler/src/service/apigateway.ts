@@ -40,5 +40,5 @@ export interface ApiGatewayRequestContextIdentity {
 export interface ApiGatewayResponse {
 	statusCode: number;
 	body?: string;
-	headers?: {[key:string]:string};
+	headers?: { [key: string]: string };
 }

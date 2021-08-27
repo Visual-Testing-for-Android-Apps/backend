@@ -1,11 +1,11 @@
-import { createNewJob, FileUploadResponseBody } from "./createNewJob"
-import { ApiGatewayEvent, ApiGatewayResponse } from "./service/apigateway"
+import { createNewJob, FileUploadResponseBody } from "./createNewJob";
+import { ApiGatewayEvent, ApiGatewayResponse } from "./service/apigateway";
 
 const CORS_HEADER = {
-	'Access-Control-Allow-Headers': '*',
-	'Access-Control-Allow-Origin': '*',
-	'Access-Control-Allow-Methods': 'OPTIONS,POST,GET'
-}
+	"Access-Control-Allow-Headers": "*",
+	"Access-Control-Allow-Origin": "*",
+	"Access-Control-Allow-Methods": "OPTIONS,POST,GET",
+};
 
 /**
  * Sample Lambda function which creates an instance of a PostApp and executes it.
@@ -18,20 +18,21 @@ const CORS_HEADER = {
  */
 
 export const handler = async (event: ApiGatewayEvent): Promise<ApiGatewayResponse> => {
-	try{
-		const returnBody:FileUploadResponseBody = await createNewJob(event.body);
-		return { 
-			statusCode: 200, 
-			headers:CORS_HEADER,
-			body:  JSON.stringify({
-				returnBody
-			})
+	try {
+		const returnBody: FileUploadResponseBody = await createNewJob(event.body);
+		return {
+			statusCode: 200,
+			headers: CORS_HEADER,
+			body: JSON.stringify({
+				returnBody,
+			}),
 		};
-	}catch (e){
+	} catch (e) {
+		console.log(e);
 		return {
 			statusCode: 502,
-			body: e.message
-		}
+			headers: CORS_HEADER,
+			body: String(e),
+		};
 	}
-
 };
