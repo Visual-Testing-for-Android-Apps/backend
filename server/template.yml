@@ -1,4 +1,5 @@
 AWSTemplateFormatVersion: 2010-09-09
+
 Description: >-
   android-visual-testing
 
@@ -93,12 +94,12 @@ Resources:
             Path: /job
             Method: POST
 
-  PostProcessHandler:
+  JobCompletionStatus:
     Type: AWS::Serverless::Function
     Metadata:
       BuildMethod: makefile
     Properties:
-      CodeUri: postProcessHandler/
+      CodeUri: isJobComplete/
       Handler: dist/index.handler # TODO
       Runtime: nodejs12.x
       MemorySize: 128
@@ -115,6 +116,7 @@ Resources:
           # Make table name accessible as environment variable from function code during execution
           JOB_TABLE: !Ref JobTable
           SRC_BUCKET: !Ref SrcBucket
+          REPORT_GENERATION_QUEUE: !Ref ReportGenerationQueue
       Events:
         SQSQueueEvent:
           Type: SQS
@@ -237,7 +239,13 @@ Resources:
 
   # This is an SQS queue with all default configuration properties. To learn more about the available options, see
   # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-sqs-queues.html
-  PostProcessHandlerQueue:
+  JobCompletionStatusQueue:
+    Properties:
+      ReceiveMessageWaitTimeSeconds: 5
+      VisibilityTimeout: 1000
+    Type: AWS::SQS::Queue
+
+  ReportGenerationQueue:
     Properties:
       ReceiveMessageWaitTimeSeconds: 5
       VisibilityTimeout: 1000
@@ -294,8 +302,8 @@ Outputs:
     Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/prod/"
   UploadHandlerFunction:
     Value: !Ref UploadHandler
-  PostProcessHandlerFuntion:
-    Value: !Ref PostProcessHandler
+  JobCompletionStatusFuntion:
+    Value: !Ref JobCompletionStatus
   FileCompressApi:
     Description: "API Gateway endpoint URL for Prod stage for file compression function"
     Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/fileCompress/"
@@ -305,5 +313,3 @@ Outputs:
   #   Value: !Ref SrcBucket
   # JobTableName:
   #   Value: !Ref JobTable
-  # PostProcessHandlerQueue:
-  #   Value
