@@ -10,16 +10,15 @@ Transform:
 Globals:
   Api:
     Cors:
-      AllowHeaders: 
-        - "*"
-      AllowMethods: 
-        - GET 
-        - POST 
-        - DELETE
-        - OPTIONS
+      AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+      AllowMethods: "'OPTIONS,POST,GET,DELETE'"
       AllowCredentials: false
-      AllowOrigins: 
-        - "*"
+      AllowOrigin: "'*'"
+    BinaryMediaTypes:
+      - video/mp4
+      - image/png
+      - image/jpg
+      - image/jpeg
 
 Parameters:
   deployOwlEye:
@@ -123,8 +122,6 @@ Resources:
           Properties:
             Path: /Seenomaly
             Method: post
-            BinaryMediaTypes:
-              - video/mp4
         SQSQueueEvent:
           Type: SQS
           Properties:
@@ -145,41 +142,41 @@ Resources:
       DockerContext: ./seenomaly
       DockerTag: python3.7-v1
       
-  OwlEyeFunction:
-      Type: AWS::Serverless::Function 
-      Properties:
-        PackageType: Image
-        Timeout: 300
-        MemorySize: 1000
-        Events:
-          Api:
-            Type: Api 
-            Properties:
-              Path: /owleye
-              Method: post
-              BinaryMediaTypes:
-                - image/png
-                - image/jpg
-                - image/jpeg
-          SQSQueueEvent:
-            Type: SQS
-            Properties:
-              Queue: !GetAtt OwlEyeQueue.Arn
-              BatchSize: 1
-      Policies:
-        - DynamoDBCrudPolicy:
-            TableName: !Ref JobTable
-        - S3CrudPolicy:
-            BucketName: !Ref SrcBucket
-      Environment:
-        Variables:
-          SRC_BUCKET: !Ref SrcBucket
-          JOB_TABLE: !Ref JobTable
-          POST_PROCESS_HANDLER_QUEUE: !Ref PostProcessHandlerQueue   
-      Metadata:
-        Dockerfile: Dockerfile
-        DockerContext: ./owlEye
-        DockerTag: python3.7-v1
+  # OwlEyeFunction:
+  #     Type: AWS::Serverless::Function 
+  #     Properties:
+  #       PackageType: Image
+  #       Timeout: 300
+  #       MemorySize: 1000
+  #       Events:
+  #         Api:
+  #           Type: Api 
+  #           Properties:
+  #             Path: /owleye
+  #             Method: post
+  #             BinaryMediaTypes:
+  #               - image/png
+  #               - image/jpg
+  #               - image/jpeg
+  #         SQSQueueEvent:
+  #           Type: SQS
+  #           Properties:
+  #             Queue: !GetAtt OwlEyeQueue.Arn
+  #             BatchSize: 1
+  #     Policies:
+  #       - DynamoDBCrudPolicy:
+  #           TableName: !Ref JobTable
+  #       - S3CrudPolicy:
+  #           BucketName: !Ref SrcBucket
+  #     Environment:
+  #       Variables:
+  #         SRC_BUCKET: !Ref SrcBucket
+  #         JOB_TABLE: !Ref JobTable
+  #         POST_PROCESS_HANDLER_QUEUE: !Ref PostProcessHandlerQueue   
+  #     Metadata:
+  #       Dockerfile: Dockerfile
+  #       DockerContext: ./owlEye
+  #       DockerTag: python3.7-v1
 
   # This is an SQS queue with all default configuration properties. To learn more about the available options, see
   # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-sqs-queues.html

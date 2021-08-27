@@ -1,9 +1,8 @@
-import { SQS } from "aws-sdk";
-import { v4 as uuidv4 } from "uuid";
+import { v4 as uuidv4 } from "uuid"
 
-import { addFileToJob, createNewJobItem } from "./service/dynamodbService";
-import { getUploadedFilesInJob, getUploadURL } from "./service/S3Client";
-import { modelTiggerSqsEvent, sendMessage } from "./service/sqsClient";
+import { addFileToJob, createNewJobItem } from "./service/dynamodbService"
+import { getUploadedFilesInJob, getUploadURL } from "./service/S3Client"
+import { modelTiggerSqsEvent, sendMessage } from "./service/sqsClient"
 
 const seenomalySqsURL = process.env.SEENORMALY_URL as string;
 const videoExtension = ["mp4"];
@@ -26,7 +25,7 @@ export const createNewJob = async (eventBody: string): Promise<FileUploadRespons
 		await sqsTriggerModels(jobID);
 		return { jobID } as FileUploadResponseBody;
 	}
-	const id = jobID ? jobID : uuidv4;
+	const id = jobID ? jobID : uuidv4();
 	console.log("Running uploadHandler");
 	// 1. upload files to S3
 	const randomfileName = Math.round(Math.random() * 10000000);
@@ -39,9 +38,9 @@ export const createNewJob = async (eventBody: string): Promise<FileUploadRespons
 
 	// 2. save job to DB
 	if (!jobID) {
-		await createNewJobItem(id.toString(), email);
+		await createNewJobItem(id, email);
 	}
-	await addFileToJob(id.toString(), fileKey, email);
+	await addFileToJob(id, fileKey, email);
 	return returnBody;
 };
 
