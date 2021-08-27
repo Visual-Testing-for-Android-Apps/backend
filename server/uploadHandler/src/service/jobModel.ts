@@ -7,11 +7,11 @@ export interface job {
 
 export interface file {
 	fileReference: string;
-	fileType: FileType;
-	finishTime: string;
+	fileType: string;
+	finishTime?: string;
 	fileStatus: FileStatus;
-	resultCode: number;
-	resultFileReference: string;
+	resultCode?: number;
+	resultFileReference?: string;
 }
 
 export enum FileType {
