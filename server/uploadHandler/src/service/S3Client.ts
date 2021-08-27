@@ -11,8 +11,6 @@ export const uploadToS3 = (fileName: string, fileStream:string): Promise<any> {
       Body: fileStream
     } as AWS.S3.Types.PutObjectRequest;
   
-    url = s3bucket.getSignedUrlPromise(params)
     return s3bucket.upload(params).promise()
-
     
   }
