@@ -10,20 +10,16 @@ Transform:
 Globals:
   Api:
     Cors:
-      AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
-      AllowMethods: "'OPTIONS,POST,GET,DELETE'"
+      AllowHeaders: 
+        - "*"
+      AllowMethods: 
+        - GET 
+        - POST 
+        - DELETE
+        - OPTIONS
       AllowCredentials: false
-      AllowOrigin: "'*'"
-    MethodSettings:
-      - DataTraceEnabled: true
-        HttpMethod: "*"
-        LoggingLevel: INFO
-        MetricsEnabled: true
-        ResourcePath: /*
-    # Set OpenApiVersion to suppress awslabs/serverless-application-model#191 (SAM generates an extra "Stage" stage).
-    # Ref: https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-resource-api.html#sam-api-openapiversion
-    # https://github.com/awslabs/serverless-application-model/issues/191#issuecomment-551051431
-    OpenApiVersion: "2.0"
+      AllowOrigins: 
+        - "*"
     BinaryMediaTypes:
       - video/mp4
 

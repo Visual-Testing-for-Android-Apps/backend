@@ -3,7 +3,7 @@ import { SendMessageRequest, SendMessageResult } from "aws-sdk/clients/sqs"
 import { PromiseResult } from "aws-sdk/lib/request"
 
 export interface modelTiggerSqsEvent{
-    jobId: string
+    jobID: string
     fileReference: string
 }
 
