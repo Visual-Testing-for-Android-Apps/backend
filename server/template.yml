@@ -213,6 +213,32 @@ Resources:
   #           Path: /fileCompress
   #           Method: get
 
+  ReportGenerator:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: reportGenerator/
+      Handler: src/reportGen.generateReport 
+      Runtime: nodejs12.x
+      Timeout: 100
+      Description: Endpoint for generating HTML report
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref JobTable
+        - S3CrudPolicy:
+            BucketName: !Ref SrcBucket
+      Environment:
+        Variables:
+          # Make names accessible as environment variable from function code during execution
+          JOB_TABLE: !Ref JobTable
+          SRC_BUCKET: !Ref SrcBucket
+          FILE_ZIP_QUEUE: !Ref FileZipQueue
+      # Events:
+        # Specifies the event that trigger this function. Not sure at the moment, so commented out
+        # SQSQueueEvent:
+        #   Type: SQS
+        #   Properties:
+        #     Queue: !GetAtt PostProcessHandlerQueue.Arn
+
   # This is an SQS queue with all default configuration properties. To learn more about the available options, see
   # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-sqs-queues.html
   PostProcessHandlerQueue:
@@ -278,6 +304,9 @@ Outputs:
   FileCompressApi:
     Description: "API Gateway endpoint URL for Prod stage for file compression function"
     Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/fileCompress/"
+  ReportGeneratorFunction:
+    Description: "API Gateway endpoint URL for Prod stage for HTML report generation function"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/reportGenerator/"
   # SrcBucket:
   #   Value: !Ref SrcBucket
   # JobTableName:
