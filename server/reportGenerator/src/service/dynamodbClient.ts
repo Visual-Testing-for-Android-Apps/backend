@@ -1,4 +1,4 @@
-import { AWSError, DynamoDB } from "aws-sdk";
+import { SQS, AWSError, DynamoDB } from "aws-sdk";
 import {
   GetItemInput,
   GetItemOutput,
@@ -9,7 +9,11 @@ import {
   UpdateItemInput,
   UpdateItemOutput,
 } from "aws-sdk/clients/dynamodb";
-export { GetItemInput, GetItemOutput };
+import {
+	SendMessageRequest,
+  SendMessageResult
+} from "aws-sdk/clients/sqs";
+export { GetItemInput, GetItemOutput, SendMessageRequest };
 import { PromiseResult } from "aws-sdk/lib/request";
 import { Agent } from "https";
 
@@ -20,6 +24,11 @@ const dynamoDb = new DynamoDB({
   httpOptions: { agent: new Agent({ maxSockets: 200 }) },
   maxRetries: 3,
   region: awsRegion,
+});
+
+const sqs = new SQS({
+	apiVersion: '2012-11-05',
+	region: awsRegion
 });
 
 export const getItem = (
@@ -41,3 +50,7 @@ export const updateItem = (
   params: UpdateItemInput
 ): Promise<PromiseResult<UpdateItemOutput, AWSError>> =>
   dynamoDb.updateItem(params).promise();
+
+export const pushToQueue = (
+  params: SendMessageRequest
+): Promise<PromiseResult<SendMessageResult, AWSError>> => sqs.sendMessage(params).promise();

@@ -1,5 +1,7 @@
 import { SQSEvent } from "aws-lambda";
-import { getItem, GetItemInput } from "./service/dynamodbClient";
+// import { Lambda, AWS } from "aws-sdk";
+import { getItem, GetItemInput, pushToQueue, SendMessageRequest } from './service/dynamodbClient';
+// import { writeFileSync } from 'fs';
 
 /**
  * Generates a html report for a given image issue
@@ -87,7 +89,7 @@ export const generateReport = async (event: SQSEvent, context: AWSLambda.Context
     };
     const dbRes = await getItem(request);
 
-    let res = "";
+    let res = "<!DOCTYPE html><html lang='en'><head></head><body>";
     if (dbRes.Item != null) {
         const files = dbRes.Item.files;
         if (files.L != null) {
@@ -98,16 +100,52 @@ export const generateReport = async (event: SQSEvent, context: AWSLambda.Context
                     const resultCode = element.M.resultCode.N;
                     const resultFileRef = element.M.resultFileReference.S;
 
-                    if (fileType === "image" && !(fileRef == null || resultFileRef == null || resultCode == null)) {
-                        res += generateImgReport(index, fileRef, resultFileRef, +resultCode);
-                    } else if (fileType === "video" && !(resultCode == null)) {
-                        res += generateVidReport(index, +resultCode);
+                    if (fileType != null && fileRef != null && resultFileRef != null && resultCode != null) {
+                        // Add image/vid string to overall report string
+                        if (fileType === "image") {
+                            res += generateImgReport(index, fileRef, resultFileRef, +resultCode);
+                        } else if (fileType === "video") {
+                            res += generateVidReport(index, +resultCode);
+                        }
+                        res += "<p><br><br></p>";
                     }
-                    res += "<p><br><br></p>";
                 }
             });
         }
     }
+    res += "</body></html>";
+
+    /* Create html file */
+    // const filename = "report.html";
+    // writeFileSync(filename, res, function(err: any) {
+    //     if(err) {
+    //       return console.log(err);
+    //     }
+    // });
+
+    /* Add html file to s3 bucket */
+    // const fileContent = fs.readFileSync(filename);
+    // const s3params = {
+    //     Bucket: process.env.SRC_BUCKET,
+    //     Key: filename, // File name you want to save as in S3
+    //     Body: fileContent
+    // };
+    // const s3 = new AWS.S3({
+    //     accessKeyId: ID,
+    //     secretAccessKey: SECRET
+    // });
+    // s3.upload(s3params);
+
+    /* Add batch to file zip queue */
+    const params: SendMessageRequest = {
+        MessageBody: '{ "queryStringParameters": { "id": "' + String(key) + '" } }', // zipfile accesses event["queryStringParameters"]["id"]
+        QueueUrl: process.env.FILE_ZIP_QUEUE as string,
+    };
+    pushToQueue(params);
+    
     return res;
-    // Call Collins' function?
 };
+
+exports.handler = (event: SQSEvent, context: AWSLambda.Context): Promise<any> => {
+    return generateReport(event, context);
+}
