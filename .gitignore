@@ -3,6 +3,8 @@
 # Created by https://www.toptal.com/developers/gitignore/api/visualstudiocode,linux,macos,node,osx,pycharm,python,vscode,windows
 # Edit at https://www.toptal.com/developers/gitignore?templates=visualstudiocode,linux,macos,node,osx,pycharm,python,vscode,windows
 
+# not push the model 
+
 ### Linux ###
 *~
 
@@ -30,6 +32,8 @@ Icon
 # server
 server/.aws-sam 
 server/samconfig.toml
+server/seenomaly/lambda/models
+
 
 
 
@@ -483,3 +487,19 @@ $RECYCLE.BIN/
 
 # Custom rules (everything added below won't be overriden by 'Generate .gitignore File' if you use 'Update' option)
 
+
+.idea/
+
+owl-eye-multiple-models-version/hello_world/app/opt/
+
+owl-eye-multiple-models-version/samconfig.toml
+
+owl-eye-multiple-models-version/.aws-sam/build.toml
+
+server/owl-eye-multiple-models-version/owlEye/app/opt/ml/0model.pth
+
+server/owl-eye-multiple-models-version/owlEye/app/opt/ml/comp-model.pth
+
+server/owl-eye-multiple-models-version/owlEye/app/opt/ml/image-model.pth
+
+server/owl-eye-multiple-models-version/owlEye/app/opt/ml/null-model.pth
