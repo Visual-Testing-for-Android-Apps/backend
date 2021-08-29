@@ -88,8 +88,6 @@ Resources:
           # Make table name accessible as environment variable from function code during execution
           JOB_TABLE: !Ref JobTable
           SRC_BUCKET: !Ref SrcBucket
-          EMAIL:
-          PASSWORD:
       Events:
         SQSQueueEvent:
           Type: SQS
@@ -105,10 +103,10 @@ Resources:
     Type: AWS::SQS::Queue
 
   SendEmailQueue:
-  Properties:
-    ReceiveMessageWaitTimeSeconds: 5
-    VisibilityTimeout: 1000
-  Type: AWS::SQS::Queue
+    Properties:
+      ReceiveMessageWaitTimeSeconds: 5
+      VisibilityTimeout: 1000
+    Type: AWS::SQS::Queue
 
   # DynamoDB table to store job information
   JobTable:
