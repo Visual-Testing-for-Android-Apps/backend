@@ -1,8 +1,8 @@
-import { v4 as uuidv4 } from "uuid";
+import { v4 as uuidv4 } from "uuid"
 
-import { addFileToJob, createNewJobItem } from "./service/dynamodbService";
-import { getUploadedFilesInJob, getUploadURL } from "./service/S3Client";
-import { modelTiggerSqsEvent, sendMessage } from "./service/sqsClient";
+import { addFileToJob, createNewJobItem } from "./service/dynamodbService"
+import { getUploadedFilesInJob, getUploadURL } from "./service/S3Client"
+import { modelTiggerSqsEvent, sendMessage } from "./service/sqsClient"
 
 const seenomalySqsURL = process.env.SEENORMALY_URL as string;
 const videoExtension = ["mp4"];
@@ -52,12 +52,14 @@ export const createNewJob = async (eventBody: string): Promise<FileUploadRespons
 
 const sqsTriggerModels = async (jobID: string) => {
 	const uploadedFiles = await getUploadedFilesInJob(jobID);
-	for (const fileKey of uploadedFiles) {
+	for (const i=0;i < uploadedFiles.length; i++) {
+		const fileKey = uploadedFiles[i]
 		console.log("fileKey", fileKey);
 		const fileExtension = fileKey.split(".")[1];
 		const event = {
 			jobID,
 			fileKey,
+			fileIdx:i
 		} as modelTiggerSqsEvent;
 
 		if (videoExtension.includes(fileExtension.toLowerCase())) {

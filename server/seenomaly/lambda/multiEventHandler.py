@@ -62,9 +62,14 @@ def handleRequestFromSQS(event):
         (x, msg) = use.main(netName, checkpoint, modelDir, preprocess.fromJson(videoBytes))
         print("msg:" + str(msg))
         print("clarification:"+ str(x))
-        result = {"msg":"a message", "filename":"filename.mp4"}
         # save result to database 
-        saveResultToDb(result)
+        fileIdx = body["fileIdx"]
+        jobID = body["jobID"]
+        result = {
+            "msg":msg,
+            "code":x
+        }
+        saveResultToDb(result, fileIdx, jobID)
         # trigger SQS - postProcessHandle
         submitSQSForm()
         return "successful"
@@ -74,16 +79,20 @@ def handleRequestFromSQS(event):
 
 
 
-def saveResultToDb(result):
-    tablename = os.getenv("JOB_TABLE","visual-testing-backend-v2-JobTable-VCGGLNCXZ70M")
+def saveResultToDb(result,fileIdx, jobID):
+    tablename = os.getenv("JOB_TABLE")
     table = boto3.resource('dynamodb').Table(tablename)
     # update the record. 
     response = table.update_item(
-    Key={'id': "random-id"},
-    UpdateExpression="SET #results = list_append(if_not_exists(#results, :emptyList), :resultMessage)",
-    ExpressionAttributeValues={':resultMessage': [result],":emptyList":[]},
+    Key={'id': jobID},
+    UpdateExpression="SET files["+fileIdx+"].resultCode = :resultCode, files["+fileIdx+"].resultMessage = :resultMessage, files["+fileIdx+"].finished = :finished",
+    ExpressionAttributeValues={
+        ':resultCode': result["code"], 
+        ":finished": True,
+        ":resultMessage":result["msg"]
+    },
     ReturnValues="UPDATED_NEW",
-    ExpressionAttributeNames= {"#results": "results"}
+
     )
     return response
 

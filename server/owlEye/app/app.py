@@ -336,120 +336,96 @@ CORS_HEADER = {
             'Access-Control-Allow-Methods': 'OPTIONS,POST,GET'
         }
 
-def handler(event, context):
-
-    try:
-        image_bytes = event['body'].encode('utf-8')  # here is where the app get the image data in string
-        image = Image.open(BytesIO(base64.b64decode(image_bytes)))  # decode the image string
+def imageProcess(image_bytes):
+    image = Image.open(BytesIO(image_bytes))  # decode the image string
 
 
-        """ python grad_cam.py <path_to_image>
-            1. Loads an image with opencv.
-            2. Preprocesses it for VGG19 and converts to a pytorch variable.
-            3. Makes a forward pass to find the category index with the highest score,
-            and computes intermediate activations.
-            Makes the visualization. """
+    """ python grad_cam.py <path_to_image>
+        1. Loads an image with opencv.
+        2. Preprocesses it for VGG19 and converts to a pytorch variable.
+        3. Makes a forward pass to find the category index with the highest score,
+        and computes intermediate activations.
+        Makes the visualization. """
 
-        # file = os.listdir(image_dir)  # TODO : file is in the input event data
-        # target_dir = 'LOCATION IN S3'  # TODO target dir is some location
-        #
-        # print(file)
-        # (filename, extension) = os.path.splitext(file)
-        # image_num = filename
-        # image_name = image_dir + file
-        # args = get_args()
+    # file = os.listdir(image_dir)  # TODO : file is in the input event data
+    # target_dir = 'LOCATION IN S3'  # TODO target dir is some location
+    #
+    # print(file)
+    # (filename, extension) = os.path.splitext(file)
+    # image_num = filename
+    # image_name = image_dir + file
+    # args = get_args()
 
-        multi_model_directory = os.getenv("MODEL_DIR", './opt/ml/')
-        # this directory will contain 4 models
+    multi_model_directory = os.getenv("MODEL_DIR", './opt/ml/')
+    # this directory will contain 4 models
 
-        models = os.listdir(multi_model_directory)  # get each model
+    models = os.listdir(multi_model_directory)  # get each model
 
-        bug_type = []  # contain the type of the bugs
-        out1 = []
-        idx = 0
+    bug_type = []  # contain the type of the bugs
+    out1 = []
+    idx = 0
 
-        img_res_str = ''
-        for model_file in models:
+    img_res_str = ''
+    for model_file in models:
 
-            model_path = multi_model_directory + model_file
-            model = Net()
-            # model.cuda()
-            model = nn.DataParallel(model)
+        model_path = multi_model_directory + model_file
+        model = Net()
+        # model.cuda()
+        model = nn.DataParallel(model)
 
-            # now the algorithm can run the gpu model
-            model.load_state_dict(torch.load(model_path, torch.device('cpu')))  # TODO : model is in the S3 bucket
+        # now the algorithm can run the gpu model
+        model.load_state_dict(torch.load(model_path, torch.device('cpu')))  # TODO : model is in the S3 bucket
 
-            if model_file == '0model.pth':  # this model is use to detect all the bug in side the image and generate the heatmap
-                grad_cam = GradCam(model=model, target_layer_names=["40"], use_cuda=False)
-                img = np.array(image)
-                img = np.float32(cv2.resize(img, (448, 768))) / 255
+        if model_file == '0model.pth':  # this model is use to detect all the bug in side the image and generate the heatmap
+            grad_cam = GradCam(model=model, target_layer_names=["40"], use_cuda=False)
+            img = np.array(image)
+            img = np.float32(cv2.resize(img, (448, 768))) / 255
 
-                input = preprocess_image(image, True)
-                # print(input.dim())
-                target_index = None
-                mask = grad_cam(input, target_index)
-                # print(mask)
-                img_res = show_cam_on_image(img, mask)
-                # print(img_res)
-                img_res_str = cv2.imencode('.jpg', img_res)[1].tobytes()
+            input = preprocess_image(image, True)
+            # print(input.dim())
+            target_index = None
+            mask = grad_cam(input, target_index)
+            # print(mask)
+            img_res = show_cam_on_image(img, mask)
+            # print(img_res)
+            img_res_str = cv2.imencode('.jpg', img_res)[1].tobytes()
 
-                print("process finish")
+            print("process finish")
 
-            else:  # the rest model is to detect type of bugs
-                model.eval()
-                img_data = preprocess_image(image)
+        else:  # the rest model is to detect type of bugs
+            model.eval()
+            img_data = preprocess_image(image)
 
-                out = model(img_data)
-                out = F.softmax(out, dim=1)
-                out = out.data.cpu().numpy()
-                out2 = out[0]
-                out1.append(out2)
-                imgs_data = []
+            out = model(img_data)
+            out = F.softmax(out, dim=1)
+            out = out.data.cpu().numpy()
+            out2 = out[0]
+            out1.append(out2)
+            imgs_data = []
 
-                out3 = np.array(out1)
+            out3 = np.array(out1)
 
 
 
-                if out3[idx, 0] > out3[idx, 1]:  # found a bug
-                    if model_file == 'null-model.pth':
-                        bug_type.append('Null value')
+            if out3[idx, 0] > out3[idx, 1]:  # found a bug
+                if model_file == 'null-model.pth':
+                    bug_type.append('Null value')
 
 
 
-                    if model_file == 'image-model.pth':
-                        bug_type.append('Missing image')
+                if model_file == 'image-model.pth':
+                    bug_type.append('Missing image')
 
 
-                    if model_file == 'comp-model.pth':
-                        bug_type.append('Component occlusion')
+                if model_file == 'comp-model.pth':
+                    bug_type.append('Component occlusion')
 
-                idx += 1
+            idx += 1
+    
+        res_image = base64.b64encode(img_res_str).decode('utf-8'), # this is the heat map
+    return res_image, bug_type
 
-        return {
-            'statusCode': 200,
-            'headers': CORS_HEADER,
-            'body': json.dumps(
-                {
-                    "predicted_label": 'placeholder',
-                    "original_img": event['body'], # this is the original image
-                    'res_img': base64.b64encode(img_res_str).decode('utf-8'), # this is the heat map
-                    'bug_type': bug_type # contain bug. Currently only have three type of bug
-                    # 'res_img' : img_res_str
-                }
-            )
-        }
 
-    except Exception as e:
-        return {
-            'statusCode': 502,
-            'headers': CORS_HEADER,
-            'body': json.dumps(
-                {
-                    "predicted_label": 'placeholder',
-                    "error_msg": str(e)
-                }
-            )
-        }
 
 # if __name__ == '__main__':
 #     with open('bug.4006.jpg', 'rb') as open_file:
