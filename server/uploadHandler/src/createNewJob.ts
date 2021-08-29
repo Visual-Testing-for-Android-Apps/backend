@@ -1,8 +1,8 @@
-import { v4 as uuidv4 } from "uuid"
+import { v4 as uuidv4 } from "uuid";
 
-import { addFileToJob, createNewJobItem } from "./service/dynamodbService"
-import { getUploadedFilesInJob, getUploadURL } from "./service/S3Client"
-import { modelTiggerSqsEvent, sendMessage } from "./service/sqsClient"
+import { addFileToJob, createNewJobItem } from "./service/dynamodbService";
+import { getUploadedFilesInJob, getUploadURL } from "./service/S3Client";
+import { modelTiggerSqsEvent, sendMessage } from "./service/sqsClient";
 
 const seenomalySqsURL = process.env.SEENORMALY_URL as string;
 const videoExtension = ["mp4"];
@@ -17,19 +17,25 @@ export const createNewJob = async (eventBody: string): Promise<FileUploadRespons
 	// 0. parse event body
 	const parsedBody = JSON.parse(eventBody);
 	const jobID = parsedBody["jobID"];
-	const email = parsedBody["email"];
-	const fileExtension = parsedBody["fileExtension"];
 	const uploadDone = parsedBody["uploadDone"] === "true";
 	// 3. trigger
 	if (uploadDone) {
+		if (!jobID) {
+			throw Error("No jobID provided");
+		}
 		await sqsTriggerModels(jobID);
 		return { jobID } as FileUploadResponseBody;
 	}
+	const email = parsedBody["email"];
+	const fullFileName = parsedBody["fileName"];
+	const [fileName, fileExtension] = fullFileName.split(".");
+
 	const id = jobID ? jobID : uuidv4();
 	console.log("Running uploadHandler");
 	// 1. upload files to S3
 	const randomfileName = Math.round(Math.random() * 10000000);
-	const fileKey = `${id}/${randomfileName}.${fileExtension}`;
+	// append random number to resolve naming conflict, originalName#randomNumber.extension
+	const fileKey = `${id}/${fileName}#${randomfileName}.${fileExtension}`;
 	const uploadUrl = await getUploadURL(fileKey, fileExtension);
 	const returnBody: FileUploadResponseBody = {
 		uploadUrl,
@@ -47,10 +53,11 @@ export const createNewJob = async (eventBody: string): Promise<FileUploadRespons
 const sqsTriggerModels = async (jobID: string) => {
 	const uploadedFiles = await getUploadedFilesInJob(jobID);
 	for (const fileKey of uploadedFiles) {
+		console.log("fileKey", fileKey);
 		const fileExtension = fileKey.split(".")[1];
 		const event = {
 			jobID,
-			fileReference: fileKey,
+			fileKey,
 		} as modelTiggerSqsEvent;
 
 		if (videoExtension.includes(fileExtension.toLowerCase())) {

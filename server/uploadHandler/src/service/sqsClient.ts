@@ -4,13 +4,12 @@ import { PromiseResult } from "aws-sdk/lib/request";
 
 export interface modelTiggerSqsEvent {
 	jobID: string;
-	fileReference: string;
+	fileKey: string;
 }
 
 const sqsClient = new SQS({
 	apiVersion: "2012-11-05",
 	maxRetries: 3,
-	region: "ap-southeast-2",
 });
 
 export const sendMessage = (

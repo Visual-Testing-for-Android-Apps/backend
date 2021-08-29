@@ -1,11 +1,7 @@
-import {
-  Converter,
-  PutItemInput,
-  UpdateItemInput,
-} from "aws-sdk/clients/dynamodb"
+import { Converter, PutItemInput, UpdateItemInput } from "aws-sdk/clients/dynamodb";
 
-import { file, FileStatus } from "../service/jobModel"
-import { putItem, updateItem } from "./dynamodbClient"
+import { file, FileStatus } from "../service/jobModel";
+import { putItem, updateItem } from "./dynamodbClient";
 
 const tableName = process.env.JOB_TABLE as string;
 
@@ -13,9 +9,9 @@ export const createNewJobItem = async (email: string, id: string): Promise<void>
 	const newJobItem = {
 		TableName: tableName,
 		Item: {
-			"id": { S: id },
-			"email": { S: email },
-			"createdAt": { S: new Date().toISOString() },
+			id: { S: id },
+			email: { S: email },
+			createdAt: { S: new Date().toISOString() },
 		},
 	} as PutItemInput;
 	await putItem(newJobItem);
