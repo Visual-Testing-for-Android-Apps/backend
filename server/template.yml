@@ -99,7 +99,7 @@ Resources:
       BuildMethod: makefile
     Properties:
       CodeUri: postProcessHandler/
-      Handler: dist/index.handler # TODO 
+      Handler: dist/index.handler # TODO
       Runtime: nodejs12.x
       MemorySize: 128
       Timeout: 100
@@ -187,6 +187,31 @@ Resources:
   #       DockerContext: ./owlEye
   #       DockerTag: python3.7-v1
 
+  FileCompress:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: fileCompress/
+      Handler: app.lambda_handler
+      Runtime: python3.9
+      Timeout: 10
+      Policies:
+        # Give Create/Read/Update/Delete Permissions to the SampleTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref JobTable
+        - S3CrudPolicy:
+            BucketName: !Ref SrcBucket
+      Environment:
+        Variables:
+          # Make table name accessible as environment variable from function code during execution
+          JOB_TABLE: !Ref JobTable
+          SRC_BUCKET: !Ref SrcBucket
+      Events:
+        FileCompress:
+          Type: Api
+          Properties:
+            Path: /fileCompress
+            Method: get
+
   # This is an SQS queue with all default configuration properties. To learn more about the available options, see
   # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-sqs-queues.html
   PostProcessHandlerQueue:
@@ -241,6 +266,9 @@ Outputs:
     Value: !Ref UploadHandler
   PostProcessHandlerFuntion:
     Value: !Ref PostProcessHandler
+  FileCompressApi:
+    Description: "API Gateway endpoint URL for Prod stage for file compression function"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/fileCompress/"
   # SrcBucket:
   #   Value: !Ref SrcBucket
   # JobTableName:
