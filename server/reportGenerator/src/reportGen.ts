@@ -1,7 +1,6 @@
 import { SQSEvent } from "aws-lambda";
-// import { Lambda, AWS } from "aws-sdk";
+import { AWS } from "aws-sdk";
 import { getItem, GetItemInput, pushToQueue, SendMessageRequest } from './service/dynamodbClient';
-// import { writeFileSync } from 'fs';
 
 /**
  * Generates a html report for a given image issue
@@ -22,7 +21,7 @@ function generateVidReport(index: number, algResult: number): string {
         "Stack multiple snackbars",
         "Lack of shadow",
         "Invisible scrim of modal bottom sheet"
-    ]
+    ];
     const desc: string[] = [
         "The video could not be matched in the sample space. No known design violations detected.",
         "Text and/or images is found to pass through other page elements resulting in some content being hidden from view.",
@@ -34,7 +33,7 @@ function generateVidReport(index: number, algResult: number): string {
         "Multiple snackbars were found to stack on each other hiding some information from the user.",
         "The background lacks shadow when another window appears. This can divert the user's attention away from the window.",
         "UI elements behind a modal bottom sheet lack a visible scrim/filter whilst the bottom sheet is onscreen.  A visible scrim indicates to the user that these elements cannot be interacted with whilst the menu is displayed.",
-    ]
+    ];
 
     let res = "<h2>Item " + index.toString() + "</h2>";
     res += "<p>" + titles[algResult] + "<br>" + desc[algResult] + "</p>";
@@ -58,13 +57,13 @@ function generateImgReport(index: number, filePath: string, algResultPath: strin
         "Missing image",
         "Component occlusion"
         // no models for blurred screen or text overlap, so no description is needed
-    ]
+    ];
     const desc: string[] = [
         "Heatmap highlights all potential issues.",
         "'NULL' text is being displayed, instead of the correct information.",
         "A placeholder 'missing/broken image' symbol is displayed, instead of an intended image.",
         "Text is overlapped or obscured by other components."
-    ]
+    ];
 
     let res = "<h2>Item " + index.toString() + "</h2>";
     res += "<image src='" + filePath + "'>";
@@ -74,6 +73,7 @@ function generateImgReport(index: number, filePath: string, algResultPath: strin
 }
 
 /**
+ * Adds html report for a batch to s3 bucket
  * 
  * @param event 
  * @param context 
@@ -89,10 +89,12 @@ export const generateReport = async (event: SQSEvent, context: AWSLambda.Context
     };
     const dbRes = await getItem(request);
 
-    let res = "<!DOCTYPE html><html lang='en'><head></head><body>";
+    let res = "<!DOCTYPE html><html lang='en'><head></head><body><div>";
     if (dbRes.Item != null) {
         const files = dbRes.Item.files;
         if (files.L != null) {
+
+            // Iterate through each file
             files.L.forEach((element, index) => {
                 if (element.M != null) {
                     const fileRef = element.M.fileRef.S;
@@ -100,9 +102,9 @@ export const generateReport = async (event: SQSEvent, context: AWSLambda.Context
                     const resultCode = element.M.resultCode.N;
                     const resultFileRef = element.M.resultFileReference.S;
 
-                    if (fileType != null && fileRef != null && resultFileRef != null && resultCode != null) {
-                        // Add image/vid string to overall report string
-                        if (fileType === "image") {
+                    // Add image/vid string to overall report string
+                    if (fileType != null && resultCode != null) {
+                        if (fileType === "image" && fileRef != null && resultFileRef != null) {
                             res += generateImgReport(index, fileRef, resultFileRef, +resultCode);
                         } else if (fileType === "video") {
                             res += generateVidReport(index, +resultCode);
@@ -113,28 +115,23 @@ export const generateReport = async (event: SQSEvent, context: AWSLambda.Context
             });
         }
     }
-    res += "</body></html>";
-
-    /* Create html file */
-    // const filename = "report.html";
-    // writeFileSync(filename, res, function(err: any) {
-    //     if(err) {
-    //       return console.log(err);
-    //     }
-    // });
+    res += "</div></body></html>";
 
     /* Add html file to s3 bucket */
-    // const fileContent = fs.readFileSync(filename);
-    // const s3params = {
-    //     Bucket: process.env.SRC_BUCKET,
-    //     Key: filename, // File name you want to save as in S3
-    //     Body: fileContent
-    // };
-    // const s3 = new AWS.S3({
-    //     accessKeyId: ID,
-    //     secretAccessKey: SECRET
-    // });
-    // s3.upload(s3params);
+    const filepath = key + "/report.html";
+    const s3params = {
+        Bucket: process.env.SRC_BUCKET,
+        Key: filepath, // File name you want to save as in S3
+        Body: res
+    };
+    const s3 = new AWS.S3({
+        accessKeyId: process.env.AWS_ACCESS_KEY,
+        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
+    });
+    s3.upload(s3params);
+
+    // AWS_ACCESS_KEY=<your_access_key> AWS_SECRET_ACCESS_KEY=<your_secret_key> node index.js
+
 
     /* Add batch to file zip queue */
     const params: SendMessageRequest = {
