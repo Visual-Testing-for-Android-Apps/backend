@@ -1,9 +1,9 @@
 import { SQSEvent } from "aws-lambda";
-import { AWS } from "aws-sdk";
+import { S3 } from "aws-sdk";
 import { getItem, GetItemInput, pushToQueue, SendMessageRequest } from './service/dynamodbClient';
 
 /**
- * Generates a html report for a given image issue
+ * Generates a html report for a given video issue
  * 
  * @param index - index of original video in batch
  * @param algResult - issue type code
@@ -73,22 +73,25 @@ function generateImgReport(index: number, filePath: string, algResultPath: strin
 }
 
 /**
- * Adds html report for a batch to s3 bucket
+ * Adds html report for a batch to s3 bucket. The function that's run when the lambda function is called.
  * 
- * @param event 
- * @param context 
- * @returns html string describing issues identified for each img/vid
+ * @param event object containing information about the job as defined here: https://docs.aws.amazon.com/lambda/latest/dg/with-sqs.html
+ *              The body attribute is a json object as a string containing job information
+ * @param context object containing information about the invocation, function, and execution environment
+ * @returns html string describing issues identified for each image and/or video
  */
 export const generateReport = async (event: SQSEvent, context: AWSLambda.Context): Promise<any> => {
-    const key: string = JSON.parse(event.Records[0].body).jobKey;
+    // fetch job results from database
+    const key: string = JSON.parse(event.Records[0].body).jobKey;  // queue batchsize = 1, so Records[0].length = 1
     const request: GetItemInput = {
-        TableName: 'JobTable',
+        TableName: process.env.JOB_TABLE, 
         Key: {
             batch_id: { S: key }
         }
     };
     const dbRes = await getItem(request);
 
+    // construct HTML report contents
     let res = "<!DOCTYPE html><html lang='en'><head></head><body><div>";
     if (dbRes.Item != null) {
         const files = dbRes.Item.files;
@@ -124,7 +127,7 @@ export const generateReport = async (event: SQSEvent, context: AWSLambda.Context
         Key: filepath, // File name you want to save as in S3
         Body: res
     };
-    const s3 = new AWS.S3({
+    const s3 = new S3({
         accessKeyId: process.env.AWS_ACCESS_KEY,
         secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
     });
@@ -143,6 +146,8 @@ export const generateReport = async (event: SQSEvent, context: AWSLambda.Context
     return res;
 };
 
-exports.handler = (event: SQSEvent, context: AWSLambda.Context): Promise<any> => {
-    return generateReport(event, context);
-}
+
+// Currently, generateReport is called by the lambda function, so this is unused
+// export const handler = (event: SQSEvent, context: AWSLambda.Context): Promise<any> => {
+//     return generateReport(event, context);
+// }
