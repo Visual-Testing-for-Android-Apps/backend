@@ -255,15 +255,17 @@ Resources:
           JOB_TABLE: !Ref JobTable
           SRC_BUCKET: !Ref SrcBucket
           FILE_ZIP_QUEUE: !Ref FileZipQueue
-      # Events:
-        # Specifies the event that trigger this function. Not sure at the moment, so commented out
-        # SQSQueueEvent:
-        #   Type: SQS
-        #   Properties:
-        #     Queue: !GetAtt PostProcessHandlerQueue.Arn
+      Events:
+        # Specifies the event that trigger this function. 
+        SQSQueueEvent:
+          Type: SQS
+          Properties:
+            Queue: !GetAtt PostProcessHandlerQueue.Arn
+            BatchSize: 1
 
   # This is an SQS queue with all default configuration properties. To learn more about the available options, see
   # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-sqs-queues.html
+  # Queue that triggers report generation
   PostProcessHandlerQueue:
     Properties:
       ReceiveMessageWaitTimeSeconds: 5
@@ -336,11 +338,12 @@ Outputs:
   SendEmailFunction:
     Value: !Ref SendEmail
   ReportGeneratorFunction:
-    Description: "API Gateway endpoint URL for Prod stage for HTML report generation function"
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/reportGenerator/"
-  # SrcBucket:
-  #   Value: !Ref SrcBucket
-  # JobTableName:
-  #   Value: !Ref JobTable
+    Value: !Ref ReportGenerator
+    # Description: "API Gateway endpoint URL for Prod stage for HTML report generation function"
+    # Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/reportGenerator/"
+  SrcBucket:
+    Value: !Ref SrcBucket
+  JobTableName:
+    Value: !Ref JobTable
   # PostProcessHandlerQueue:
   #   Value
