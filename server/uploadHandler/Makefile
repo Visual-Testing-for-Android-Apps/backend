@@ -6,8 +6,8 @@ build-UploadHandler:
 	npm run fast-compile
 	npm run test
 	npm prune --production
-ifeq ($(OS),Windows_NT)
-	Xcopy /E * $(ARTIFACTS_DIR)
-else
-	cp -R * $(ARTIFACTS_DIR)
-endif
+# ifeq ($(OS),Windows_NT)
+# 	Xcopy /E * $(ARTIFACTS_DIR)
+# else
+# 	cp -R * $(ARTIFACTS_DIR)
+# endif

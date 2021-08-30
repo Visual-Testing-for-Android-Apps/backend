@@ -74,6 +74,8 @@ function generateImgReport(index: number, filePath: string, algResultPath: strin
 
 /**
  * Adds html report for a batch to s3 bucket. The function that's run when the lambda function is called.
+ * DynamoDB data is assumed to be in the format defined here: https://github.com/Visual-Testing-for-Android-Apps/backend/issues/15#issuecomment-898450609
+ * with the exception of "batch_id" being "id" instead due to issues.
  * 
  * @param event object containing information about the job as defined here: https://docs.aws.amazon.com/lambda/latest/dg/with-sqs.html
  *              The body attribute is a json object as a string containing job information
@@ -86,7 +88,7 @@ export const generateReport = async (event: SQSEvent, context: AWSLambda.Context
     const request: GetItemInput = {
         TableName: process.env.JOB_TABLE, 
         Key: {
-            batch_id: { S: key }
+            id: { S: key }
         }
     };
     const dbRes = await getItem(request);
