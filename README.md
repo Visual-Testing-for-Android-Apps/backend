@@ -14,7 +14,7 @@ POST https://knfxd86hz7.execute-api.ap-southeast-2.amazonaws.com/Prod/job
 // First file
 {
     "email": "sample_email@gmail.com",
-    "fileName":"test.mp4"
+    "fileName":"test.mp4" // extension is important. 
 }
 
 // Following files 
@@ -63,11 +63,12 @@ Example body format
     "fileKey": the file reference in S3,
     "fileIdx": the file index in the dynmodb files list of the job.
 }
+```
 ✅ Go to cloudwatch/log group to see the the execution logs
 ✅ dynamodb to check if result has been updated 
 ✅ S3 to check if image is saved (only for image model)
 
-```
+
 
 
 

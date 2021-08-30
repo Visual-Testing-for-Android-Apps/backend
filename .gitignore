@@ -33,6 +33,7 @@ Icon
 server/.aws-sam 
 server/samconfig.toml
 server/seenomaly/lambda/models
+server/owlEye/app/opt
 
 
 
