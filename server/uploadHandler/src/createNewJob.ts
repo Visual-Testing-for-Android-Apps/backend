@@ -5,6 +5,7 @@ import { getUploadedFilesInJob, getUploadURL } from "./service/S3Client"
 import { modelTiggerSqsEvent, sendMessage } from "./service/sqsClient"
 
 const seenomalySqsURL = process.env.SEENORMALY_URL as string;
+const owlEyeSqsURL = process.env.OWLEUE_URL as string;
 const videoExtension = ["mp4"];
 const imageExtension = ["jpg", "jpeg"];
 
@@ -28,14 +29,12 @@ export const createNewJob = async (eventBody: string): Promise<FileUploadRespons
 	}
 	const email = parsedBody["email"];
 	const fullFileName = parsedBody["fileName"];
-	const [fileName, fileExtension] = fullFileName.split(".");
+	const [_, fileExtension] = fullFileName.split(".");
 
 	const id = jobID ? jobID : uuidv4();
 	console.log("Running uploadHandler");
 	// 1. upload files to S3
-	const randomfileName = Math.round(Math.random() * 10000000);
-	// append random number to resolve naming conflict, originalName#randomNumber.extension
-	const fileKey = `${id}/${fileName}#${randomfileName}.${fileExtension}`;
+	const fileKey = generateFileKey(fullFileName, id)
 	const uploadUrl = await getUploadURL(fileKey, fileExtension);
 	const returnBody: FileUploadResponseBody = {
 		uploadUrl,
@@ -52,28 +51,26 @@ export const createNewJob = async (eventBody: string): Promise<FileUploadRespons
 
 const sqsTriggerModels = async (jobID: string) => {
 	const uploadedFiles = await getUploadedFilesInJob(jobID);
-	for (const i=0;i < uploadedFiles.length; i++) {
-		const fileKey = uploadedFiles[i]
+	for (let i = 0; i < uploadedFiles.length; i++) {
+		const fileKey = uploadedFiles[i];
 		console.log("fileKey", fileKey);
 		const fileExtension = fileKey.split(".")[1];
 		const event = {
 			jobID,
 			fileKey,
-			fileIdx:i
+			fileIdx: i,
 		} as modelTiggerSqsEvent;
 
 		if (videoExtension.includes(fileExtension.toLowerCase())) {
+			console.log("send message to seenomaly");
 			await sendMessage(event, seenomalySqsURL);
 			return;
 		}
 
 		// TODO get URL trigger for owl-eye
 		if (imageExtension.includes(fileExtension.toLowerCase())) {
-			// await sendMessage(
-			//   event,
-			//   seenomalySqsURL
-			// )
 			console.log("send message to owl-eye");
+			await sendMessage(event, owlEyeSqsURL);
 			return;
 		}
 
@@ -86,3 +83,14 @@ const sqsTriggerModels = async (jobID: string) => {
 		);
 	}
 };
+
+const generateFileKey = (fullFileName:string, jobID:string): string =>{
+	const [_, fileExtension] = fullFileName.split(".");
+	const randomfileName = Math.round(Math.random() * 10000000);
+	// append random number to resolve naming conflict, originalName#randomNumber.extension
+	const fileKey = `${jobID}/${randomfileName}.${fileExtension}`;
+	console.log("fileKey",fileKey)
+	return fileKey
+
+
+}

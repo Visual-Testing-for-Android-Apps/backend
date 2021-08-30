@@ -1,20 +1,11 @@
 import base64
 import json
-from io import BytesIO
-import torch
-from PIL import Image, ImageFile
+from PIL import ImageFile
 
 ImageFile.LOAD_TRUNCATED_IMAGES = True
 import os
-import torch.utils.data as data
-import torchvision.transforms as transforms
-import cv2
-import numpy as np
-from torch.autograd import Function, Variable
 
 ImageFile.LOAD_TRUNCATED_IMAGES = True
-import torch.nn.functional as F
-import torch.nn as nn
 from app import * 
 import boto3
 
@@ -71,7 +62,7 @@ def handleRequestFromSQS(event):
         imageBytes = response["Body"].read()
         res_image, bug_type = imageProcess(base64.b64decode(imageBytes))
         # 3. save result to dynamoDB
-        fileIdx = body["fileIdx"]
+        fileIdx = int(body["fileIdx"])
         jobID = body["jobID"]
         saveResultToDb(bug_type, fileIdx, jobID)
         # 4. save image to S3 

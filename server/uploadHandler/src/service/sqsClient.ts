@@ -1,11 +1,11 @@
-import { AWSError, SQS } from "aws-sdk"
-import { SendMessageRequest, SendMessageResult } from "aws-sdk/clients/sqs"
-import { PromiseResult } from "aws-sdk/lib/request"
+import { AWSError, SQS } from "aws-sdk";
+import { SendMessageRequest, SendMessageResult } from "aws-sdk/clients/sqs";
+import { PromiseResult } from "aws-sdk/lib/request";
 
 export interface modelTiggerSqsEvent {
 	jobID: string;
 	fileKey: string;
-	fileIdx: Number;
+	fileIdx: number;
 }
 
 const sqsClient = new SQS({

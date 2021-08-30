@@ -1,4 +1,4 @@
-import * as AWS from "aws-sdk";
+import * as AWS from "aws-sdk"
 
 const BUCKET_NAME = process.env["SRC_BUCKET"];
 const URL_EXPIRATION_SECONDS = 300;
@@ -52,11 +52,11 @@ export const getUploadedFilesInJob = async (jobId: string): Promise<string[]> =>
 };
 
 const getContentType = (fileExtension: string) => {
-	if (videoExtension.includes(fileExtension.toLocaleLowerCase())) {
+	if (videoExtension.includes(fileExtension.toLowerCase())) {
 		return "video/mp4";
 	}
-	if (imageExtension.includes(fileExtension.toLocaleLowerCase())) {
-		return `image/${fileExtension.toLocaleLowerCase}`;
+	if (imageExtension.includes(fileExtension.toLowerCase())) {
+		return `image/${fileExtension.toLowerCase()}`;
 	}
 	throw Error(
 		JSON.stringify({
