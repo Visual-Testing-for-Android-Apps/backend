@@ -129,11 +129,14 @@ export const generateReport = async (event: SQSEvent, context: AWSLambda.Context
         Key: filepath, // File name you want to save as in S3
         Body: res
     };
+
     const s3 = new S3({
         accessKeyId: process.env.AWS_ACCESS_KEY,
         secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
     });
-    s3.upload(s3params);
+
+    // await because if the lambda function terminates before the upload is finished, it won't complete
+    await s3.upload(s3params).promise();
 
     // AWS_ACCESS_KEY=<your_access_key> AWS_SECRET_ACCESS_KEY=<your_secret_key> node index.js
 
