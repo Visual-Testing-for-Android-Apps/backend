@@ -14,8 +14,10 @@ CORS_HEADER = {
             'Access-Control-Allow-Origin': '*',
             'Access-Control-Allow-Methods': 'OPTIONS,POST,GET'
         }
+TABLE_NAME =  os.getenv("JOB_TABLE")
+DBClient = boto3.resource('dynamodb').Table(TABLE_NAME)
 
-def handler(event):
+def handler(event, context):
     # check event header 
     if "httpMethod" in event and event["httpMethod"] =="POST":
         return handleRequestFromAPIGateway(event)
@@ -51,35 +53,54 @@ def handleRequestFromAPIGateway(event):
 
 def handleRequestFromSQS(event):
     try:
+        body = json.loads(event["Records"][0]["body"])
+        fileIdx = int(body["fileIdx"])
+        jobID = body["jobID"]
+        key = body["fileKey"]
+        # 0. validate 
+        validateFileStatus(jobID, fileIdx, key)
         # 0. init clients 
         s3 = boto3.client('s3')
         bucket = os.getenv("SRC_BUCKET", "visual-testing-backend-v2-srcbucket-p3rsmcrs75qa")
-        # 1. get file location, jobID
-        body = json.loads(event["Records"][0]["body"])
-        key = body["fileKey"]
+        # 1. get file in S3
         response = s3.get_object(Bucket=bucket, Key=key)
         # 2. parse response + run model
         imageBytes = response["Body"].read()
-        res_image, bug_type = imageProcess(base64.b64decode(imageBytes))
+        res_image, bug_type = imageProcess(imageBytes)
         # 3. save result to dynamoDB
-        fileIdx = int(body["fileIdx"])
-        jobID = body["jobID"]
         saveResultToDb(bug_type, fileIdx, jobID)
         # 4. save image to S3 
         s3.upload(Bucket=bucket, key="result/result_" + key, body=res_image)
         # (TODO) 5. trigger SQS - postProcessHandle
+        return "successful"
 
     except Exception as e:
         print(e)
-        return e
+        return str(e)
+
+def validateFileStatus(jobID, fileIdx, fileKey):
+    fileRec = getFile(jobID, fileIdx)
+    if fileRec.finished:
+        raise Exception("File is already processed")
+    if fileRec.fileReference != fileKey:
+        raise Exception("Inconsistent fileKey, fileKey received: {}, fileKey in DB: {}".format(fileKey,fileRec.fileReference))
+
+
+def getFile(jobID, fileIdx):
+    response = DBClient.get_item(Key={"id":jobID})
+    item = response["Item"]
+    print("item: " + json.dumps(item))
+    if not item.files:
+        raise Exception("not files in job")
+    if fileIdx >= len(item.files):
+        raise Exception("Invalid fileIdx")
+    return item.files[fileIdx]
 
 def saveResultToDb(result,fileIdx, jobID):
-    tablename = os.getenv("JOB_TABLE")
-    table = boto3.resource('dynamodb').Table(tablename)
     # update the record. 
-    response = table.update_item(
+    response = DBClient.update_item(
     Key={'id': jobID},
-    UpdateExpression="SET files["+fileIdx+"].resultMessage = :resultMessage, files["+fileIdx+"].finished = :finished",
+    UpdateExpression="SET files["+str(fileIdx)+"].resultMessage = :resultMessage, files["+str(fileIdx)+"].finished = :finished",
     ExpressionAttributeValues={':resultMessage': result, ":finished": True},
     ReturnValues="UPDATED_NEW",
     )

@@ -173,45 +173,45 @@ Resources:
             Properties:
               Queue: !GetAtt OwlEyeQueue.Arn
               BatchSize: 1
-      Policies:
-        - DynamoDBCrudPolicy:
-            TableName: !Ref JobTable
-        - S3CrudPolicy:
-            BucketName: !Ref SrcBucket
-      Environment:
-        Variables:
-          SRC_BUCKET: !Ref SrcBucket
-          JOB_TABLE: !Ref JobTable
-          POST_PROCESS_HANDLER_QUEUE: !Ref PostProcessHandlerQueue   
+        Policies:
+          - DynamoDBCrudPolicy:
+              TableName: !Ref JobTable
+          - S3CrudPolicy:
+              BucketName: !Ref SrcBucket
+        Environment:
+          Variables:
+            SRC_BUCKET: !Ref SrcBucket
+            JOB_TABLE: !Ref JobTable
+            POST_PROCESS_HANDLER_QUEUE: !Ref PostProcessHandlerQueue   
       Metadata:
         Dockerfile: Dockerfile
         DockerContext: ./owlEye
         DockerTag: python3.7-v1
 
-  FileCompress:
-    Type: AWS::Serverless::Function
-    Properties:
-      CodeUri: fileCompress/
-      Handler: app.lambda_handler
-      Runtime: python3.7
-      Timeout: 10
-      Policies:
-        # Give Create/Read/Update/Delete Permissions to the SampleTable
-        - DynamoDBCrudPolicy:
-            TableName: !Ref JobTable
-        - S3CrudPolicy:
-            BucketName: !Ref SrcBucket
-      Environment:
-        Variables:
-          # Make table name accessible as environment variable from function code during execution
-          JOB_TABLE: !Ref JobTable
-          SRC_BUCKET: !Ref SrcBucket
-      Events:
-        FileCompress:
-          Type: Api
-          Properties:
-            Path: /fileCompress
-            Method: get
+  # FileCompress:
+  #   Type: AWS::Serverless::Function
+  #   Properties:
+  #     CodeUri: fileCompress/
+  #     Handler: app.lambda_handler
+  #     Runtime: python3.7
+  #     Timeout: 10
+  #     Policies:
+  #       # Give Create/Read/Update/Delete Permissions to the SampleTable
+  #       - DynamoDBCrudPolicy:
+  #           TableName: !Ref JobTable
+  #       - S3CrudPolicy:
+  #           BucketName: !Ref SrcBucket
+  #     Environment:
+  #       Variables:
+  #         # Make table name accessible as environment variable from function code during execution
+  #         JOB_TABLE: !Ref JobTable
+  #         SRC_BUCKET: !Ref SrcBucket
+  #     Events:
+  #       FileCompress:
+  #         Type: Api
+  #         Properties:
+  #           Path: /fileCompress
+  #           Method: get
 
   # This is an SQS queue with all default configuration properties. To learn more about the available options, see
   # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-sqs-queues.html

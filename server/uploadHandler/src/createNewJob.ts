@@ -45,7 +45,7 @@ export const createNewJob = async (eventBody: string): Promise<FileUploadRespons
 	if (!jobID) {
 		await createNewJobItem(id, email);
 	}
-	await addFileToJob(id, fileKey, email);
+	await addFileToJob(id, fileKey, fileExtension);
 	return returnBody;
 };
 
@@ -62,14 +62,14 @@ const sqsTriggerModels = async (jobID: string) => {
 		} as modelTiggerSqsEvent;
 
 		if (videoExtension.includes(fileExtension.toLowerCase())) {
-			console.log("send message to seenomaly");
+			console.log("send message to seenomaly", event);
 			await sendMessage(event, seenomalySqsURL);
 			return;
 		}
 
 		// TODO get URL trigger for owl-eye
 		if (imageExtension.includes(fileExtension.toLowerCase())) {
-			console.log("send message to owl-eye");
+			console.log("send message to owl-eye", event);
 			await sendMessage(event, owlEyeSqsURL);
 			return;
 		}

@@ -49,6 +49,7 @@ def handleRequestFromAPIGateway(event):
 
 def handleRequestFromSQS(event):
     try:
+        print("raw body: " + event["Records"][0]["body"])
         # get file location, jobID
         body = json.loads(event["Records"][0]["body"])
         fileIdx = int(body["fileIdx"])
@@ -91,6 +92,7 @@ def validateFileStatus(jobID, fileIdx, fileKey):
 def getFile(jobID, fileIdx):
     response = DBClient.get_item(Key={"id":jobID})
     item = response["Item"]
+    print("item: " + item)
     if not item.files:
         raise Exception("not files in job")
     if fileIdx >= len(item.files):
