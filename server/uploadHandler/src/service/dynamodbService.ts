@@ -4,7 +4,7 @@ import {
   UpdateItemInput,
 } from "aws-sdk/clients/dynamodb"
 
-import { File, FileStatus } from "../service/jobModel"
+import { File } from "../service/jobModel"
 import { putItem, updateItem } from "./dynamodbClient"
 
 const tableName = process.env.JOB_TABLE as string;
