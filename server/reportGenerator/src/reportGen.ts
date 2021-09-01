@@ -73,12 +73,12 @@ function generateImgReport(index: number, filePath: string, algResultPath: strin
 }
 
 /**
- * Adds html report for a batch to s3 bucket. The function that's run when the lambda function is called.
- * DynamoDB data is assumed to be in the format defined here: https://github.com/Visual-Testing-for-Android-Apps/backend/issues/15#issuecomment-898450609
+ * Adds html report for a batch to s3 bucket, then adds the batch to a queue for file zipping.
+ * The report is saved in the bucket as <batch_id>/report.html
+ * DynamoDB data about a batch is assumed to be in the format defined here: https://github.com/Visual-Testing-for-Android-Apps/backend/issues/15#issuecomment-898450609
  * with the exception of "batch_id" being "id" instead due to issues.
  * 
- * @param event object containing information about the job as defined here: https://docs.aws.amazon.com/lambda/latest/dg/with-sqs.html
- *              The body attribute is a json object as a string containing job information
+ * @param event object containing information about the job. Its body attribute is a stringified json object containing a batch's id as jobKey
  * @param context object containing information about the invocation, function, and execution environment
  * @returns html string describing issues identified for each image and/or video
  */
@@ -122,7 +122,7 @@ export const generateReport = async (event: SQSEvent, context: AWSLambda.Context
     }
     res += "</div></body></html>";
 
-    /* Add html file to s3 bucket */
+    // Add html file to s3 bucket
     const filepath = key + "/report.html";
     const s3params = {
         Bucket: process.env.SRC_BUCKET,
@@ -135,13 +135,10 @@ export const generateReport = async (event: SQSEvent, context: AWSLambda.Context
         secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
     });
 
-    // await because if the lambda function terminates before the upload is finished, it won't complete
+    // need to await, otherwise if the lambda function terminates before the upload is finished, it won't complete
     await s3.upload(s3params).promise();
 
-    // AWS_ACCESS_KEY=<your_access_key> AWS_SECRET_ACCESS_KEY=<your_secret_key> node index.js
-
-
-    /* Add batch to file zip queue */
+    // Add batch to file zip queue
     const params: SendMessageRequest = {
         MessageBody: '{ "queryStringParameters": { "id": "' + String(key) + '" } }', // zipfile accesses event["queryStringParameters"]["id"]
         QueueUrl: process.env.FILE_ZIP_QUEUE as string,
@@ -150,9 +147,3 @@ export const generateReport = async (event: SQSEvent, context: AWSLambda.Context
     
     return res;
 };
-
-
-// Currently, generateReport is called by the lambda function, so this is unused
-// export const handler = (event: SQSEvent, context: AWSLambda.Context): Promise<any> => {
-//     return generateReport(event, context);
-// }
