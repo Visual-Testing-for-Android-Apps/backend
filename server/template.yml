@@ -17,7 +17,6 @@ Globals:
     BinaryMediaTypes:
       - video/mp4
       - image/png
-      - image/jpg
       - image/jpeg
 
 Parameters:

@@ -1,6 +1,12 @@
 import { v4 as uuidv4 } from "uuid"
 
 import { addFileToJob, createNewJobItem } from "./service/dynamodbService"
+import {
+  extensionToContentType,
+  File,
+  FileStatus,
+  getFileType,
+} from "./service/jobModel"
 import { getUploadedFilesInJob, getUploadURL } from "./service/S3Client"
 import { modelTiggerSqsEvent, sendMessage } from "./service/sqsClient"
 
@@ -10,42 +16,46 @@ const videoExtension = ["mp4"];
 const imageExtension = ["jpg", "jpeg"];
 
 export interface FileUploadResponseBody {
-	uploadUrl?: string;
+	uploadUrls: {[key:string]:string};
 	jobID: string;
 }
 
 export const createNewJob = async (eventBody: string): Promise<FileUploadResponseBody> => {
 	// 0. parse event body
 	const parsedBody = JSON.parse(eventBody);
-	const jobID = parsedBody["jobID"];
+	const recievedJobID = parsedBody["jobID"];
 	const uploadDone = parsedBody["uploadDone"] === "true";
 	// 3. trigger
 	if (uploadDone) {
-		if (!jobID) {
+		if (!recievedJobID) {
 			throw Error("No jobID provided");
 		}
-		await sqsTriggerModels(jobID);
-		return { jobID } as FileUploadResponseBody;
+		await sqsTriggerModels(recievedJobID);
+		return { jobID: recievedJobID } as FileUploadResponseBody;
 	}
 	const email = parsedBody["email"];
-	const fullFileName = parsedBody["fileName"];
-	const [_, fileExtension] = fullFileName.split(".");
-
-	const id = jobID ? jobID : uuidv4();
-	console.log("Running uploadHandler");
-	// 1. upload files to S3
-	const fileKey = generateFileKey(fullFileName, id)
-	const uploadUrl = await getUploadURL(fileKey, fileExtension);
+	const fileNames = parsedBody["fileNames"];
+	const jobID = recievedJobID ? recievedJobID : uuidv4();
 	const returnBody: FileUploadResponseBody = {
-		uploadUrl,
-		jobID: id,
+		jobID,
+		uploadUrls: {}
 	};
-
 	// 2. save job to DB
-	if (!jobID) {
-		await createNewJobItem(id, email);
+	if (!recievedJobID) {
+		await createNewJobItem(jobID, email);
 	}
-	await addFileToJob(id, fileKey, fileExtension);
+	for (const fileName of fileNames){
+		const file = initFile(fileName, jobID)
+		// 1. generate preSigned Url for files to S3
+		const uploadUrl = await getUploadURL(file.s3Key, file.contentType);
+		// 2. save job to DB
+		await addFileToJob(jobID, file);
+		returnBody.uploadUrls[fileName] = uploadUrl
+
+	}
+
+	console.log("Running uploadHandler");
+	
 	return returnBody;
 };
 
@@ -84,13 +94,21 @@ const sqsTriggerModels = async (jobID: string) => {
 	}
 };
 
-const generateFileKey = (fullFileName:string, jobID:string): string =>{
-	const [_, fileExtension] = fullFileName.split(".");
+
+const initFile = (fileName:string, jobID:string): File => {
+	const fileExtension = fileName.split(".").pop();
+	if (typeof fileExtension == "undefined"){
+		throw Error("Can't find file extension")
+	}
 	const randomfileName = Math.round(Math.random() * 10000000);
-	// append random number to resolve naming conflict, originalName#randomNumber.extension
-	const fileKey = `${jobID}/${randomfileName}.${fileExtension}`;
-	console.log("fileKey",fileKey)
-	return fileKey
+	const s3Key = `${jobID}/${randomfileName}.${fileExtension}`;
+	const file:File = {
+		contentType: extensionToContentType[fileExtension],
+		s3Key,
+		type: getFileType(fileExtension),
+		orginalName: fileName, 
+		status:FileStatus.NEW,
+	}
+	return file
 
-
-}
+} 

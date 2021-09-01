@@ -11,7 +11,7 @@ CORS_HEADER = {
             'Access-Control-Allow-Origin': '*',
             'Access-Control-Allow-Methods': 'OPTIONS,POST,GET'
         }
-TABLE_NAME =  os.getenv("JOB_TABLE")
+TABLE_NAME =  os.environ["JOB_TABLE"]
 DBClient = boto3.resource('dynamodb').Table(TABLE_NAME)
 netName = "gan"
 checkpoint = 29471
@@ -60,8 +60,8 @@ def handleRequestFromSQS(event):
         validateFileStatus(jobID, fileIdx, key)
         # get file from S3 
         s3 = boto3.client('s3')
-        bucket = os.getenv("SRC_BUCKET", "visual-testing-backend-v2-srcbucket-p3rsmcrs75qa")
-        print("SRC_BUCKET",os.getenv("SRC_BUCKET"))
+        bucket = os.environ["SRC_BUCKET"]
+        print("SRC_BUCKET", bucket)
         response = s3.get_object(Bucket=bucket, Key=key)
         print(response["Body"])
         videoBytes = response["Body"].read()
@@ -118,7 +118,7 @@ def saveResultToDb(result,fileIdx, jobID):
 def submitSQSForm():
     # Create SQS client
     sqs = boto3.client('sqs')
-    queue_url = os.getenv('POST_PROCESS_HANDLER_QUEUE')
+    queue_url = os.environ['POST_PROCESS_HANDLER_QUEUE']
     print('POST_PROCESS_HANDLER_QUEUE', queue_url)
     # Send message to SQS queue
     response = sqs.send_message(
