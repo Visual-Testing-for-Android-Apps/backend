@@ -90,11 +90,11 @@ def getFile(jobID, fileIdx):
     response = DBClient.get_item(Key={"id":jobID})
     item = response["Item"]
     print("item: " + json.dumps(item))
-    if not item.files:
-        raise Exception("not files in job")
-    if fileIdx >= len(item.files):
+    if not item["files"]:
+        raise Exception("no files in job")
+    if fileIdx >= len(item["files"]):
         raise Exception("Invalid fileIdx")
-    return item.files[fileIdx]
+    return item["files"][fileIdx]
 
 def saveResultToDb(result,fileIdx, jobID):
     # update the record. 

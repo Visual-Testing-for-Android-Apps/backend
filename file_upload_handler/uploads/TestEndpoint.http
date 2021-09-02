@@ -28,18 +28,18 @@ content-type: application/json
 
 
 
-###
+### request upload 
 POST https://knfxd86hz7.execute-api.ap-southeast-2.amazonaws.com/Prod/job HTTP/1.1
 content-type: application/json
 
-{"email": "sample_email@gmail.com","fileName":"test_instagram.mp4"}
+{"email": "sample_email@gmail.com","fileNames":["test_instagram.mp4", "test.jpg"]}
 
 
-### 
+### upload completion
 POST https://knfxd86hz7.execute-api.ap-southeast-2.amazonaws.com/Prod/job HTTP/1.1
 content-type: application/json
 
-{"email": "sample_email@gmail.com","fileName":"test.jpeg","jobID":"e59d4681-3207-467c-a477-cc934f154e2c"}
+{"jobID":"e59d4681-3207-467c-a477-cc934f154e2c", "uploadDone":"true"}
 
 ### 
 
