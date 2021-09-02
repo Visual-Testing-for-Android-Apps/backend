@@ -56,6 +56,9 @@ Resources:
       Timeout: 100
       Description: Endpoint for post processing results
       Policies:
+        #Allow us to push to the next queue
+        - SQSSendMessagePolicy:
+            QueueName: !Ref ReportGenerationQueue
         # Give Create/Read/Update/Delete Permissions to the SampleTable
         - DynamoDBCrudPolicy:
             TableName: !Ref JobTable
@@ -72,6 +75,7 @@ Resources:
           Type: SQS
           Properties:
             Queue: !GetAtt JobCompletionStatusQueue.Arn
+
 
   FileCompress:
     Type: AWS::Serverless::Function
@@ -105,6 +109,21 @@ Resources:
       ReceiveMessageWaitTimeSeconds: 5
       VisibilityTimeout: 1000
     Type: AWS::SQS::Queue
+
+  # EventInvokeConfig:
+  #   Type: AWS::Lambda::EventInvokeConfig
+  #   Properties:
+  #       Policies:
+  #         #Allow us to push to the next queue
+  #         - SQSSendMessagePolicy:
+  #             QueueName: !Ref ReportGenerationQueue
+  #       FunctionName: !Ref JobCompletionStatus
+  #       Qualifier: "$LATEST"
+  #       DestinationConfig:
+  #           OnSuccess:
+  #               Destination: !GetAtt ReportGenerationQueue.Arn
+  #           OnFailure:
+  #               Destination: !GetAtt ReportGenerationQueue.Arn
 
   ReportGenerationQueue:
     Properties:
