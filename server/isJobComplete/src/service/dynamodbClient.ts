@@ -44,7 +44,6 @@ export const updateItem = (
 	params: UpdateItemInput
 ): Promise<PromiseResult<UpdateItemOutput, AWSError>> => dynamoDb.updateItem(params).promise();
 
-
 export const pushToQueue = (
 	params: SendMessageRequest
 ): Promise<PromiseResult<SendMessageResult, AWSError>> => sqs.sendMessage(params).promise();
