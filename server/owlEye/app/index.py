@@ -52,38 +52,41 @@ def handleRequestFromAPIGateway(event):
         }
 
 def handleRequestFromSQS(event):
-    try:
-        body = json.loads(event["Records"][0]["body"])
-        fileIdx = int(body["fileIdx"])
-        jobID = body["jobID"]
-        key = body["fileKey"]
-        # 0. validate 
-        validateFileStatus(jobID, fileIdx, key)
-        # 0. init clients 
-        s3 = boto3.client('s3')
-        bucket = os.environ["SRC_BUCKET"]
-        # 1. get file in S3
-        response = s3.get_object(Bucket=bucket, Key=key)
-        # 2. parse response + run model
-        imageBytes = response["Body"].read()
-        res_image, bug_type = imageProcess(imageBytes)
-        # 3. save result to dynamoDB
-        saveResultToDb(bug_type, fileIdx, jobID)
-        # 4. save image to S3 
-        s3.upload(Bucket=bucket, key="result/result_" + key, body=res_image)
-        # (TODO) 5. trigger SQS - postProcessHandle
-        return "successful"
 
-    except Exception as e:
-        print(e)
-        return str(e)
+    body = json.loads(event["Records"][0]["body"])
+    fileIdx = int(body["fileIdx"])
+    jobID = body["jobID"]
+    key = body["fileKey"]
+    # 0. validate 
+    validateFileStatus(jobID, fileIdx, key)
+    # 0. init clients 
+    s3 = boto3.client('s3')
+    bucket = os.environ["SRC_BUCKET"]
+    # 1. get file in S3
+    print("get file from s3...")
+    response = s3.get_object(Bucket=bucket, Key=key)
+    # 2. parse response + run model
+    print("run model ...")
+    imageBytes = response["Body"].read()
+    res_image, bug_type = imageProcess(imageBytes)
+    # 3. save image to S3 
+    print("save result image to s3 ...")
+    resultKey = jobID + "/result/result_" + key.split("/")[-1]
+    s3.put_object(Bucket=bucket, Key=resultKey, Body=res_image)
+    # 4. save result to dynamoDB
+    print("save result to db...")
+    saveResultToDb(bug_type, fileIdx, jobID, resultKey)
+    # (TODO) 5. trigger SQS - postProcessHandle
+    return "successful"
+
+ 
 
 def validateFileStatus(jobID, fileIdx, fileKey):
     fileRec = getFile(jobID, fileIdx)
-    if fileRec.finished:
+    if fileRec["status"] != "NEW":
         raise Exception("File is already processed")
-    if fileRec.fileReference != fileKey:
-        raise Exception("Inconsistent fileKey, fileKey received: {}, fileKey in DB: {}".format(fileKey,fileRec.fileReference))
+    if fileRec["s3Key"] != fileKey:
+        raise Exception("Inconsistent fileKey, fileKey received: {}, fileKey in DB: {}".format(fileKey,fileRec["s3Key"]))
 
 
 def getFile(jobID, fileIdx):
@@ -96,12 +99,17 @@ def getFile(jobID, fileIdx):
         raise Exception("Invalid fileIdx")
     return item["files"][fileIdx]
 
-def saveResultToDb(result,fileIdx, jobID):
+def saveResultToDb(result,fileIdx, jobID,resultKey):
     # update the record. 
     response = DBClient.update_item(
     Key={'id': jobID},
-    UpdateExpression="SET files["+str(fileIdx)+"].resultMessage = :resultMessage, files["+str(fileIdx)+"].finished = :finished",
-    ExpressionAttributeValues={':resultMessage': result, ":finished": True},
+    ExpressionAttributeNames= { "#status": "status" },
+    UpdateExpression="SET files["+str(fileIdx)+"].resultMessage = :resultMessage," 
+                        + "files["+str(fileIdx)+"].#status = :status,"
+                        + "files["+str(fileIdx)+"].s3KeyHeatMap = :s3KeyHeatMap,",
+    ExpressionAttributeValues={':resultMessage': result, 
+                                ":status": "DONE", 
+                                ":s3KeyHeatMap":resultKey},
     ReturnValues="UPDATED_NEW",
     )
     return response

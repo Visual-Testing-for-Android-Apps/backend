@@ -13,7 +13,7 @@ import { modelTiggerSqsEvent, sendMessage } from "./service/sqsClient"
 const seenomalySqsURL = process.env.SEENORMALY_URL as string;
 const owlEyeSqsURL = process.env.OWLEUE_URL as string;
 const videoExtension = ["mp4"];
-const imageExtension = ["jpg", "jpeg"];
+const imageExtension = ["jpg", "jpeg", "png"];
 
 export interface FileUploadResponseBody {
 	uploadUrls: {[key:string]:string};
@@ -74,14 +74,14 @@ const sqsTriggerModels = async (jobID: string) => {
 		if (videoExtension.includes(fileExtension.toLowerCase())) {
 			console.log("send message to seenomaly", event);
 			await sendMessage(event, seenomalySqsURL);
-			return;
+			continue;
 		}
 
 		// TODO get URL trigger for owl-eye
 		if (imageExtension.includes(fileExtension.toLowerCase())) {
 			console.log("send message to owl-eye", event);
 			await sendMessage(event, owlEyeSqsURL);
-			return;
+			continue;
 		}
 
 		throw Error(
