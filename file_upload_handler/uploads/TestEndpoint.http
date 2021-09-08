@@ -28,11 +28,24 @@ content-type: application/json
 
 
 
-###
+### request upload 
 POST https://knfxd86hz7.execute-api.ap-southeast-2.amazonaws.com/Prod/job HTTP/1.1
 content-type: application/json
 
-{"email": "sample_email@gmail.com","fileName":"test.mp4"}
+{"email": "beining0026@gmail.com","fileNames":["test_instagram.mp4", "test.jpg"]}
+
+### request verification code
+POST https://knfxd86hz7.execute-api.ap-southeast-2.amazonaws.com/Prod/job HTTP/1.1
+content-type: application/json
+
+{"jobID": "7d4dd335-ce8b-49c4-a90c-e5fc5d22d40e","verificationCode":"589807"}
+
+
+### upload completion
+POST https://knfxd86hz7.execute-api.ap-southeast-2.amazonaws.com/Prod/job HTTP/1.1
+content-type: application/json
+
+{"jobID":"7d4dd335-ce8b-49c4-a90c-e5fc5d22d40e", "uploadDone":"true"}
 
 ### 
 

@@ -48,14 +48,19 @@ def handleRequestFromAPIGateway(event):
 
 def handleRequestFromSQS(event):
     try:
+        print("raw body: " + event["Records"][0]["body"])
         # get file location, jobID
         body = json.loads(event["Records"][0]["body"])
+        fileIdx = int(body["fileIdx"])
+        jobID = body["jobID"]
+        key = body["fileKey"]
         print("body",body)
+        # check file status 
+        validateFileStatus(jobID, fileIdx, key)
         # get file from S3 
         s3 = boto3.client('s3')
-        bucket = os.getenv("SRC_BUCKET", "visual-testing-backend-v2-srcbucket-p3rsmcrs75qa")
-        print("SRC_BUCKET",os.getenv("SRC_BUCKET"))
-        key = body["fileKey"]
+        bucket = os.environ["SRC_BUCKET"]
+        print("SRC_BUCKET", bucket)
         response = s3.get_object(Bucket=bucket, Key=key)
         print(response["Body"])
         videoBytes = response["Body"].read()
@@ -63,8 +68,6 @@ def handleRequestFromSQS(event):
         print("msg:" + str(msg))
         print("clarification:"+ str(x))
         # save result to database 
-        fileIdx = body["fileIdx"]
-        jobID = body["jobID"]
         result = {
             "msg":msg,
             "code":x
@@ -74,8 +77,15 @@ def handleRequestFromSQS(event):
         submitSQSForm()
         return "successful"
     except Exception as e:
-        print(e)
-        return e
+        print(str(e))
+        return str(e)
+ 
+def validateFileStatus(jobID, fileIdx, fileKey):
+    fileRec = getFile(jobID, fileIdx)
+    if fileRec["status"] != "NEW":
+        raise Exception("File is already processed")
+    if fileRec["s3Key"] != fileKey:
+        raise Exception("Inconsistent fileKey, fileKey received: {}, fileKey in DB: {}".format(fileKey,fileRec["s3Key"]))
 
 
 
@@ -87,9 +97,9 @@ def saveResultToDb(result,fileIdx, jobID):
     Key={'id': jobID},
     UpdateExpression="SET files["+fileIdx+"].resultCode = :resultCode, files["+fileIdx+"].resultMessage = :resultMessage, files["+fileIdx+"].finished = :finished",
     ExpressionAttributeValues={
-        ':resultCode': result["code"], 
-        ":finished": True,
-        ":resultMessage":result["msg"]
+        ':resultCode':  str(result["code"]), 
+        ":status": "DONE",
+        ":resultMessage": result["msg"]
     },
     ReturnValues="UPDATED_NEW",
 

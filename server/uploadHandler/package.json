@@ -26,6 +26,7 @@
   },
   "dependencies": {
     "aws-sdk": "^2.809.0",
+    "crypto-secure-random-digit": "^1.0.9",
     "uuid": "^3.3.2"
   }
 }
