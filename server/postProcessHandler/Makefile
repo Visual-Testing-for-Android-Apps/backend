@@ -6,9 +6,9 @@ build-PostProcessHandler:
 	npm run fast-compile
 	npm run test
 	npm prune --production
-# ifeq ($(OS),Windows_NT)
-# 	Xcopy /E * $(ARTIFACTS_DIR)
-# else
-# 	cp -r dist "$(ARTIFACTS_DIR)/"
+ifeq ($(OS),Windows_NT)
+	Xcopy /E * "$(ARTIFACTS_DIR)"
+else
+	cp -r dist "$(ARTIFACTS_DIR)/"
 	
-# endif
+endif
