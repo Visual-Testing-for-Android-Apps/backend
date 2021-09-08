@@ -1,4 +1,4 @@
-build-PostProcessHandler:
+build-ReportGenerator:
 	npm install
 # workaround https://github.com/aws/aws-sam-cli/issues/2565
 	npm rebuild
@@ -7,7 +7,7 @@ build-PostProcessHandler:
 	npm run test
 	npm prune --production
 ifeq ($(OS),Windows_NT)
-	Xcopy /E * $(ARTIFACTS_DIR)
+	Xcopy /E * "$(ARTIFACTS_DIR)"
 else
 	cp -r dist "$(ARTIFACTS_DIR)/"
 	
