@@ -64,7 +64,10 @@ const sqsTriggerModels = async (jobID: string) => {
 	for (let i = 0; i < uploadedFiles.length; i++) {
 		const fileKey = uploadedFiles[i];
 		console.log("fileKey", fileKey);
-		const fileExtension = fileKey.split(".")[1];
+		const fileExtension = fileKey.split(".").pop();
+		if (typeof fileExtension == "undefined"){
+			throw Error("Can't find file extension")
+		}
 		const event = {
 			jobID,
 			fileKey,
