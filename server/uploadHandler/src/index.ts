@@ -1,5 +1,5 @@
-import { createNewJob, FileUploadResponseBody } from "./createNewJob"
-import { ApiGatewayEvent, ApiGatewayResponse } from "./service/apigateway"
+import { createNewJob, FileUploadResponseBody } from "./createNewJob";
+import { ApiGatewayEvent, ApiGatewayResponse } from "./service/apigateway";
 
 const CORS_HEADER = {
 	"Access-Control-Allow-Headers": "*",

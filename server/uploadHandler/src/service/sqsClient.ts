@@ -5,7 +5,7 @@ import { PromiseResult } from "aws-sdk/lib/request"
 export interface modelTiggerSqsEvent {
 	jobID: string;
 	fileKey: string;
-	fileIdx: Number;
+	fileIdx: number;
 }
 
 const sqsClient = new SQS({
