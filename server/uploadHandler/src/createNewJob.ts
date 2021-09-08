@@ -40,10 +40,8 @@ export const createNewJob = async (eventBody: string): Promise<FileUploadRespons
 		jobID,
 		uploadUrls: {}
 	};
-	// 2. save job to DB
-	if (!recievedJobID) {
-		await createNewJobItem(jobID, email);
-	}
+	// 2. create new job record in db
+	await createNewJobItem(jobID, email);
 	for (const fileName of fileNames){
 		const file = initFile(fileName, jobID)
 		// 1. generate preSigned Url for files to S3

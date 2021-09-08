@@ -9,7 +9,7 @@ import { putItem, updateItem } from "./dynamodbClient"
 
 const tableName = process.env.JOB_TABLE as string;
 
-export const createNewJobItem = async (email: string, id: string): Promise<void> => {
+export const createNewJobItem = async ( id: string,email: string): Promise<void> => {
 	const newJobItem = {
 		TableName: tableName,
 		Item: {

@@ -72,6 +72,7 @@ def handleRequestFromSQS(event):
     # 3. save image to S3 
     print("save result image to s3 ...")
     resultKey = jobID + "/result/result_" + key.split("/")[-1]
+    print("res_image: " + res_image)
     s3.put_object(Bucket=bucket, Key=resultKey, Body=res_image)
     # 4. save result to dynamoDB
     print("save result to db...")
