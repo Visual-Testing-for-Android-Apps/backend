@@ -2,17 +2,14 @@
 Script for sending email to user of job results
 code referencing: https://www.cloudmailin.com/blog/sending_and_receiving_email_in_node_2021
 
-*note when using function you need to add catch for error,
-i.e. sendMail(<string>, <string>).catch(console.error)
-
 */
 
 import { SQSEvent } from "aws-lambda";
 import { getItem, GetItemInput } from "./service/dynamodbClient";
 import { AttributeMap } from "aws-sdk/clients/dynamodb";
 import dotenv from "dotenv";
-let nodemailer = require("nodemailer"); // import nodemailer to use
-dotenv.config();
+import nodemailer from "nodemailer";
+dotenv.config(); // configure environment vars
 
 export const awaitJob = async (request: GetItemInput): Promise<AttributeMap | null> => {
 	const res = await getItem(request);
@@ -35,47 +32,49 @@ export const sendEmail = async (event: SQSEvent, context: AWSLambda.Context): Pr
 			id: { S: key },
 		},
 	};
-	const res = await awaitJob(request); // wait for job
+	// make request, store result in res
+	const res = await awaitJob(request);
 
-	// check if result exists with email and link, will add: && res?.link?.S
-	if (res?.email?.S != null) {
-		// get email and link from job
+	// checks that email and results exist
+	if (res?.email?.S != null && res?.resultsURL?.S != null) {
+		// get email and results from job
 		const emailString = res.email.S;
-		const htmlResult = res.link.S;
+		const htmlResult = res.resultsURL.S;
 
 		// create transport for email
 		const transporter = nodemailer.createTransport({
 			host: hostname,
 			port: 465, // secure -> 465, not secure -> 587
-			secure: true,
+			secure: true, // use SSL
 			requireTLS: true,
 			auth: {
 				user: process.env.EMAIL,
 				pass: process.env.PASSWORD,
 			},
-			logger: true,
 		});
 
-		// verify connection
 		console.log("verifying transporter...");
-		/*
-    transporter.verify(function (error, success) {
-        if (error) {
-        console.log(error);
-        } else {
-        console.log("Server is ready to take our messages");
-        }
-    });
-    */
+		// verify connection
+		transporter.verify(function (error, success) {
+			if (error) {
+				console.log(error);
+			} else {
+				console.log("Server is ready to take our messages");
+			}
+		});
 
 		console.log("sending email...");
 		// send email with defined transport object
 		const info = await transporter.sendMail({
 			from: process.env.EMAIL,
 			to: emailString,
-			subject: "Vision Job Results",
+			subject: "<p>Vision Job Results<p>",
 			text: "",
-			html: htmlResult,
+			html:
+				'<p>Job Processing Complete. <br>Your <a href="' +
+				htmlResult +
+				'">Job Results</a> are now available.</p>' +
+				"<br><p>Thanks for using Vision!</p>",
 		});
 
 		// log response
