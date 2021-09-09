@@ -4,14 +4,14 @@ import { randomDigits } from "crypto-secure-random-digit"
 import {
   getEmailVerification,
   saveVerificationCode,
-  updateEmailToVerified,
+  updateEmailVerified,
 } from "./dynamodbService"
 
 const ses = new SES();
 const EXPIRE_DURATION  = 500; // in seconds
+const isProd = process.env['IS_PROD'] === "true"
 
-
-export const handlerNewEmailSes = async (jobID:string ,emailAddress:string) => {
+export const handleNewEmailSes = async (jobID:string ,emailAddress:string) => {
     const verificationCode = randomDigits(6).join('');
     Promise.all([
         sendVerificationCodeEmail(emailAddress, verificationCode),
@@ -27,6 +27,13 @@ export const checkVerificationCode = async (jobID:string, userVerificationCode:s
     const currentTime = new Date();
     const verifyTime = new Date(savedVerification.createdAt);
     const timeDiff = Math.abs(verifyTime.getTime() - currentTime.getTime())/1000; // in seconds
+    
+    // skip checking code for non-production mode
+    if (!isProd){
+        await updateEmailVerified(jobID, true)
+        return true 
+    }
+
     if (timeDiff > EXPIRE_DURATION){
         console.log("timestamp expired", {
             timeDiff,
@@ -44,7 +51,7 @@ export const checkVerificationCode = async (jobID:string, userVerificationCode:s
         return false;
     }
     // update db 
-    await updateEmailToVerified(jobID)
+    await updateEmailVerified(jobID,true)
 
     return true
 
@@ -74,5 +81,15 @@ const sendVerificationCodeEmail = async (emailAddress: string, verificationCode:
         },
         Source: process.env.SES_FROM_ADDRESS!
     };
+    if (!isProd){
+        //  catch email validation error if not in production environment
+        console.log("sending verification code...")
+        try{
+            await ses.sendEmail(params).promise();
+        }catch (e) {
+            console.log(JSON.stringify(e))
+        }
+        return 
+    }
     await ses.sendEmail(params).promise();
 }

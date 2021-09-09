@@ -36,13 +36,9 @@ export const createNewJobItem = async ( id: string,email: string): Promise<void>
 	await putItem(newJobItem);
 };
 
-export const addFileToJob = async (id: string, fileKey: string, fileType: string) => {
-	const fileElement: file = {
-		fileReference: fileKey,
-		fileStatus: FileStatus.NEW,
-		fileType,
-	};
-	const fileElementAttrMap = Converter.marshall(fileElement);
+
+export const addFileToJob = async (id: string, file:File) => {
+	const fileElementAttrMap = Converter.marshall(file);
 	const updateItemInput = {
 		ExpressionAttributeNames: { "#files": "files" },
 		ExpressionAttributeValues: {
@@ -85,10 +81,10 @@ export const getEmailVerification = async (id:string): Promise<EmailVerification
 	return Converter.unmarshall(ret.Item!).emailVerification as EmailVerification;
 }
 
-export const updateEmailToVerified = async (id:string) => {
+export const updateEmailVerified = async (id:string, verified:boolean) => {
 	const updateItemInput = {
 		ExpressionAttributeNames: { "#emailVerified": "emailVerified" },
-		ExpressionAttributeValues: {":emailVerified":{BOOL:true}},
+		ExpressionAttributeValues: {":emailVerified":{BOOL:verified}},
 		Key: { id: { S: id } },
 		ReturnValues: "UPDATED_NEW",
 		TableName: tableName,
@@ -97,3 +93,27 @@ export const updateEmailToVerified = async (id:string) => {
 	await updateItem(updateItemInput);
 }
 
+
+export const updateEmail = async (id:string, newEmail:string) => {
+	const updateItemInput = {
+		ExpressionAttributeNames: { "#email": "email", "#emailVerified": "emailVerified" },
+		ExpressionAttributeValues: {":email":{S:newEmail},":emailVerified":{BOOL:false}},
+		Key: { id: { S: id } },
+		ReturnValues: "UPDATED_NEW",
+		TableName: tableName,
+		UpdateExpression: "SET #email=:email, #emailVerified=:emailVerified",
+	} as UpdateItemInput;
+	await updateItem(updateItemInput);
+}
+
+export const getEmail = async (id:string):Promise<string> => {
+	const getItemInput: GetItemInput = {
+		TableName:tableName,
+		Key: {id : {S:id}},
+		ProjectionExpression: "email"
+	}
+
+	const ret = await getItem(getItemInput);
+	console.log(ret)
+	return Converter.unmarshall(ret.Item!).email;
+}

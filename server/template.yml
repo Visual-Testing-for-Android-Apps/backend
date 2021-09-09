@@ -33,6 +33,12 @@ Parameters:
       - true
       - false
     Default: false
+  isProd:
+      Type: String
+      AllowedValues:
+      - true
+      - false
+      Default: false
 
 Conditions:
   ifDeployOwlEye: !Equals
@@ -91,12 +97,20 @@ Resources:
           SEENORMALY_URL: !Ref SeenomalyQueue
           OWLEUE_URL: !Ref OwlEyeQueue
           SES_FROM_ADDRESS: vtaa.report.response@gmail.com
+          IS_PROD: !Ref isProd
       Events:
         Api:
           Type: Api
           Properties:
             Path: /job
             Method: POST
+        ProxiedApi:
+            Type: Api
+            Properties:
+              Path: /job/{proxy+}
+              Method: POST
+
+        
 
   PostProcessHandler:
     Type: AWS::Serverless::Function
