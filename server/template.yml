@@ -20,29 +20,29 @@ Globals:
       - image/jpg
       - image/jpeg
 
-Parameters:
-  deployOwlEye:
-    Type: String
-    AllowedValues:
-      - true
-      - false
-    Default: true
-  deploySeenomaly:
-    Type: String
-    AllowedValues:
-      - true
-      - false
-    Default: false
+# Parameters:
+#   deployOwlEye:
+#     Type: String
+#     AllowedValues:
+#       - true
+#       - false
+#     Default: true
+#   deploySeenomaly:
+#     Type: String
+#     AllowedValues:
+#       - true
+#       - false
+#     Default: false
 
-Conditions:
-  ifDeployOwlEye: !Equals
-    - !Ref deployOwlEye
-    - true
-  ifDeploySeenomaly: !Equals
-    - !Ref deploySeenomaly
-    - true
+# Conditions:
+#   ifDeployOwlEye: !Equals
+#     - !Ref deployOwlEye
+#     - true
+#   ifDeploySeenomaly: !Equals
+#     - !Ref deploySeenomaly
+#     - true
 
-  # Resources declares the AWS resources that you want to include in the stack
+# Resources declares the AWS resources that you want to include in the stack
 # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/resources-section-structure.html
 Resources:
   # Each Lambda function is defined by properties:
@@ -122,38 +122,38 @@ Resources:
             Queue: !GetAtt PostProcessHandlerQueue.Arn
             BatchSize: 1
 
-  SeenomalyFunction:
-    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
-    Condition: ifDeploySeenomaly
-    Properties:
-      PackageType: Image
-      Timeout: 900
-      MemorySize: 5000
-      Events:
-        Api:
-          Type: Api #
-          Properties:
-            Path: /Seenomaly
-            Method: post
-        SQSQueueEvent:
-          Type: SQS
-          Properties:
-            Queue: !GetAtt SeenomalyQueue.Arn
-            BatchSize: 1
-      Policies:
-        - DynamoDBCrudPolicy:
-            TableName: !Ref JobTable
-        - S3CrudPolicy:
-            BucketName: !Ref SrcBucket
-      Environment:
-        Variables:
-          SRC_BUCKET: !Ref SrcBucket
-          JOB_TABLE: !Ref JobTable
-          POST_PROCESS_HANDLER_QUEUE: !Ref PostProcessHandlerQueue
-    Metadata:
-      Dockerfile: Dockerfile
-      DockerContext: ./seenomaly
-      DockerTag: python3.7-v1
+  # SeenomalyFunction:
+  #   Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+  #   Condition: ifDeploySeenomaly
+  #   Properties:
+  #     PackageType: Image
+  #     Timeout: 900
+  #     MemorySize: 5000
+  #     Events:
+  #       Api:
+  #         Type: Api #
+  #         Properties:
+  #           Path: /Seenomaly
+  #           Method: post
+  #       SQSQueueEvent:
+  #         Type: SQS
+  #         Properties:
+  #           Queue: !GetAtt SeenomalyQueue.Arn
+  #           BatchSize: 1
+  #     Policies:
+  #       - DynamoDBCrudPolicy:
+  #           TableName: !Ref JobTable
+  #       - S3CrudPolicy:
+  #           BucketName: !Ref SrcBucket
+  #     Environment:
+  #       Variables:
+  #         SRC_BUCKET: !Ref SrcBucket
+  #         JOB_TABLE: !Ref JobTable
+  #         POST_PROCESS_HANDLER_QUEUE: !Ref PostProcessHandlerQueue
+  #   Metadata:
+  #     Dockerfile: Dockerfile
+  #     DockerContext: ./seenomaly
+  #     DockerTag: python3.7-v1
 
   # OwlEyeFunction:
   #     Type: AWS::Serverless::Function
@@ -255,6 +255,12 @@ Resources:
       VisibilityTimeout: 1000
     Type: AWS::SQS::Queue
 
+  SendEmailQueue:
+    Properties:
+      ReceiveMessageWaitTimeSeconds: 5
+      VisibilityTimeout: 1000
+    Type: AWS::SQS::Queue
+
   # DynamoDB table to store job information
   JobTable:
     Type: AWS::Serverless::SimpleTable
@@ -292,6 +298,8 @@ Outputs:
   FileCompressApi:
     Description: "API Gateway endpoint URL for Prod stage for file compression function"
     Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/fileCompress/"
+  SendEmailFunction:
+    Value: !Ref SendEmail
   # SrcBucket:
   #   Value: !Ref SrcBucket
   # JobTableName:

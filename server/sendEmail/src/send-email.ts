@@ -7,9 +7,10 @@ code referencing: https://www.cloudmailin.com/blog/sending_and_receiving_email_i
 import { SQSEvent } from "aws-lambda";
 import { getItem, GetItemInput } from "./service/dynamodbClient";
 import { AttributeMap } from "aws-sdk/clients/dynamodb";
-import dotenv from "dotenv";
-import nodemailer from "nodemailer";
+import * as dotenv from "dotenv";
 dotenv.config(); // configure environment vars
+import * as nodemailer from "nodemailer";
+//const nodemailer = require("nodemailer");
 
 export const awaitJob = async (request: GetItemInput): Promise<AttributeMap | null> => {
 	const res = await getItem(request);
@@ -20,9 +21,12 @@ export const awaitJob = async (request: GetItemInput): Promise<AttributeMap | nu
 };
 
 export const sendEmail = async (event: SQSEvent, context: AWSLambda.Context): Promise<any> => {
-	const hostname = "smtp.gmail.com"; // hostname to connect to
-
-	const key: string = JSON.parse(event.Records[0].body).jobKey; // get job key from DB
+	// endpoint with syndey aws region
+	const smtpEndpoint = "email-smtp.ap-southeast-2.amazonaws.com";
+	// The port to use when connecting to the SMTP server.
+	const port = 465;
+	// get job key from DB
+	const key: string = JSON.parse(event.Records[0].body).jobKey;
 	console.log("Job key: " + String(key));
 
 	// make request for DB info using job key, store in request
@@ -38,23 +42,24 @@ export const sendEmail = async (event: SQSEvent, context: AWSLambda.Context): Pr
 	// checks that email and results exist
 	if (res?.email?.S != null && res?.resultsURL?.S != null) {
 		// get email and results from job
-		const emailString = res.email.S;
+		const recipientEmail = res.email.S; // recipient email address; if account in sandbox - this needs to be verified.
 		const htmlResult = res.resultsURL.S;
 
 		// create transport for email
 		const transporter = nodemailer.createTransport({
-			host: hostname,
-			port: 465, // secure -> 465, not secure -> 587
-			secure: true, // use SSL
+			host: smtpEndpoint,
+			port: port,
+			secure: true, // use SSL (with port 465)
 			requireTLS: true,
 			auth: {
-				user: process.env.EMAIL,
-				pass: process.env.PASSWORD,
+				user: process.env.SMTP_USERNAME,
+				pass: process.env.SMTP_PASSWORD,
 			},
 		});
 
 		console.log("verifying transporter...");
 		// verify connection
+		/*
 		transporter.verify(function (error, success) {
 			if (error) {
 				console.log(error);
@@ -62,12 +67,13 @@ export const sendEmail = async (event: SQSEvent, context: AWSLambda.Context): Pr
 				console.log("Server is ready to take our messages");
 			}
 		});
+		*/
 
 		console.log("sending email...");
 		// send email with defined transport object
 		const info = await transporter.sendMail({
 			from: process.env.EMAIL,
-			to: emailString,
+			to: recipientEmail,
 			subject: "<p>Vision Job Results<p>",
 			text: "",
 			html:
@@ -78,7 +84,7 @@ export const sendEmail = async (event: SQSEvent, context: AWSLambda.Context): Pr
 		});
 
 		// log response
-		console.log("message sent: %s", info.response);
+		console.log("message sent! message id: ", info.messageId);
 	} else {
 		return null;
 	}
