@@ -14,25 +14,23 @@ example request body
 ```
 POST https://knfxd86hz7.execute-api.ap-southeast-2.amazonaws.com/Prod/job
 
-// First file
+// Upload Request
 {
     "email": "sample_email@gmail.com",
-    "fileName":"test.mp4"
+    "fileNames":["test.mp4", "test_image.jpeg", ...]
 }
 
-// Following files
-{
-    "email": "sample_email@gmail.com",
-    "fileName":"test.mp4",
-    "jobID" : "jobId returned from the first api call"
-}
 ```
 
 example return body
 
 ```
 {
-    "uploadUrl": "some_url",
+    "uploadUrls": {
+        "test.mp4": "a preSigned url",
+        "test_image.jpeg":"another preSigned url",
+        ...
+    }
     "jobID": "2a9c3a0e-8df2-4484-a281-059796b15682"
 }
 ```

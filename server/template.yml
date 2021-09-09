@@ -17,7 +17,6 @@ Globals:
     BinaryMediaTypes:
       - video/mp4
       - image/png
-      - image/jpg
       - image/jpeg
 
 # Parameters:
@@ -78,7 +77,8 @@ Resources:
             - Action: s3:*
               Effect: Allow
               Resource:
-                - !GetAtt SrcBucket.Arn
+                - !Sub arn:aws:s3:::${SrcBucket}/*
+                - !Sub arn:aws:s3:::${SrcBucket}
       Environment:
         Variables:
           # Make table name accessible as environment variable from function code during execution
@@ -122,95 +122,95 @@ Resources:
             Queue: !GetAtt PostProcessHandlerQueue.Arn
             BatchSize: 1
 
-  # SeenomalyFunction:
-  #   Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
-  #   Condition: ifDeploySeenomaly
-  #   Properties:
-  #     PackageType: Image
-  #     Timeout: 900
-  #     MemorySize: 5000
-  #     Events:
-  #       Api:
-  #         Type: Api #
-  #         Properties:
-  #           Path: /Seenomaly
-  #           Method: post
-  #       SQSQueueEvent:
-  #         Type: SQS
-  #         Properties:
-  #           Queue: !GetAtt SeenomalyQueue.Arn
-  #           BatchSize: 1
-  #     Policies:
-  #       - DynamoDBCrudPolicy:
-  #           TableName: !Ref JobTable
-  #       - S3CrudPolicy:
-  #           BucketName: !Ref SrcBucket
-  #     Environment:
-  #       Variables:
-  #         SRC_BUCKET: !Ref SrcBucket
-  #         JOB_TABLE: !Ref JobTable
-  #         POST_PROCESS_HANDLER_QUEUE: !Ref PostProcessHandlerQueue
-  #   Metadata:
-  #     Dockerfile: Dockerfile
-  #     DockerContext: ./seenomaly
-  #     DockerTag: python3.7-v1
-
-  # OwlEyeFunction:
-  #     Type: AWS::Serverless::Function
-  #     Properties:
-  #       PackageType: Image
-  #       Timeout: 300
-  #       MemorySize: 1000
-  #       Events:
-  #         Api:
-  #           Type: Api
-  #           Properties:
-  #             Path: /owleye
-  #             Method: post
-  #         SQSQueueEvent:
-  #           Type: SQS
-  #           Properties:
-  #             Queue: !GetAtt OwlEyeQueue.Arn
-  #             BatchSize: 1
-  #     Policies:
-  #       - DynamoDBCrudPolicy:
-  #           TableName: !Ref JobTable
-  #       - S3CrudPolicy:
-  #           BucketName: !Ref SrcBucket
-  #     Environment:
-  #       Variables:
-  #         SRC_BUCKET: !Ref SrcBucket
-  #         JOB_TABLE: !Ref JobTable
-  #         POST_PROCESS_HANDLER_QUEUE: !Ref PostProcessHandlerQueue
-  #     Metadata:
-  #       Dockerfile: Dockerfile
-  #       DockerContext: ./owlEye
-  #       DockerTag: python3.7-v1
-
-  FileCompress:
-    Type: AWS::Serverless::Function
+  SeenomalyFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Condition: ifDeploySeenomaly
     Properties:
-      CodeUri: fileCompress/
-      Handler: app.lambda_handler
-      Runtime: python3.9
-      Timeout: 10
+      PackageType: Image
+      Timeout: 900
+      MemorySize: 5000
+      Events:
+        Api:
+          Type: Api #
+          Properties:
+            Path: /Seenomaly
+            Method: post
+        SQSQueueEvent:
+          Type: SQS
+          Properties:
+            Queue: !GetAtt SeenomalyQueue.Arn
+            BatchSize: 1
       Policies:
-        # Give Create/Read/Update/Delete Permissions to the SampleTable
         - DynamoDBCrudPolicy:
             TableName: !Ref JobTable
         - S3CrudPolicy:
             BucketName: !Ref SrcBucket
       Environment:
         Variables:
-          # Make table name accessible as environment variable from function code during execution
-          JOB_TABLE: !Ref JobTable
           SRC_BUCKET: !Ref SrcBucket
+          JOB_TABLE: !Ref JobTable
+          POST_PROCESS_HANDLER_QUEUE: !Ref PostProcessHandlerQueue
+    Metadata:
+      Dockerfile: Dockerfile
+      DockerContext: ./seenomaly
+      DockerTag: python3.7-v1
+
+  OwlEyeFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      PackageType: Image
+      Timeout: 300
+      MemorySize: 1000
       Events:
-        FileCompress:
+        Api:
           Type: Api
           Properties:
-            Path: /fileCompress
-            Method: get
+            Path: /owleye
+            Method: post
+        SQSQueueEvent:
+          Type: SQS
+          Properties:
+            Queue: !GetAtt OwlEyeQueue.Arn
+            BatchSize: 1
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref JobTable
+        - S3CrudPolicy:
+            BucketName: !Ref SrcBucket
+      Environment:
+        Variables:
+          SRC_BUCKET: !Ref SrcBucket
+          JOB_TABLE: !Ref JobTable
+          POST_PROCESS_HANDLER_QUEUE: !Ref PostProcessHandlerQueue
+    Metadata:
+      Dockerfile: Dockerfile
+      DockerContext: ./owlEye
+      DockerTag: python3.7-v1
+
+  # FileCompress:
+  #   Type: AWS::Serverless::Function
+  #   Properties:
+  #     CodeUri: fileCompress/
+  #     Handler: app.lambda_handler
+  #     Runtime: python3.7
+  #     Timeout: 10
+  #     Policies:
+  #       # Give Create/Read/Update/Delete Permissions to the SampleTable
+  #       - DynamoDBCrudPolicy:
+  #           TableName: !Ref JobTable
+  #       - S3CrudPolicy:
+  #           BucketName: !Ref SrcBucket
+  #     Environment:
+  #       Variables:
+  #         # Make table name accessible as environment variable from function code during execution
+  #         JOB_TABLE: !Ref JobTable
+  #         SRC_BUCKET: !Ref SrcBucket
+  #     Events:
+  #       FileCompress:
+  #         Type: Api
+  #         Properties:
+  #           Path: /fileCompress
+  #           Method: get
 
   SendEmail:
     Type: AWS::Serverless::Function
@@ -284,6 +284,7 @@ Resources:
               - GET
               - PUT
               - HEAD
+              - POST
             AllowedOrigins:
               - "*"
 
