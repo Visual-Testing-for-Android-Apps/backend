@@ -28,7 +28,8 @@
 		"lint-staged": "^11.1.1",
 		"npm-run-all": "^4.1.5",
 		"prettier": "^2.3.2",
-		"standard": "^16.0.3"
+		"standard": "^16.0.3",
+		"ts-standard": "^10.0.0"
 	},
 	"dependencies": {
 		"axios": "^0.21.1",
@@ -36,7 +37,8 @@
 	},
 	"lint-staged": {
 		"**/*": "prettier --write --ignore-unknown",
-		"**/*.js": "standard --fix"
+		"**/*.js": "standard --fix",
+		"**/*.ts": "ts-standard --fix"
 	},
 	"prettier": {
 		"printWidth": 100,

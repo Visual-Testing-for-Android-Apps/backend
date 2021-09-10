@@ -337,10 +337,9 @@ CORS_HEADER = {
         }
 
 def imageProcess(image_bytes):
-
     image = Image.open(BytesIO(image_bytes))  # decode the image string
 
-    print("image parsed")
+
     """ python grad_cam.py <path_to_image>
         1. Loads an image with opencv.
         2. Preprocesses it for VGG19 and converts to a pytorch variable.
@@ -361,22 +360,21 @@ def imageProcess(image_bytes):
     # this directory will contain 4 models
 
     models = os.listdir(multi_model_directory)  # get each model
+
     bug_type = []  # contain the type of the bugs
     out1 = []
     idx = 0
 
     img_res_str = ''
     for model_file in models:
-        if ".pth" not in model_file:
-            continue
+
         model_path = multi_model_directory + model_file
-        print("model_path: " + model_path)
         model = Net()
         # model.cuda()
         model = nn.DataParallel(model)
 
         # now the algorithm can run the gpu model
-        model.load_state_dict(torch.load(model_path, torch.device('cpu'))) 
+        model.load_state_dict(torch.load(model_path, torch.device('cpu')))  # TODO : model is in the S3 bucket
 
         if model_file == '0model.pth':  # this model is use to detect all the bug in side the image and generate the heatmap
             grad_cam = GradCam(model=model, target_layer_names=["40"], use_cuda=False)

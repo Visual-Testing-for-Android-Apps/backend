@@ -1,11 +1,20 @@
 import base64
 import json
-from PIL import ImageFile
+from io import BytesIO
+import torch
+from PIL import Image, ImageFile
 
 ImageFile.LOAD_TRUNCATED_IMAGES = True
 import os
+import torch.utils.data as data
+import torchvision.transforms as transforms
+import cv2
+import numpy as np
+from torch.autograd import Function, Variable
 
 ImageFile.LOAD_TRUNCATED_IMAGES = True
+import torch.nn.functional as F
+import torch.nn as nn
 from app import * 
 import boto3
 
@@ -14,10 +23,8 @@ CORS_HEADER = {
             'Access-Control-Allow-Origin': '*',
             'Access-Control-Allow-Methods': 'OPTIONS,POST,GET'
         }
-TABLE_NAME =  os.environ["JOB_TABLE"]
-DBClient = boto3.resource('dynamodb').Table(TABLE_NAME)
 
-def handler(event, context):
+def handler(event):
     # check event header 
     if "httpMethod" in event and event["httpMethod"] =="POST":
         return handleRequestFromAPIGateway(event)
@@ -52,65 +59,37 @@ def handleRequestFromAPIGateway(event):
         }
 
 def handleRequestFromSQS(event):
+    try:
+        # 0. init clients 
+        s3 = boto3.client('s3')
+        bucket = os.getenv("SRC_BUCKET", "visual-testing-backend-v2-srcbucket-p3rsmcrs75qa")
+        # 1. get file location, jobID
+        body = json.loads(event["Records"][0]["body"])
+        key = body["fileKey"]
+        response = s3.get_object(Bucket=bucket, Key=key)
+        # 2. parse response + run model
+        imageBytes = response["Body"].read()
+        res_image, bug_type = imageProcess(base64.b64decode(imageBytes))
+        # 3. save result to dynamoDB
+        fileIdx = body["fileIdx"]
+        jobID = body["jobID"]
+        saveResultToDb(bug_type, fileIdx, jobID)
+        # 4. save image to S3 
+        s3.upload(Bucket=bucket, key="result/result_" + key, body=res_image)
+        # (TODO) 5. trigger SQS - postProcessHandle
 
-    body = json.loads(event["Records"][0]["body"])
-    fileIdx = int(body["fileIdx"])
-    jobID = body["jobID"]
-    key = body["fileKey"]
-    # 0. validate 
-    validateFileStatus(jobID, fileIdx, key)
-    # 0. init clients 
-    s3 = boto3.client('s3')
-    bucket = os.environ["SRC_BUCKET"]
-    # 1. get file in S3
-    print("get file from s3...")
-    response = s3.get_object(Bucket=bucket, Key=key)
-    # 2. parse response + run model
-    print("run model ...")
-    imageBytes = response["Body"].read()
-    res_image, bug_type = imageProcess(imageBytes)
-    # 3. save image to S3 
-    print("save result image to s3 ...")
-    resultKey = jobID + "/result/result_" + key.split("/")[-1]
-    print("res_image: " + res_image)
-    s3.put_object(Bucket=bucket, Key=resultKey, Body=res_image)
-    # 4. save result to dynamoDB
-    print("save result to db...")
-    saveResultToDb(bug_type, fileIdx, jobID, resultKey)
-    # (TODO) 5. trigger SQS - postProcessHandle
-    return "successful"
+    except Exception as e:
+        print(e)
+        return e
 
- 
-
-def validateFileStatus(jobID, fileIdx, fileKey):
-    fileRec = getFile(jobID, fileIdx)
-    if fileRec["status"] != "NEW":
-        raise Exception("File is already processed")
-    if fileRec["s3Key"] != fileKey:
-        raise Exception("Inconsistent fileKey, fileKey received: {}, fileKey in DB: {}".format(fileKey,fileRec["s3Key"]))
-
-
-def getFile(jobID, fileIdx):
-    response = DBClient.get_item(Key={"id":jobID})
-    item = response["Item"]
-    print("item: " + json.dumps(item))
-    if not item["files"]:
-        raise Exception("no files in job")
-    if fileIdx >= len(item["files"]):
-        raise Exception("Invalid fileIdx")
-    return item["files"][fileIdx]
-
-def saveResultToDb(result,fileIdx, jobID,resultKey):
+def saveResultToDb(result,fileIdx, jobID):
+    tablename = os.getenv("JOB_TABLE")
+    table = boto3.resource('dynamodb').Table(tablename)
     # update the record. 
-    response = DBClient.update_item(
+    response = table.update_item(
     Key={'id': jobID},
-    ExpressionAttributeNames= { "#status": "status" },
-    UpdateExpression="SET files["+str(fileIdx)+"].resultMessage = :resultMessage," 
-                        + "files["+str(fileIdx)+"].#status = :status,"
-                        + "files["+str(fileIdx)+"].s3KeyHeatMap = :s3KeyHeatMap,",
-    ExpressionAttributeValues={':resultMessage': result, 
-                                ":status": "DONE", 
-                                ":s3KeyHeatMap":resultKey},
+    UpdateExpression="SET files["+fileIdx+"].resultMessage = :resultMessage, files["+fileIdx+"].finished = :finished",
+    ExpressionAttributeValues={':resultMessage': result, ":finished": True},
     ReturnValues="UPDATED_NEW",
     )
     return response
@@ -118,7 +97,7 @@ def saveResultToDb(result,fileIdx, jobID,resultKey):
 def submitSQSForm():
     # Create SQS client
     sqs = boto3.client('sqs')
-    queue_url = os.environ['POST_PROCESS_HANDLER_QUEUE']
+    queue_url = os.getenv('POST_PROCESS_HANDLER_QUEUE')
     print('POST_PROCESS_HANDLER_QUEUE', queue_url)
     # Send message to SQS queue
     response = sqs.send_message(
