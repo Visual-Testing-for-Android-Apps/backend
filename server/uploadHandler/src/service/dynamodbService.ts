@@ -1,15 +1,11 @@
-import {
-  Converter,
-  PutItemInput,
-  UpdateItemInput,
-} from "aws-sdk/clients/dynamodb"
+import { Converter, PutItemInput, UpdateItemInput } from "aws-sdk/clients/dynamodb";
 
-import { File } from "../service/jobModel"
-import { putItem, updateItem } from "./dynamodbClient"
+import { File } from "../service/jobModel";
+import { putItem, updateItem } from "./dynamodbClient";
 
 const tableName = process.env.JOB_TABLE as string;
 
-export const createNewJobItem = async ( id: string,email: string): Promise<void> => {
+export const createNewJobItem = async (id: string, email: string): Promise<void> => {
 	const newJobItem = {
 		TableName: tableName,
 		Item: {
@@ -21,7 +17,7 @@ export const createNewJobItem = async ( id: string,email: string): Promise<void>
 	await putItem(newJobItem);
 };
 
-export const addFileToJob = async (id: string, file:File) => {
+export const addFileToJob = async (id: string, file: File) => {
 	const fileElementAttrMap = Converter.marshall(file);
 	const updateItemInput = {
 		ExpressionAttributeNames: { "#files": "files" },

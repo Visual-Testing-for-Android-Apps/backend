@@ -1,9 +1,8 @@
-import * as AWS from "aws-sdk"
+import * as AWS from "aws-sdk";
 
 const BUCKET_NAME = process.env["SRC_BUCKET"];
 const URL_EXPIRATION_SECONDS = 300;
 const s3bucket = new AWS.S3();
-
 
 export const uploadToS3 = (fileName: string, fileStream: string): Promise<any> => {
 	const params = {
@@ -15,7 +14,7 @@ export const uploadToS3 = (fileName: string, fileStream: string): Promise<any> =
 	return s3bucket.upload(params).promise();
 };
 
-export const getUploadURL = async (key:string, contentType:string) => {
+export const getUploadURL = async (key: string, contentType: string) => {
 	// Get signed URL from S3
 	const s3Params = {
 		Bucket: BUCKET_NAME,
@@ -49,4 +48,3 @@ export const getUploadedFilesInJob = async (jobId: string): Promise<string[]> =>
 	// might need continous token to pagination
 	return uploadedFileNames;
 };
-
