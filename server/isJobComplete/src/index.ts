@@ -64,7 +64,7 @@ export const isJobComplete = async (event: SQSEvent, context: AWSLambda.Context)
 		if (media.L != null) {
 			media.L.forEach((element) => {
 				if (element.M != null) {
-					var fin = element.M.finished.BOOL;
+					const fin = element.M.finished.BOOL;
 					if (!(fin == null)) {
 						ready &&= fin.valueOf();
 						//console.log("Is " + (element.M.fileRef.S != null ? String(element.M.fileRef.S) : "") + " finished?: " + String(fin))
@@ -89,7 +89,7 @@ export const isJobComplete = async (event: SQSEvent, context: AWSLambda.Context)
 			//const message: String = '{ "jobKey": "' + String(key) + '" }'
 
 			//Push a request to the SQS queue
-			var params: SendMessageRequest = {
+			const params: SendMessageRequest = {
 				MessageBody: '{ "jobKey": "' + String(key) + '" }',
 				QueueUrl: process.env.REPORT_GENERATION_QUEUE as string,
 			};
