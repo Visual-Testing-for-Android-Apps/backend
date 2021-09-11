@@ -20,27 +20,27 @@ Globals:
       - image/png
       - image/jpeg
 
-# Parameters:
-#   deployOwlEye:
-#     Type: String
-#     AllowedValues:
-#       - true
-#       - false
-#     Default: true
-#   deploySeenomaly:
-#     Type: String
-#     AllowedValues:
-#       - true
-#       - false
-#     Default: false
+Parameters:
+  deployOwlEye:
+    Type: String
+    AllowedValues:
+      - true
+      - false
+    Default: true
+  deploySeenomaly:
+    Type: String
+    AllowedValues:
+      - true
+      - false
+    Default: false
 
-# Conditions:
-#   ifDeployOwlEye: !Equals
-#     - !Ref deployOwlEye
-#     - true
-#   ifDeploySeenomaly: !Equals
-#     - !Ref deploySeenomaly
-#     - true
+Conditions:
+  ifDeployOwlEye: !Equals
+    - !Ref deployOwlEye
+    - true
+  ifDeploySeenomaly: !Equals
+    - !Ref deploySeenomaly
+    - true
 
 # Resources declares the AWS resources that you want to include in the stack
 # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/resources-section-structure.html
@@ -124,7 +124,7 @@ Resources:
         SQSQueueEvent:
           Type: SQS
           Properties:
-            Queue: !GetAtt PostProcessHandlerQueue.Arn
+            Queue: !GetAtt JobCompletionStatusQueue.Arn
             BatchSize: 1
 
   SeenomalyFunction:
@@ -154,7 +154,7 @@ Resources:
         Variables:
           SRC_BUCKET: !Ref SrcBucket
           JOB_TABLE: !Ref JobTable
-          POST_PROCESS_HANDLER_QUEUE: !Ref PostProcessHandlerQueue
+          POST_PROCESS_HANDLER_QUEUE: !Ref JobCompletionStatusQueue
     Metadata:
       Dockerfile: Dockerfile
       DockerContext: ./seenomaly
@@ -186,42 +186,42 @@ Resources:
         Variables:
           SRC_BUCKET: !Ref SrcBucket
           JOB_TABLE: !Ref JobTable
-          POST_PROCESS_HANDLER_QUEUE: !Ref PostProcessHandlerQueue
+          POST_PROCESS_HANDLER_QUEUE: !Ref JobCompletionStatusQueue
     Metadata:
       Dockerfile: Dockerfile
       DockerContext: ./owlEye
       DockerTag: python3.7-v1
 
-  # FileCompress:
-  #   Type: AWS::Serverless::Function
-  #   Properties:
-  #     CodeUri: fileCompress/
-  #     Handler: app.lambda_handler
-  #     Runtime: python3.7
-  #     Timeout: 10
-  #     Policies:
-  #       # Give Create/Read/Update/Delete Permissions to the SampleTable
-  #       - DynamoDBCrudPolicy:
-  #           TableName: !Ref JobTable
-  #       - S3CrudPolicy:
-  #           BucketName: !Ref SrcBucket
-  #     Environment:
-  #       Variables:
-  #         # Make table name accessible as environment variable from function code during execution
-  #         JOB_TABLE: !Ref JobTable
-  #         SRC_BUCKET: !Ref SrcBucket
-  #     Events:
-  #       FileCompress:
-  #         Type: Api
-  #         Properties:
-  #           Path: /fileCompress
-  #           Method: get
+  FileCompress:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: fileCompress/
+      Handler: app.lambda_handler
+      Runtime: python3.7
+      Timeout: 10
+      Policies:
+        # Give Create/Read/Update/Delete Permissions to the SampleTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref JobTable
+        - S3CrudPolicy:
+            BucketName: !Ref SrcBucket
+      Environment:
+        Variables:
+          # Make table name accessible as environment variable from function code during execution
+          JOB_TABLE: !Ref JobTable
+          SRC_BUCKET: !Ref SrcBucket
+      Events:
+        FileCompress:
+          Type: Api
+          Properties:
+            Path: /fileCompress
+            Method: get
 
   SendEmail:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: sendEmail/
-      Handler: dist/send-email.sendEmail
+      Handler: dist/index.sendEmail
       Runtime: nodejs12.x
       Description: Endpoint for sending email with results to users
       Policies:
