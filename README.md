@@ -20,6 +20,12 @@ POST https://knfxd86hz7.execute-api.ap-southeast-2.amazonaws.com/Prod/job
     "fileNames":["test.mp4", "test_image.jpeg", ...]
 }
 
+// Following files
+{
+    "email": "sample_email@gmail.com",
+    "fileName":"test.mp4",
+    "jobID" : "jobId returned from the first api call"
+}
 ```
 
 example return body
