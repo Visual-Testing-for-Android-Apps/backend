@@ -1,4 +1,5 @@
 AWSTemplateFormatVersion: 2010-09-09
+
 Description: >-
   android-visual-testing
 
@@ -19,27 +20,27 @@ Globals:
       - image/png
       - image/jpeg
 
-# Parameters:
-#   deployOwlEye:
-#     Type: String
-#     AllowedValues:
-#       - true
-#       - false
-#     Default: true
-#   deploySeenomaly:
-#     Type: String
-#     AllowedValues:
-#       - true
-#       - false
-#     Default: false
+Parameters:
+  deployOwlEye:
+    Type: String
+    AllowedValues:
+      - true
+      - false
+    Default: true
+  deploySeenomaly:
+    Type: String
+    AllowedValues:
+      - true
+      - false
+    Default: false
 
-# Conditions:
-#   ifDeployOwlEye: !Equals
-#     - !Ref deployOwlEye
-#     - true
-#   ifDeploySeenomaly: !Equals
-#     - !Ref deploySeenomaly
-#     - true
+Conditions:
+  ifDeployOwlEye: !Equals
+    - !Ref deployOwlEye
+    - true
+  ifDeploySeenomaly: !Equals
+    - !Ref deploySeenomaly
+    - true
 
 # Resources declares the AWS resources that you want to include in the stack
 # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/resources-section-structure.html
@@ -93,18 +94,21 @@ Resources:
             Path: /job
             Method: POST
 
-  PostProcessHandler:
+  JobCompletionStatus:
     Type: AWS::Serverless::Function
     Metadata:
       BuildMethod: makefile
     Properties:
-      CodeUri: postProcessHandler/
+      CodeUri: isJobComplete/
       Handler: dist/index.handler # TODO
       Runtime: nodejs12.x
       MemorySize: 128
       Timeout: 100
       Description: Endpoint for post processing results
       Policies:
+        #Allow us to push to the next queue
+        - SQSSendMessagePolicy:
+            QueueName: !Ref ReportGenerationQueue
         # Give Create/Read/Update/Delete Permissions to the SampleTable
         - DynamoDBCrudPolicy:
             TableName: !Ref JobTable
@@ -115,12 +119,12 @@ Resources:
           # Make table name accessible as environment variable from function code during execution
           JOB_TABLE: !Ref JobTable
           SRC_BUCKET: !Ref SrcBucket
-          FILE_ZIP_QUEUE: !Ref FileZipQueue
+          REPORT_GENERATION_QUEUE: !Ref ReportGenerationQueue
       Events:
         SQSQueueEvent:
           Type: SQS
           Properties:
-            Queue: !GetAtt PostProcessHandlerQueue.Arn
+            Queue: !GetAtt JobCompletionStatusQueue.Arn
             BatchSize: 1
 
   SeenomalyFunction:
@@ -150,7 +154,7 @@ Resources:
         Variables:
           SRC_BUCKET: !Ref SrcBucket
           JOB_TABLE: !Ref JobTable
-          POST_PROCESS_HANDLER_QUEUE: !Ref PostProcessHandlerQueue
+          POST_PROCESS_HANDLER_QUEUE: !Ref JobCompletionStatusQueue
     Metadata:
       Dockerfile: Dockerfile
       DockerContext: ./seenomaly
@@ -182,7 +186,7 @@ Resources:
         Variables:
           SRC_BUCKET: !Ref SrcBucket
           JOB_TABLE: !Ref JobTable
-          POST_PROCESS_HANDLER_QUEUE: !Ref PostProcessHandlerQueue
+          POST_PROCESS_HANDLER_QUEUE: !Ref JobCompletionStatusQueue
     Metadata:
       Dockerfile: Dockerfile
       DockerContext: ./owlEye
@@ -217,7 +221,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: sendEmail/
-      Handler: dist/send-email.sendEmail
+      Handler: dist/index.sendEmail
       Runtime: nodejs12.x
       Description: Endpoint for sending email with results to users
       Policies:
@@ -267,7 +271,33 @@ Resources:
 
   # This is an SQS queue with all default configuration properties. To learn more about the available options, see
   # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-sqs-queues.html
-  # Queue that triggers report generation
+  JobCompletionStatusQueue:
+    Properties:
+      ReceiveMessageWaitTimeSeconds: 5
+      VisibilityTimeout: 1000
+    Type: AWS::SQS::Queue
+
+  # EventInvokeConfig:
+  #   Type: AWS::Lambda::EventInvokeConfig
+  #   Properties:
+  #       Policies:
+  #         #Allow us to push to the next queue
+  #         - SQSSendMessagePolicy:
+  #             QueueName: !Ref ReportGenerationQueue
+  #       FunctionName: !Ref JobCompletionStatus
+  #       Qualifier: "$LATEST"
+  #       DestinationConfig:
+  #           OnSuccess:
+  #               Destination: !GetAtt ReportGenerationQueue.Arn
+  #           OnFailure:
+  #               Destination: !GetAtt ReportGenerationQueue.Arn
+
+  ReportGenerationQueue:
+    Properties:
+      ReceiveMessageWaitTimeSeconds: 5
+      VisibilityTimeout: 1000
+    Type: AWS::SQS::Queue
+    
   PostProcessHandlerQueue:
     Properties:
       ReceiveMessageWaitTimeSeconds: 5
@@ -332,8 +362,8 @@ Outputs:
     Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/prod/"
   UploadHandlerFunction:
     Value: !Ref UploadHandler
-  PostProcessHandlerFuntion:
-    Value: !Ref PostProcessHandler
+  JobCompletionStatusFuntion:
+    Value: !Ref JobCompletionStatus
   FileCompressApi:
     Description: "API Gateway endpoint URL for Prod stage for file compression function"
     Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/fileCompress/"
