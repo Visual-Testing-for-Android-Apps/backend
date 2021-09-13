@@ -10,11 +10,10 @@ import { FileType, Job, JobStatus } from "./service/jobModel"
 /**
  * Generates a html report for a given video issue
  *
- * @param index - index of original video in batch
  * @param algResult - issue type code
  * @returns html string containing image, heatmap, and description
  */
-function generateVidReport(index: number, algResult: number): string {
+function generateVidReport(algResult: number): object {
 	const titles: string[] = [
 		'Cannot place image in space',
 		'Pass through other material',
@@ -40,26 +39,21 @@ function generateVidReport(index: number, algResult: number): string {
 		'UI elements behind a modal bottom sheet lack a visible scrim/filter whilst the bottom sheet is onscreen.  A visible scrim indicates to the user that these elements cannot be interacted with whilst the menu is displayed.'
 	]
 
-	let res = '    <h2>Item ' + index.toString() + '</h2>\n'
-	res += '    <p>' + titles[algResult] + '<br>' + desc[algResult] + '</p>\n'
-	return res
+	return {
+		title: titles[algResult],
+		desc: desc[algResult],
+	};
 }
 
 /**
  * Generates a html report for a given image issue
  *
- * @param index - index of original image in batch
  * @param filePath - filepath to original image
  * @param algResultPath - filepath to heatmap outputted from OwlEyes algorithm
  * @param algResult - issue type code
  * @returns html string containing image, heatmap, and description
  */
-function generateImgReport(
-	index: number,
-	filePath: string,
-	algResultPath: string,
-	algResult: number
-): string {
+function generateImgReport(filePath: string, algResultPath: string, algResult: number): object {
 	const titles: string[] = [
 		"General issue heatmap",
 		"Null value",
@@ -74,11 +68,12 @@ function generateImgReport(
 		"Text is overlapped or obscured by other components."
 	]
 
-	let res = "    <h2>Item " + index.toString() + "</h2>\n"
-	res += "    <image src='" + filePath + "'>\n"
-	res += "    <image src='" + algResultPath + "'>\n"
-	res += "    <p>" + titles[algResult] + ".<br>" + desc[algResult] + "</p>\n"
-	return res
+	return {
+		title: titles[algResult],
+		desc: desc[algResult],
+		orig_image: filePath,
+		heatmap_image: algResultPath,
+	};
 }
 
 /**
@@ -102,35 +97,38 @@ export const generateReport = async (event: SQSEvent, context: AWSLambda.Context
 	const files = job.files
 
 	// construct HTML report contents
-	let res = "<!DOCTYPE html><html lang='en'><head></head><body><div>\n"
+	const content: object[] = [];
+	if (dbRes.Item != null) {
+		const files = dbRes.Item.files;
+		if (files.L != null) {
+			// Iterate through each file
+			files.L.forEach((element) => {
+				if (element.M != null) {
+					const fileRef = element.M.fileRef.S;
+					const fileType = element.M.fileType.S;
+					const resultCode = element.M.resultCode.N;
+					const resultFileRef = element.M.resultFileReference.S;
 
-	// Iterate through each file
-	files.forEach((element, index) => {
-		const fileRef = element.s3Key
-		const fileType = element.type
-		const resultCode = Number(element.result.code)
-		const resultFileRef = element.result.outputKey
-
-		// Add image/vid string to overall report string
-		if (fileType != null && resultCode != null) {
-			res += "  <div>\n"
-			if (fileType === FileType.IMAGE && fileRef != null && resultFileRef != null) {
-				res += generateImgReport(index, fileRef, resultFileRef, +resultCode)
-			} else if (fileType === FileType.VIDEO) {
-				res += generateVidReport(index, +resultCode)
-			}
-			res += "  </div><p><br><br></p>"
+					// Add image/vid string to overall report string
+					if (fileType != null && resultCode != null) {
+						if (fileType === "image" && fileRef != null && resultFileRef != null) {
+							content.push(generateImgReport(fileRef, resultFileRef, +resultCode));
+						} else if (fileType === "video") {
+							content.push(generateVidReport(+resultCode));
+						}
+					}
+				}
+			});
 		}
-	})
-	res += "</div></body></html>"
+	}
 
 	// Add html file to s3 bucket
-	const filepath = key + "/report.html"
+	const filepath = key + "/report.json";
 	const s3params = {
 		Bucket: process.env.SRC_BUCKET as string,
 		Key: filepath, // File name you want to save as in S3
-		Body: res
-	}
+		Body: JSON.stringify({ content: content }),
+	};
 
 	const s3 = new S3({
 		accessKeyId: process.env.AWS_ACCESS_KEY,
@@ -141,13 +139,10 @@ export const generateReport = async (event: SQSEvent, context: AWSLambda.Context
 	await s3.upload(s3params).promise()
 
 	// Add batch to file zip queue
+	// TODO: change call to frontend code for viewing report
 	const params: SendMessageRequest = {
-		MessageBody: '{ "jobKey": "' + String(key) + '" }',
-		// MessageBody: '{ "queryStringParameters": { "id": "' + String(key) + '" } }', // zipfile accesses event["queryStringParameters"]["id"]
-		QueueUrl: process.env.FILE_ZIP_QUEUE as string
-	}
-	await pushToQueue(params)
-	console.log("report generated ... ")
-
-	return res
-}
+		MessageBody: '{ "queryStringParameters": { "id": "' + String(key) + '" } }', // zipfile accesses event["queryStringParameters"]["id"]
+		QueueUrl: process.env.FILE_ZIP_QUEUE as string,
+	};
+	pushToQueue(params);
+};
