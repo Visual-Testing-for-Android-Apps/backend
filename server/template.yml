@@ -115,6 +115,7 @@ Resources:
           # Make table name accessible as environment variable from function code during execution
           JOB_TABLE: !Ref JobTable
           SRC_BUCKET: !Ref SrcBucket
+          FILE_ZIP_QUEUE: !Ref FileZipQueue
       Events:
         SQSQueueEvent:
           Type: SQS
@@ -187,30 +188,30 @@ Resources:
       DockerContext: ./owlEye
       DockerTag: python3.7-v1
 
-  # FileCompress:
-  #   Type: AWS::Serverless::Function
-  #   Properties:
-  #     CodeUri: fileCompress/
-  #     Handler: app.lambda_handler
-  #     Runtime: python3.7
-  #     Timeout: 10
-  #     Policies:
-  #       # Give Create/Read/Update/Delete Permissions to the SampleTable
-  #       - DynamoDBCrudPolicy:
-  #           TableName: !Ref JobTable
-  #       - S3CrudPolicy:
-  #           BucketName: !Ref SrcBucket
-  #     Environment:
-  #       Variables:
-  #         # Make table name accessible as environment variable from function code during execution
-  #         JOB_TABLE: !Ref JobTable
-  #         SRC_BUCKET: !Ref SrcBucket
-  #     Events:
-  #       FileCompress:
-  #         Type: Api
-  #         Properties:
-  #           Path: /fileCompress
-  #           Method: get
+  FileCompress:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: fileCompress/
+      Handler: app.lambda_handler
+      Runtime: python3.9
+      Timeout: 10
+      Policies:
+        # Give Create/Read/Update/Delete Permissions to the SampleTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref JobTable
+        - S3CrudPolicy:
+            BucketName: !Ref SrcBucket
+      Environment:
+        Variables:
+          # Make table name accessible as environment variable from function code during execution
+          JOB_TABLE: !Ref JobTable
+          SRC_BUCKET: !Ref SrcBucket
+      Events:
+        FileCompress:
+          Type: Api
+          Properties:
+            Path: /fileCompress
+            Method: get
 
   SendEmail:
     Type: AWS::Serverless::Function
@@ -235,8 +236,38 @@ Resources:
           Properties:
             Queue: !GetAtt SendEmailQueue.Arn
 
+  ReportGenerator:
+    Type: AWS::Serverless::Function
+    Metadata:
+      BuildMethod: makefile
+    Properties:
+      CodeUri: reportGenerator/
+      Handler: dist/reportGen.generateReport
+      Runtime: nodejs12.x
+      Timeout: 100
+      Description: Endpoint for generating HTML report
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref JobTable
+        - S3CrudPolicy:
+            BucketName: !Ref SrcBucket
+      Environment:
+        Variables:
+          # Make names accessible as environment variable from function code during execution
+          JOB_TABLE: !Ref JobTable
+          SRC_BUCKET: !Ref SrcBucket
+          FILE_ZIP_QUEUE: !Ref FileZipQueue
+      Events:
+        # Specifies the event that trigger this function.
+        SQSQueueEvent:
+          Type: SQS
+          Properties:
+            Queue: !GetAtt PostProcessHandlerQueue.Arn
+            BatchSize: 1
+
   # This is an SQS queue with all default configuration properties. To learn more about the available options, see
   # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-sqs-queues.html
+  # Queue that triggers report generation
   PostProcessHandlerQueue:
     Properties:
       ReceiveMessageWaitTimeSeconds: 5
@@ -250,6 +281,13 @@ Resources:
     Type: AWS::SQS::Queue
 
   OwlEyeQueue:
+    Properties:
+      ReceiveMessageWaitTimeSeconds: 5
+      VisibilityTimeout: 1000
+    Type: AWS::SQS::Queue
+
+  # Queue to zip job files once report has been generated
+  FileZipQueue:
     Properties:
       ReceiveMessageWaitTimeSeconds: 5
       VisibilityTimeout: 1000
@@ -301,9 +339,13 @@ Outputs:
     Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/fileCompress/"
   SendEmailFunction:
     Value: !Ref SendEmail
-  # SrcBucket:
-  #   Value: !Ref SrcBucket
-  # JobTableName:
-  #   Value: !Ref JobTable
+  ReportGeneratorFunction:
+    Value: !Ref ReportGenerator
+    # Description: "API Gateway endpoint URL for Prod stage for HTML report generation function"
+    # Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/reportGenerator/"
+  SrcBucket:
+    Value: !Ref SrcBucket
+  JobTableName:
+    Value: !Ref JobTable
   # PostProcessHandlerQueue:
   #   Value
