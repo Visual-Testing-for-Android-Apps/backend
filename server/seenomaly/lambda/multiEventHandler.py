@@ -11,7 +11,8 @@ CORS_HEADER = {
             'Access-Control-Allow-Origin': '*',
             'Access-Control-Allow-Methods': 'OPTIONS,POST,GET'
         }
-
+TABLE_NAME =  os.environ["JOB_TABLE"]
+DBClient = boto3.resource('dynamodb').Table(TABLE_NAME)
 netName = "gan"
 checkpoint = 29471
 modelDir = os.getenv("MODEL_DIR", "./models/gan") # local env default to ./models
@@ -87,7 +88,15 @@ def validateFileStatus(jobID, fileIdx, fileKey):
     if fileRec["s3Key"] != fileKey:
         raise Exception("Inconsistent fileKey, fileKey received: {}, fileKey in DB: {}".format(fileKey,fileRec["s3Key"]))
 
-
+def getFile(jobID, fileIdx):
+    response = DBClient.get_item(Key={"id":jobID})
+    item = response["Item"]
+    print("item: " + json.dumps(item))
+    if not item["files"]:
+        raise Exception("no files in job")
+    if fileIdx >= len(item["files"]):
+        raise Exception("Invalid fileIdx")
+    return item["files"][fileIdx]
 
 def saveResultToDb(result,fileIdx, jobID):
     tablename = os.getenv("JOB_TABLE")

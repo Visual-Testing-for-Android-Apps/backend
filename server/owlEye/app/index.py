@@ -23,6 +23,8 @@ CORS_HEADER = {
             'Access-Control-Allow-Origin': '*',
             'Access-Control-Allow-Methods': 'OPTIONS,POST,GET'
         }
+TABLE_NAME =  os.environ["JOB_TABLE"]
+DBClient = boto3.resource('dynamodb').Table(TABLE_NAME)
 
 def handler(event):
     # check event header 
