@@ -13,7 +13,7 @@ import { FileType, Job, JobStatus } from "./service/jobModel"
  * @param algResult - issue type code
  * @returns html string containing image, heatmap, and description
  */
-function generateVidReport(algResult: number): object {
+function generateVidReport(algResult: number): Record<string, string> {
 	const titles: string[] = [
 		'Cannot place image in space',
 		'Pass through other material',
@@ -53,7 +53,11 @@ function generateVidReport(algResult: number): object {
  * @param algResult - issue type code
  * @returns html string containing image, heatmap, and description
  */
-function generateImgReport(filePath: string, algResultPath: string, algResult: number): object {
+function generateImgReport(
+	filePath: string,
+	algResultPath: string,
+	algResult: number
+): Record<string, string> {
 	const titles: string[] = [
 		"General issue heatmap",
 		"Null value",
@@ -97,7 +101,7 @@ export const generateReport = async (event: SQSEvent, context: AWSLambda.Context
 	const files = job.files
 
 	// construct HTML report contents
-	const content: object[] = [];
+	const content: Record<string, string>[] = [];
 	if (dbRes.Item != null) {
 		const files = dbRes.Item.files;
 		if (files.L != null) {
