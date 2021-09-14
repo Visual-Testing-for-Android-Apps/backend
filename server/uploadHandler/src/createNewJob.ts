@@ -12,9 +12,8 @@ import { getUploadURL } from "./service/S3Client"
 import { handleNewEmailSes } from "./service/sesService"
 
 export interface FileUploadResponseBody {
-	uploadUrls?: string;
+	uploadUrls: {[key:string]:string};
 	jobID: string;
-	verified?: boolean;
 }
 
 export const createNewJob = async (eventBody: string): Promise<FileUploadResponseBody> => {
@@ -32,6 +31,7 @@ export const createNewJob = async (eventBody: string): Promise<FileUploadRespons
 	// 3. send verification code 
 	await handleNewEmailSes(jobID,email)
 	// 4. init file upload
+	const returnBody:FileUploadResponseBody = {uploadUrls:{}, jobID}
 	for (const fileName of filenames){
 		const file = initFile(fileName, jobID)
 		// 4.1. generate preSigned Url for files to S3
