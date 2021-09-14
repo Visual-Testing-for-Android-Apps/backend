@@ -118,7 +118,7 @@ def getFile(jobID, fileIdx):
         raise Exception("Invalid fileIdx")
     return item["files"][fileIdx]
 
-def saveResultToDb(result,fileIdx, jobID):
+def saveResultToDb(result,fileIdx, jobID,resultKey):
     tablename = os.getenv("JOB_TABLE")
     table = boto3.resource('dynamodb').Table(tablename)
     # update the record. 
