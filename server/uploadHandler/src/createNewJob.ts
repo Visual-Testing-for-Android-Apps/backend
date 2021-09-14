@@ -12,7 +12,7 @@ import { getUploadURL } from "./service/S3Client"
 import { handleNewEmailSes } from "./service/sesService"
 
 export interface FileUploadResponseBody {
-	uploadUrl?: string;
+	uploadUrls?: string;
 	jobID: string;
 	verified?: boolean;
 }
@@ -22,26 +22,17 @@ export const createNewJob = async (eventBody: string): Promise<FileUploadRespons
 	const parsedBody = JSON.parse(eventBody);
 	const recievedJobID = parsedBody["jobID"];
 	const email = parsedBody["email"];
-	const fullFileName = parsedBody["fileName"];
-	const [fileName, fileExtension] = fullFileName.split(".");
+	const filenames = parsedBody["fileNames"];
 
-	const id = jobID ? jobID : uuidv4();
-	console.log("Running uploadHandler");
-	// 1. upload files to S3
-	const randomfileName = Math.round(Math.random() * 10000000);
-	// append random number to resolve naming conflict, originalName#randomNumber.extension
-	const fileKey = `${id}/${fileName}#${randomfileName}.${fileExtension}`;
-	const uploadUrl = await getUploadURL(fileKey, fileExtension);
-	const returnBody: FileUploadResponseBody = {
-		uploadUrl,
-		jobID: id,
-	};
+	const jobID = recievedJobID ? recievedJobID : uuidv4();
 	// 2. create new job record in db
-	await createNewJobItem(jobID, email);
+	if (recievedJobID){
+		await createNewJobItem(jobID, email);
+	}
 	// 3. send verification code 
 	await handleNewEmailSes(jobID,email)
 	// 4. init file upload
-	for (const fileName of fileNames){
+	for (const fileName of filenames){
 		const file = initFile(fileName, jobID)
 		// 4.1. generate preSigned Url for files to S3
 		const uploadUrl = await getUploadURL(file.s3Key, file.contentType);

@@ -6,11 +6,13 @@ export interface Job {
 	emailVerified:boolean;
 }
 
-export interface file {
-	fileReference: string;
-	fileType: string;
+export interface File {
+	contentType: string;
+	s3Key: string;
+	orginalName:string;
+	type: string;
 	finishTime?: string;
-	fileStatus: FileStatus;
+	status: FileStatus;
 	resultCode?: number;
 	resultFileReference?: string;
 }
