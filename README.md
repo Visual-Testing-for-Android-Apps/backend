@@ -1,17 +1,20 @@
 Uploaded 29/8/2021
 
-# Visual testing Backend 
+# Visual testing Backend
 
-## Front end reads this section 
-### Batch job. 
-Front need to 
+## Front end reads this section
 
-🔵 1. (for each file) send a POST request to get a preSigned URL for upload image/vidoe 
+### Batch job.
+
+Front need to
+
+🔵 1. (for each file) send a POST request to get a preSigned URL for upload image/vidoe
 example request body
-```
-POST https://knfxd86hz7.execute-api.ap-southeast-2.amazonaws.com/Prod/job 
 
-// First file
+```
+POST https://knfxd86hz7.execute-api.ap-southeast-2.amazonaws.com/Prod/job
+
+// Upload Request
 {
     "email": "sample_email@gmail.com",
     "fileName":"test.mp4"
@@ -24,7 +27,9 @@ POST https://knfxd86hz7.execute-api.ap-southeast-2.amazonaws.com/Prod/job
     "jobID" : "jobId returned from the first api call"
 }
 ```
-example return body 
+
+example return body
+
 ```
 {
     "uploadUrl": "some_url",
@@ -35,6 +40,7 @@ example return body
 📧 At this point, you will receive a verification code in your email. However for now, the email service is in sendbox mode, can't send email to unverified email address. Let me (Rebecca) know if you want to be verified.  All verification codes are 6 digit numbers. You can still use unverified email for submiting jobs, then the verification is just skipped. 
 
 🔵 2. (for each file) Send a PUT request on the preSigned URL with file
+
 ```
 PUT {uploadUrl returned from step 1}
 ```
@@ -53,10 +59,10 @@ POST https://knfxd86hz7.execute-api.ap-southeast-2.amazonaws.com/Prod/job
 
 🔵 4. (after all file has been uploaded) send a Post requst to notify finish 
 ```
-POST https://knfxd86hz7.execute-api.ap-southeast-2.amazonaws.com/Prod/job 
+POST https://knfxd86hz7.execute-api.ap-southeast-2.amazonaws.com/Prod/job
 
 {
-    "uploadDone": "true", 
+    "uploadDone": "true",
     "jobID":"jobId returned from the first api call"
 }
 ```
@@ -65,14 +71,15 @@ POST https://knfxd86hz7.execute-api.ap-southeast-2.amazonaws.com/Prod/job
 
 Video Endpoint: POST https://knfxd86hz7.execute-api.ap-southeast-2.amazonaws.com/Prod/Seenomaly
 
+## Back end reads this section
 
-## Back end reads this section 
-
-✅ Manual trigger owlEye and seenomaly 
+✅ Manual trigger owlEye and seenomaly
 In your AWS console,
-1. go to SQS 
-2. select `send and reieve messages`. 
-Example body format
+
+1. go to SQS
+2. select `send and reieve messages`.
+   Example body format
+
 ```
 {
     "jobID":123,
@@ -80,10 +87,7 @@ Example body format
     "fileIdx": the file index in the dynmodb files list of the job.
 }
 ✅ Go to cloudwatch/log group to see the the execution logs
-✅ dynamodb to check if result has been updated 
+✅ dynamodb to check if result has been updated
 ✅ S3 to check if image is saved (only for image model)
 
 ```
-
-
-
