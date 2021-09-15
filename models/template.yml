@@ -1,0 +1,82 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Description: >-
+  android-visual-testing-models
+
+# Transform section specifies one or more macros that AWS CloudFormation uses to process your template
+# https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/transform-section-structure.html
+Transform:
+  - AWS::Serverless-2016-10-31
+
+Globals:
+  Api:
+    Cors:
+      AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+      AllowMethods: "'OPTIONS,POST,GET,DELETE'"
+      AllowCredentials: false
+      AllowOrigin: "'*'"
+    BinaryMediaTypes:
+      - video/mp4
+      - image/png
+      - image/jpg
+      - image/jpeg
+  
+  OwlEyeFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      PackageType: Image
+      Timeout: 300
+      MemorySize: 1000
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /owleye
+            Method: post
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref JobTable
+        - S3CrudPolicy:
+            BucketName: !Ref SrcBucket
+      Environment:
+        Variables:
+          SRC_BUCKET: !Ref SrcBucket
+          JOB_TABLE: !Ref JobTable
+          POST_PROCESS_HANDLER_QUEUE: !Ref JobCompletionStatusQueue
+    Metadata:
+      Dockerfile: Dockerfile
+      DockerContext: ./owlEye
+      DockerTag: python3.7-v1
+
+  SeenomalyFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Condition: ifDeploySeenomaly
+    Properties:
+      PackageType: Image
+      Timeout: 900
+      MemorySize: 5000
+      Events:
+        Api:
+          Type: Api #
+          Properties:
+            Path: /Seenomaly
+            Method: post
+        SQSQueueEvent:
+          Type: SQS
+          Properties:
+            Queue: !GetAtt SeenomalyQueue.Arn
+            BatchSize: 1
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref JobTable
+        - S3CrudPolicy:
+            BucketName: !Ref SrcBucket
+      Environment:
+        Variables:
+          SRC_BUCKET: !Ref SrcBucket
+          JOB_TABLE: !Ref JobTable
+          POST_PROCESS_HANDLER_QUEUE: !Ref JobCompletionStatusQueue
+    Metadata:
+      Dockerfile: Dockerfile
+      DockerContext: ./seenomaly
+      DockerTag: python3.7-v1
