@@ -119,10 +119,8 @@ def getFile(jobID, fileIdx):
     return item["files"][fileIdx]
 
 def saveResultToDb(result,fileIdx, jobID,resultKey):
-    tablename = os.getenv("JOB_TABLE")
-    table = boto3.resource('dynamodb').Table(tablename)
     # update the record. 
-    response = table.update_item(
+    response = DBClient.update_item(
     Key={'id': jobID},
     ExpressionAttributeNames= { "#status": "status" },
     UpdateExpression="SET files["+str(fileIdx)+"].resultMessage = :resultMessage," 
