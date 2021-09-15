@@ -27,6 +27,17 @@ export const getUploadURL = async (key: string, contentType: string) => {
 	return uploadURL;
 };
 
+export const getDownloadURL = async (key: string):Promise<string> => {
+	// Get signed URL from S3
+	const s3Params = {
+		Bucket: BUCKET_NAME,
+		Key: key,
+		Expires: URL_EXPIRATION_SECONDS,
+	};
+
+	return await s3bucket.getSignedUrlPromise("getObject", s3Params);
+};
+
 export const getUploadedFilesInJob = async (jobId: string): Promise<string[]> => {
 	if (typeof BUCKET_NAME == "undefined") {
 		throw Error("S3 Bucket name undefined");

@@ -11,7 +11,7 @@ const owlEyeSqsURL = process.env.OWLEUE_URL as string;
 export interface modelTiggerSqsEvent {
 	jobID: string;
 	fileKey: string;
-	fileIdx: Number;
+	fileIdx: number;
 }
 
 const sqsClient = new SQS({
