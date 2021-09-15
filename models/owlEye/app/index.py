@@ -29,30 +29,30 @@ def handler(event,context):
 
 
 def handleRequestFromAPIGateway(event):
-    try:
-        image_bytes = event['body'].encode('utf-8')  # here is where the app get the image data in string
-        res_image, bug_type = imageProcess(base64.b64decode(image_bytes))
-        return {
-            'statusCode': 200,
-            'headers': CORS_HEADER,
-            'body': json.dumps(
-                {
-            
-                    "original_img": event['body'], # this is the original image
-                    'res_img': res_image,
-                    'bug_type': bug_type # contain bug. Currently only have three type of bug
-                    # 'res_img' : img_res_str
-                }
-            )
-        }
-    except Exception as e:
-        print(e)
-        return {
-            'statusCode': 502,
-            'headers': CORS_HEADER,
-            'body': json.dumps(
-                {
-                    "error_msg": str(e)
-                }
-            )
-        }
+
+    image_bytes = event['body'].encode('utf-8')  # here is where the app get the image data in string
+    res_image, bug_type = imageProcess(base64.b64decode(image_bytes))
+    return {
+        'statusCode': 200,
+        'headers': CORS_HEADER,
+        'body': json.dumps(
+            {
+        
+                "original_img": event['body'], # this is the original image
+                'res_img': res_image,
+                'bug_type': bug_type # contain bug. Currently only have three type of bug
+                # 'res_img' : img_res_str
+            }
+        )
+    }
+    # except Exception as e:
+    #     print(e)
+    #     return {
+    #         'statusCode': 502,
+    #         'headers': CORS_HEADER,
+    #         'body': json.dumps(
+    #             {
+    #                 "error_msg": str(e)
+    #             }
+    #         )
+    #     }
