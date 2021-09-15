@@ -23,7 +23,7 @@ CORS_HEADER = {
             'Access-Control-Allow-Methods': 'OPTIONS,POST,GET'
         }
 
-def handler(event):
+def handler(event,context):
     # check event header 
     return handleRequestFromAPIGateway(event)
 
@@ -46,6 +46,7 @@ def handleRequestFromAPIGateway(event):
             )
         }
     except Exception as e:
+        print(e)
         return {
             'statusCode': 502,
             'headers': CORS_HEADER,

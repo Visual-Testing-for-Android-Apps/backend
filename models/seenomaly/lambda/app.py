@@ -10,9 +10,9 @@ CORS_HEADER = {
         }
 def handler(event, context):
     # check event header 
-    print(json.dump(event))
+    print(json.dumps(event))
     try:
-        if (event['body']['url']):
+        if (event['body']['download_url']):
             (x,msg) =  multiEventHandler.handleVideoInPresignedUrl(event)
         else:
             (x,msg) =  multiEventHandler.handleVideoInBody(event)
@@ -27,7 +27,7 @@ def handler(event, context):
             )
         }
         
-    except:
+    except Exception as e:
         print(e)
         return {
             "statusCode": 502,
