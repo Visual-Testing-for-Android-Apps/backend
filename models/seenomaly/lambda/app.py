@@ -11,7 +11,8 @@ CORS_HEADER = {
 def handler(event, context):
     # check event header 
     print(json.dumps(event))
-    if (isinstance(event['body'],str)):
+    json.loads(event)
+    if (not isinstance(event['body'],str)):
         (x,msg) =  multiEventHandler.handleVideoInPresignedUrl(event)
     else:
         (x,msg) =  multiEventHandler.handleVideoInBody(event)
