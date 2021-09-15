@@ -94,12 +94,12 @@ export const isJobComplete = async (event: SQSEvent, context: AWSLambda.Context)
 				QueueUrl: process.env.REPORT_GENERATION_QUEUE as string,
 			};
 
-			pushToQueue(params);
+			await pushToQueue(params);
 			return true; //message
 		}
 	}
 
-	return true;
+	return false;
 };
 
 //Exports isJobComplete for use with AWS lambda

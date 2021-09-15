@@ -24,8 +24,10 @@
 	},
 	"homepage": "https://github.com/Visual-Testing-for-Android-Apps/backend#readme",
 	"devDependencies": {
+		"@types/aws-lambda": "^8.10.83",
 		"@types/jest": "^27.0.1",
 		"@types/nodemailer": "^6.4.4",
+		"@types/uuid": "^8.3.1",
 		"husky": "^7.0.1",
 		"lint-staged": "^11.1.1",
 		"npm-run-all": "^4.1.5",
@@ -36,6 +38,7 @@
 	"dependencies": {
 		"aws-sdk": "^2.978.0",
 		"axios": "^0.21.1",
+		"crypto-secure-random-digit": "^1.0.9",
 		"dotenv": "^10.0.0",
 		"express": "^4.17.1",
 		"nodemailer": "^6.6.3",
