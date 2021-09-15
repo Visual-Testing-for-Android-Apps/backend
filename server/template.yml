@@ -15,25 +15,8 @@ Globals:
       AllowMethods: "'OPTIONS,POST,GET,DELETE'"
       AllowCredentials: false
       AllowOrigin: "'*'"
-    BinaryMediaTypes:
-      - video/mp4
-      - image/png
-      - image/jpg
-      - image/jpeg
 
 Parameters:
-  deployOwlEye:
-    Type: String
-    AllowedValues:
-      - true
-      - false
-    Default: true
-  deploySeenomaly:
-    Type: String
-    AllowedValues:
-      - true
-      - false
-    Default: false
   isProd:
       Type: String
       AllowedValues:
@@ -41,13 +24,6 @@ Parameters:
       - false
       Default: false
 
-Conditions:
-  ifDeployOwlEye: !Equals
-    - !Ref deployOwlEye
-    - true
-  ifDeploySeenomaly: !Equals
-    - !Ref deploySeenomaly
-    - true
 
 # Resources declares the AWS resources that you want to include in the stack
 # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/resources-section-structure.html
@@ -95,8 +71,6 @@ Resources:
           # Make table name accessible as environment variable from function code during execution
           JOB_TABLE: !Ref JobTable
           SRC_BUCKET: !Ref SrcBucket
-          SEENORMALY_URL: !Ref SeenomalyQueue
-          OWLEUE_URL: !Ref OwlEyeQueue
           SES_FROM_ADDRESS: vtaa.report.response@gmail.com
           IS_PROD: !Ref isProd
       Events:
@@ -146,70 +120,8 @@ Resources:
             Queue: !GetAtt JobCompletionStatusQueue.Arn
             BatchSize: 1
 
-  SeenomalyFunction:
-    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
-    Condition: ifDeploySeenomaly
-    Properties:
-      PackageType: Image
-      Timeout: 900
-      MemorySize: 5000
-      Events:
-        Api:
-          Type: Api #
-          Properties:
-            Path: /Seenomaly
-            Method: post
-        SQSQueueEvent:
-          Type: SQS
-          Properties:
-            Queue: !GetAtt SeenomalyQueue.Arn
-            BatchSize: 1
-      Policies:
-        - DynamoDBCrudPolicy:
-            TableName: !Ref JobTable
-        - S3CrudPolicy:
-            BucketName: !Ref SrcBucket
-      Environment:
-        Variables:
-          SRC_BUCKET: !Ref SrcBucket
-          JOB_TABLE: !Ref JobTable
-          POST_PROCESS_HANDLER_QUEUE: !Ref JobCompletionStatusQueue
-    Metadata:
-      Dockerfile: Dockerfile
-      DockerContext: ./seenomaly
-      DockerTag: python3.7-v1
+   
 
-  OwlEyeFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      PackageType: Image
-      Timeout: 300
-      MemorySize: 1000
-      Events:
-        Api:
-          Type: Api
-          Properties:
-            Path: /owleye
-            Method: post
-        SQSQueueEvent:
-          Type: SQS
-          Properties:
-            Queue: !GetAtt OwlEyeQueue.Arn
-            BatchSize: 1
-      Policies:
-        - DynamoDBCrudPolicy:
-            TableName: !Ref JobTable
-        - S3CrudPolicy:
-            BucketName: !Ref SrcBucket
-      Environment:
-        Variables:
-          SRC_BUCKET: !Ref SrcBucket
-          JOB_TABLE: !Ref JobTable
-          POST_PROCESS_HANDLER_QUEUE: !Ref JobCompletionStatusQueue
-    Metadata:
-      Dockerfile: Dockerfile
-      DockerContext: ./owlEye
-      DockerTag: python3.7-v1
 
   FileCompress:
     Type: AWS::Serverless::Function
@@ -323,17 +235,6 @@ Resources:
       VisibilityTimeout: 1000
     Type: AWS::SQS::Queue
 
-  SeenomalyQueue:
-    Properties:
-      ReceiveMessageWaitTimeSeconds: 5
-      VisibilityTimeout: 1000
-    Type: AWS::SQS::Queue
-
-  OwlEyeQueue:
-    Properties:
-      ReceiveMessageWaitTimeSeconds: 5
-      VisibilityTimeout: 1000
-    Type: AWS::SQS::Queue
 
   # Queue to zip job files once report has been generated
   FileZipQueue:
