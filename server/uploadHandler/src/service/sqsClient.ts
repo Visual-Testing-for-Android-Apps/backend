@@ -1,6 +1,6 @@
-import { AWSError, SQS } from "aws-sdk";
-import { SendMessageRequest, SendMessageResult } from "aws-sdk/clients/sqs";
-import { PromiseResult } from "aws-sdk/lib/request";
+import { AWSError, SQS } from "aws-sdk"
+import { SendMessageRequest, SendMessageResult } from "aws-sdk/clients/sqs"
+import { PromiseResult } from "aws-sdk/lib/request"
 
 import { getJob } from "./dynamodbService"
 import { FileType } from "./jobModel"

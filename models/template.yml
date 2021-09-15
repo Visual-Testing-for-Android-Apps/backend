@@ -20,7 +20,8 @@ Globals:
       - image/png
       - image/jpg
       - image/jpeg
-  
+
+Resources:
   OwlEyeFunction:
     Type: AWS::Serverless::Function
     Properties:

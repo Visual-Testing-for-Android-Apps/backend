@@ -500,3 +500,4 @@ server/owlEye/samconfig.toml
 
 server/owlEye/.aws-sam/build.toml
 
+models/.aws-sam
