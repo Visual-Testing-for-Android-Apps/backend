@@ -347,14 +347,6 @@ def imageProcess(image_bytes):
         and computes intermediate activations.
         Makes the visualization. """
 
-    # file = os.listdir(image_dir)  # TODO : file is in the input event data
-    # target_dir = 'LOCATION IN S3'  # TODO target dir is some location
-    #
-    # print(file)
-    # (filename, extension) = os.path.splitext(file)
-    # image_num = filename
-    # image_name = image_dir + file
-    # args = get_args()
 
     multi_model_directory = os.getenv("MODEL_DIR", './opt/ml/')
     # this directory will contain 4 models
