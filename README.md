@@ -17,23 +17,27 @@ POST https://knfxd86hz7.execute-api.ap-southeast-2.amazonaws.com/Prod/job
 // Upload Request
 {
     "email": "sample_email@gmail.com",
-    "fileNames":["test.mp4", "test_image.jpeg", ...]
+    "fileName":"test.mp4"
 }
 
+// Following files 
+{
+    "email": "sample_email@gmail.com",
+    "fileName":"test.mp4",
+    "jobID" : "jobId returned from the first api call"
+}
 ```
 
 example return body
 
 ```
 {
-    "uploadUrls": {
-        "test.mp4": "a preSigned url",
-        "test_image.jpeg":"another preSigned url",
-        ...
-    }
+    "uploadUrl": "some_url",
     "jobID": "2a9c3a0e-8df2-4484-a281-059796b15682"
 }
+
 ```
+📧 At this point, you will receive a verification code in your email. However for now, the email service is in sendbox mode, can't send email to unverified email address. Let me (Rebecca) know if you want to be verified.  All verification codes are 6 digit numbers. You can still use unverified email for submiting jobs, then the verification is just skipped. 
 
 🔵 2. (for each file) Send a PUT request on the preSigned URL with file
 
@@ -41,8 +45,19 @@ example return body
 PUT {uploadUrl returned from step 1}
 ```
 
-🔵 3. (after all file has been uploaded) send a Post requst to notify finish
+🔴 3. After the user entered the verification code, 
+```
+POST https://knfxd86hz7.execute-api.ap-southeast-2.amazonaws.com/Prod/job 
 
+{
+    "verificationCode": "some 6 digt number", // can be anything code for now send 
+    "jobID":"jobId returned from the first api call"
+}
+```
+
+3.1 if user want to update their email 
+
+🔵 4. (after all file has been uploaded) send a Post requst to notify finish 
 ```
 POST https://knfxd86hz7.execute-api.ap-southeast-2.amazonaws.com/Prod/job
 

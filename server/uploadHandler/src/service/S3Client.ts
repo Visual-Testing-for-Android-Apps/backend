@@ -1,8 +1,10 @@
-import * as AWS from "aws-sdk";
+import * as AWS from "aws-sdk"
 
 const BUCKET_NAME = process.env["SRC_BUCKET"];
 const URL_EXPIRATION_SECONDS = 300;
 const s3bucket = new AWS.S3();
+const videoExtension = ["mp4"];
+const imageExtension = ["jpg", "jpeg"];
 
 export const uploadToS3 = (fileName: string, fileStream: string): Promise<any> => {
 	const params = {
@@ -18,9 +20,9 @@ export const getUploadURL = async (key: string, contentType: string) => {
 	// Get signed URL from S3
 	const s3Params = {
 		Bucket: BUCKET_NAME,
-		Key: key,
+		Key: fileKey,
 		Expires: URL_EXPIRATION_SECONDS,
-		ContentType: contentType,
+		ContentType: getContentType(fileExtension),
 	};
 
 	const uploadURL = await s3bucket.getSignedUrlPromise("putObject", s3Params);

@@ -32,19 +32,25 @@ content-type: application/json
 POST https://knfxd86hz7.execute-api.ap-southeast-2.amazonaws.com/Prod/job HTTP/1.1
 content-type: application/json
 
-{"email": "sample_email@gmail.com","fileNames":["test_instagram.mp4", "test.jpg"]}
+{"email": "beining0026@gmail.com","fileNames":["test_instagram.mp4", "test.jpg"]}
+
+### request verification code
+POST https://knfxd86hz7.execute-api.ap-southeast-2.amazonaws.com/Prod/job/verify-code HTTP/1.1
+content-type: application/json
+
+{"jobID": "1c2209d5-1ca6-42c7-a800-0eb80ac9ed84","verificationCode":"625613"}
 
 
 ### upload completion
-POST https://knfxd86hz7.execute-api.ap-southeast-2.amazonaws.com/Prod/job HTTP/1.1
+POST https://knfxd86hz7.execute-api.ap-southeast-2.amazonaws.com/Prod/job/upload-done HTTP/1.1
 content-type: application/json
 
-{"jobID":"b1fd7320-3a24-4e3f-a737-b8ac50193552", "uploadDone":"true"}
+{"jobID":"f3adbf72-dcc6-4d9f-9ff9-2d305eba5a90"}
 
-### 
+### update email
 
-POST https://knfxd86hz7.execute-api.ap-southeast-2.amazonaws.com/Prod/job HTTP/1.1
+POST https://knfxd86hz7.execute-api.ap-southeast-2.amazonaws.com/Prod/job/update-email HTTP/1.1
 content-type: application/json
 
-{"uploadDone": "true", "jobID":"e59d4681-3207-467c-a477-cc934f154e2c"}
+{"jobID": "1c2209d5-1ca6-42c7-a800-0eb80ac9ed84","email":"bche0026@studnet.monash.edu"}
 

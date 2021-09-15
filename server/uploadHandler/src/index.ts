@@ -1,5 +1,8 @@
-import { createNewJob, FileUploadResponseBody } from "./createNewJob";
-import { ApiGatewayEvent, ApiGatewayResponse } from "./service/apigateway";
+import { createNewJob, FileUploadResponseBody } from "./createNewJob"
+import { ApiGatewayEvent, ApiGatewayResponse } from "./service/apigateway"
+import { getEmail, updateEmail } from "./service/dynamodbService"
+import { checkVerificationCode, handleNewEmailSes } from "./service/sesService"
+import { sqsTriggerModels } from "./service/sqsClient"
 
 const CORS_HEADER = {
 	"Access-Control-Allow-Headers": "*",
@@ -19,14 +22,27 @@ const CORS_HEADER = {
 
 export const handler = async (event: ApiGatewayEvent): Promise<ApiGatewayResponse> => {
 	try {
-		const returnBody: FileUploadResponseBody = await createNewJob(event.body);
-		return {
-			statusCode: 200,
-			headers: CORS_HEADER,
-			body: JSON.stringify({
-				...returnBody,
-			}),
-		};
+		switch (event.path){
+			case "/job":
+				return newJobHandler(event)
+			case "/job/update-email":
+				return updateEmailHandler(event)
+			case "/job/resend-code":
+				return resendCodeHandler(event)
+			case "/job/upload-done":
+				return uploadDoneHandler(event)
+			case "/job/verify-code":
+				return verifyCodeHandler(event)
+			default:
+				return {
+					statusCode: 404,
+					headers: CORS_HEADER,
+					body: JSON.stringify({
+						message: "invalid path",
+						event:event
+					}),
+				}
+		}
 	} catch (e) {
 		console.log(e);
 		return {
@@ -36,3 +52,97 @@ export const handler = async (event: ApiGatewayEvent): Promise<ApiGatewayRespons
 		};
 	}
 };
+
+const newJobHandler = async (event:ApiGatewayEvent): Promise<ApiGatewayResponse> =>{
+
+	const returnBody: FileUploadResponseBody = await createNewJob(event.body);
+	
+	return {
+		statusCode: 200,
+		headers: CORS_HEADER,
+		body: JSON.stringify({
+			...returnBody,
+			message:"create new Job ...",
+		}),
+	};
+}
+
+const updateEmailHandler = async (event:ApiGatewayEvent): Promise<ApiGatewayResponse> =>{
+	const parsedBody = JSON.parse(event.body);
+	const jobID = parsedBody["jobID"];
+	const newEmail = parsedBody["email"];
+	if (!jobID || !newEmail){
+		throw Error("No jobID or new email provided");
+	}
+	await updateEmail(jobID, newEmail);
+	return {
+		statusCode: 200,
+		headers: CORS_HEADER,
+		body: JSON.stringify({
+			jobID,
+			newEmail,
+			message:"udpate email ... ",
+		}),
+	};
+}
+
+const resendCodeHandler = async (event:ApiGatewayEvent): Promise<ApiGatewayResponse> =>{
+	const parsedBody = JSON.parse(event.body);
+	const jobID = parsedBody["jobID"];
+	if (!jobID){
+		throw Error("No jobID or new email provided");
+	}
+
+	const email = await getEmail(jobID)
+	await handleNewEmailSes(jobID, email)
+	return {
+		statusCode: 200,
+		headers: CORS_HEADER,
+		body: JSON.stringify({
+			jobID,
+			email,
+			message: "resend code...",
+		}),
+	}
+
+}
+
+const uploadDoneHandler =  async (event:ApiGatewayEvent): Promise<ApiGatewayResponse> =>{
+	const parsedBody = JSON.parse(event.body);
+	const jobID = parsedBody["jobID"];
+	if (!jobID) {
+		throw Error("No jobID provided");
+	}
+	await sqsTriggerModels(jobID);
+	return {
+		statusCode: 200,
+		headers: CORS_HEADER,
+		body: JSON.stringify({
+			jobID,
+			message:"upload done, trigger models ...",
+		}),
+	}
+
+}
+
+const verifyCodeHandler = async (event:ApiGatewayEvent): Promise<ApiGatewayResponse> =>{
+	const parsedBody = JSON.parse(event.body);
+	const jobID = parsedBody["jobID"];
+	const verificationCode = parsedBody["verificationCode"];
+
+	if (!jobID || !verificationCode) {
+		throw Error("No jobID or verificationCode provided");
+	}
+	const verified = await checkVerificationCode(jobID, verificationCode)
+	return {
+		statusCode: verified? 200 : 403,
+		headers: CORS_HEADER,
+		body: JSON.stringify({
+			jobID,
+			verified,
+			message:"verify code ...",
+		}),
+	}
+	
+
+}
