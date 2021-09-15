@@ -1,4 +1,5 @@
 import * as AWS from "aws-sdk"
+import {getFileType} from "./jobModel"
 
 const BUCKET_NAME = process.env["SRC_BUCKET"];
 const URL_EXPIRATION_SECONDS = 300;
@@ -16,13 +17,13 @@ export const uploadToS3 = (fileName: string, fileStream: string): Promise<any> =
 	return s3bucket.upload(params).promise();
 };
 
-export const getUploadURL = async (key: string, contentType: string) => {
+export const getUploadURL = async (fileKey: string, fileExtension: string) => {
 	// Get signed URL from S3
 	const s3Params = {
 		Bucket: BUCKET_NAME,
 		Key: fileKey,
 		Expires: URL_EXPIRATION_SECONDS,
-		ContentType: getContentType(fileExtension),
+		ContentType: getFileType(fileExtension),
 	};
 
 	const uploadURL = await s3bucket.getSignedUrlPromise("putObject", s3Params);

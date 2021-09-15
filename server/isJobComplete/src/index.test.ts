@@ -61,8 +61,11 @@ const createFile = (
 	};
 };
 
-const createBatch = (...files: AttributeValue[]): AttributeMap => {
+const createBatch = (jobStatus: string, ...files: AttributeValue[]): AttributeMap => {
 	return {
+		jobStatus:{
+			S: jobStatus
+		},
 		files: {
 			L: files,
 		},
@@ -83,10 +86,12 @@ describe("Main", function () {
 
 				let batches = [
 					createBatch(
+						"PROCESSING",
 						createFile("some/path/", "image", false, 0, ""),
 						createFile("other/path/", "video", true, 1, "another/path")
 					),
 					createBatch(
+						"PROCESSING",
 						createFile("some/path/", "image", true, 0, ""),
 						createFile("other/path/", "video", true, 1, "another/path")
 					),

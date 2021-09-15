@@ -1,5 +1,4 @@
 AWSTemplateFormatVersion: 2010-09-09
-
 Description: >-
   android-visual-testing
 
@@ -18,36 +17,29 @@ Globals:
     BinaryMediaTypes:
       - video/mp4
       - image/png
-      - image/jpg
       - image/jpeg
 
-Parameters:
-  deployOwlEye:
-    Type: String
-    AllowedValues:
-      - true
-      - false
-    Default: true
-  deploySeenomaly:
-    Type: String
-    AllowedValues:
-      - true
-      - false
-    Default: false
-  isProd:
-      Type: String
-      AllowedValues:
-      - true
-      - false
-      Default: false
+# Parameters:
+#   deployOwlEye:
+#     Type: String
+#     AllowedValues:
+#       - true
+#       - false
+#     Default: true
+#   deploySeenomaly:
+#     Type: String
+#     AllowedValues:
+#       - true
+#       - false
+#     Default: false
 
-Conditions:
-  ifDeployOwlEye: !Equals
-    - !Ref deployOwlEye
-    - true
-  ifDeploySeenomaly: !Equals
-    - !Ref deploySeenomaly
-    - true
+# Conditions:
+#   ifDeployOwlEye: !Equals
+#     - !Ref deployOwlEye
+#     - true
+#   ifDeploySeenomaly: !Equals
+#     - !Ref deploySeenomaly
+#     - true
 
 # Resources declares the AWS resources that you want to include in the stack
 # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/resources-section-structure.html
@@ -87,9 +79,6 @@ Resources:
               Resource:
                 - !Sub arn:aws:s3:::${SrcBucket}/*
                 - !Sub arn:aws:s3:::${SrcBucket}
-            - Action: ses:SendEmail
-              Effect: Allow
-              Resource: "*"
       Environment:
         Variables:
           # Make table name accessible as environment variable from function code during execution
@@ -97,21 +86,12 @@ Resources:
           SRC_BUCKET: !Ref SrcBucket
           SEENORMALY_URL: !Ref SeenomalyQueue
           OWLEUE_URL: !Ref OwlEyeQueue
-          SES_FROM_ADDRESS: vtaa.report.response@gmail.com
-          IS_PROD: !Ref isProd
       Events:
         Api:
           Type: Api
           Properties:
             Path: /job
             Method: POST
-        ProxiedApi:
-            Type: Api
-            Properties:
-              Path: /job/{proxy+}
-              Method: POST
-
-        
 
   JobCompletionStatus:
     Type: AWS::Serverless::Function
@@ -125,14 +105,25 @@ Resources:
       Timeout: 100
       Description: Endpoint for post processing results
       Policies:
-        #Allow us to push to the next queue
-        - SQSSendMessagePolicy:
-            QueueName: !Ref ReportGenerationQueue
-        # Give Create/Read/Update/Delete Permissions to the SampleTable
-        - DynamoDBCrudPolicy:
-            TableName: !Ref JobTable
-        - S3CrudPolicy:
-            BucketName: !Ref SrcBucket
+        - AWSLambdaBasicExecutionRole
+        - Version: 2012-10-17
+          Statement:
+            - Action: dynamodb:*
+              Effect: Allow
+              Resource:
+                - !GetAtt JobTable.Arn
+            - Action: cloudwatch:PutMetricData
+              Effect: Allow
+              Resource: "*"
+            - Action:
+                - sqs:*
+              Effect: Allow
+              Resource: "*"
+            - Action: s3:*
+              Effect: Allow
+              Resource:
+                - !Sub arn:aws:s3:::${SrcBucket}/*
+                - !Sub arn:aws:s3:::${SrcBucket}
       Environment:
         Variables:
           # Make table name accessible as environment variable from function code during execution
@@ -146,77 +137,77 @@ Resources:
             Queue: !GetAtt JobCompletionStatusQueue.Arn
             BatchSize: 1
 
-  SeenomalyFunction:
-    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
-    Condition: ifDeploySeenomaly
-    Properties:
-      PackageType: Image
-      Timeout: 900
-      MemorySize: 5000
-      Events:
-        Api:
-          Type: Api #
-          Properties:
-            Path: /Seenomaly
-            Method: post
-        SQSQueueEvent:
-          Type: SQS
-          Properties:
-            Queue: !GetAtt SeenomalyQueue.Arn
-            BatchSize: 1
-      Policies:
-        - DynamoDBCrudPolicy:
-            TableName: !Ref JobTable
-        - S3CrudPolicy:
-            BucketName: !Ref SrcBucket
-      Environment:
-        Variables:
-          SRC_BUCKET: !Ref SrcBucket
-          JOB_TABLE: !Ref JobTable
-          POST_PROCESS_HANDLER_QUEUE: !Ref JobCompletionStatusQueue
-    Metadata:
-      Dockerfile: Dockerfile
-      DockerContext: ./seenomaly
-      DockerTag: python3.7-v1
+  # SeenomalyFunction:
+  #   Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+  #   Condition: ifDeploySeenomaly
+  #   Properties:
+  #     PackageType: Image
+  #     Timeout: 900
+  #     MemorySize: 5000
+  #     Events:
+  #       Api:
+  #         Type: Api #
+  #         Properties:
+  #           Path: /Seenomaly
+  #           Method: post
+  #       SQSQueueEvent:
+  #         Type: SQS
+  #         Properties:
+  #           Queue: !GetAtt SeenomalyQueue.Arn
+  #           BatchSize: 1
+  #     Policies:
+  #       - DynamoDBCrudPolicy:
+  #           TableName: !Ref JobTable
+  #       - S3CrudPolicy:
+  #           BucketName: !Ref SrcBucket
+  #     Environment:
+  #       Variables:
+  #         SRC_BUCKET: !Ref SrcBucket
+  #         JOB_TABLE: !Ref JobTable
+  #         POST_PROCESS_HANDLER_QUEUE: !Ref JobCompletionStatusQueue
+  #   Metadata:
+  #     Dockerfile: Dockerfile
+  #     DockerContext: ./seenomaly
+  #     DockerTag: python3.7-v1
 
-  OwlEyeFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      PackageType: Image
-      Timeout: 300
-      MemorySize: 1000
-      Events:
-        Api:
-          Type: Api
-          Properties:
-            Path: /owleye
-            Method: post
-        SQSQueueEvent:
-          Type: SQS
-          Properties:
-            Queue: !GetAtt OwlEyeQueue.Arn
-            BatchSize: 1
-      Policies:
-        - DynamoDBCrudPolicy:
-            TableName: !Ref JobTable
-        - S3CrudPolicy:
-            BucketName: !Ref SrcBucket
-      Environment:
-        Variables:
-          SRC_BUCKET: !Ref SrcBucket
-          JOB_TABLE: !Ref JobTable
-          POST_PROCESS_HANDLER_QUEUE: !Ref JobCompletionStatusQueue
-    Metadata:
-      Dockerfile: Dockerfile
-      DockerContext: ./owlEye
-      DockerTag: python3.7-v1
+  # OwlEyeFunction:
+  #   Type: AWS::Serverless::Function
+  #   Properties:
+  #     PackageType: Image
+  #     Timeout: 300
+  #     MemorySize: 1000
+  #     Events:
+  #       Api:
+  #         Type: Api
+  #         Properties:
+  #           Path: /owleye
+  #           Method: post
+  #       SQSQueueEvent:
+  #         Type: SQS
+  #         Properties:
+  #           Queue: !GetAtt OwlEyeQueue.Arn
+  #           BatchSize: 1
+  #     Policies:
+  #       - DynamoDBCrudPolicy:
+  #           TableName: !Ref JobTable
+  #       - S3CrudPolicy:
+  #           BucketName: !Ref SrcBucket
+  #     Environment:
+  #       Variables:
+  #         SRC_BUCKET: !Ref SrcBucket
+  #         JOB_TABLE: !Ref JobTable
+  #         POST_PROCESS_HANDLER_QUEUE: !Ref JobCompletionStatusQueue
+  #   Metadata:
+  #     Dockerfile: Dockerfile
+  #     DockerContext: ./owlEye
+  #     DockerTag: python3.7-v1
 
   FileCompress:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: fileCompress/
       Handler: app.lambda_handler
-      Runtime: python3.9
+      Runtime: python3.7
       Timeout: 10
       Policies:
         # Give Create/Read/Update/Delete Permissions to the SampleTable
@@ -240,7 +231,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: sendEmail/
-      Handler: dist/index.sendEmail
+      Handler: dist/send-email.sendEmail
       Runtime: nodejs12.x
       Description: Endpoint for sending email with results to users
       Policies:
@@ -285,67 +276,56 @@ Resources:
         SQSQueueEvent:
           Type: SQS
           Properties:
-            Queue: !GetAtt PostProcessHandlerQueue.Arn
+            Queue: !GetAtt ReportGenerationQueue.Arn
             BatchSize: 1
 
   # This is an SQS queue with all default configuration properties. To learn more about the available options, see
   # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-sqs-queues.html
   JobCompletionStatusQueue:
     Properties:
-      ReceiveMessageWaitTimeSeconds: 5
-      VisibilityTimeout: 1000
+      ReceiveMessageWaitTimeSeconds: 1
+      VisibilityTimeout: 10
     Type: AWS::SQS::Queue
 
-  # EventInvokeConfig:
-  #   Type: AWS::Lambda::EventInvokeConfig
-  #   Properties:
-  #       Policies:
-  #         #Allow us to push to the next queue
-  #         - SQSSendMessagePolicy:
-  #             QueueName: !Ref ReportGenerationQueue
-  #       FunctionName: !Ref JobCompletionStatus
-  #       Qualifier: "$LATEST"
-  #       DestinationConfig:
-  #           OnSuccess:
-  #               Destination: !GetAtt ReportGenerationQueue.Arn
-  #           OnFailure:
-  #               Destination: !GetAtt ReportGenerationQueue.Arn
+  FileZipQueue:
+    Properties:
+      ReceiveMessageWaitTimeSeconds: 1
+      VisibilityTimeout: 10
+    Type: AWS::SQS::Queue
+
+  EventInvokeConfig:
+    Type: AWS::Lambda::EventInvokeConfig
+    Properties:
+      FunctionName: !Ref JobCompletionStatus
+      Qualifier: "$LATEST"
+      DestinationConfig:
+          OnSuccess:
+              Destination: !GetAtt ReportGenerationQueue.Arn
+          OnFailure:
+              Destination: !GetAtt ReportGenerationQueue.Arn
 
   ReportGenerationQueue:
     Properties:
-      ReceiveMessageWaitTimeSeconds: 5
-      VisibilityTimeout: 1000
-    Type: AWS::SQS::Queue
-    
-  PostProcessHandlerQueue:
-    Properties:
-      ReceiveMessageWaitTimeSeconds: 5
-      VisibilityTimeout: 1000
+      ReceiveMessageWaitTimeSeconds: 1
+      VisibilityTimeout: 10
     Type: AWS::SQS::Queue
 
   SeenomalyQueue:
     Properties:
-      ReceiveMessageWaitTimeSeconds: 5
-      VisibilityTimeout: 1000
+      ReceiveMessageWaitTimeSeconds: 1
+      VisibilityTimeout: 10
     Type: AWS::SQS::Queue
 
   OwlEyeQueue:
     Properties:
-      ReceiveMessageWaitTimeSeconds: 5
-      VisibilityTimeout: 1000
-    Type: AWS::SQS::Queue
-
-  # Queue to zip job files once report has been generated
-  FileZipQueue:
-    Properties:
-      ReceiveMessageWaitTimeSeconds: 5
-      VisibilityTimeout: 1000
+      ReceiveMessageWaitTimeSeconds: 1
+      VisibilityTimeout: 10
     Type: AWS::SQS::Queue
 
   SendEmailQueue:
     Properties:
-      ReceiveMessageWaitTimeSeconds: 5
-      VisibilityTimeout: 1000
+      ReceiveMessageWaitTimeSeconds: 1
+      VisibilityTimeout: 10
     Type: AWS::SQS::Queue
 
   # DynamoDB table to store job information
@@ -376,16 +356,16 @@ Resources:
               - "*"
 
 Outputs:
-  UploadHandlerEndpoint:
-    Description: "API Gateway endpoint URL for Prod stage"
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/prod/"
+  # UploadHandlerEndpoint:
+  #   Description: "API Gateway endpoint URL for Prod stage"
+  #   Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/prod/"
   UploadHandlerFunction:
     Value: !Ref UploadHandler
   JobCompletionStatusFuntion:
     Value: !Ref JobCompletionStatus
-  FileCompressApi:
-    Description: "API Gateway endpoint URL for Prod stage for file compression function"
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/fileCompress/"
+  # FileCompressApi:
+  #   Description: "API Gateway endpoint URL for Prod stage for file compression function"
+  #   Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/fileCompress/"
   SendEmailFunction:
     Value: !Ref SendEmail
   ReportGeneratorFunction:
@@ -396,5 +376,3 @@ Outputs:
     Value: !Ref SrcBucket
   JobTableName:
     Value: !Ref JobTable
-  # PostProcessHandlerQueue:
-  #   Value
