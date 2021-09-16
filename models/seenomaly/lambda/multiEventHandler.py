@@ -22,5 +22,5 @@ def handleVideoInPresignedUrl(body):
     response = requests.get(url)
     print("response",response)
     #img = Image.open(BytesIO(response.content))
-    return use.main(netName, checkpoint, modelDir, preprocess.fromJson(response))
+    return use.main(netName, checkpoint, modelDir, preprocess.fromJson(response.content))
  

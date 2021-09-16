@@ -39,7 +39,7 @@ def handleRequestFromAPIGateway(event):
             {
         
                 "original_img": event['body'], # this is the original image
-                'res_img': res_image.decode('utf-8'),
+                'res_img': res_image,
                 'bug_type': bug_type # contain bug. Currently only have three type of bug
                 # 'res_img' : img_res_str
             }

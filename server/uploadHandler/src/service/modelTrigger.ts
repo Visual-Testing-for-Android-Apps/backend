@@ -4,7 +4,7 @@ import { getJob } from "./dynamodbService"
 import { FileType } from "./jobModel"
 import { getDownloadURL } from "./S3Client"
 
-const BASE_URL = "https://4cyjqwwvr5.execute-api.ap-southeast-2.amazonaws.com/Prod"
+const BASE_URL = "https://u8iacl4gj0.execute-api.ap-southeast-2.amazonaws.com/Prod"
 
 export const modelTrigger = async (jobID:string) =>{
     const job = await getJob(jobID);
