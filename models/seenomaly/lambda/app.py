@@ -1,5 +1,6 @@
 
 import json
+from json.decoder import JSONDecodeError
 import multiEventHandler 
 
 
@@ -10,12 +11,17 @@ CORS_HEADER = {
         }
 def handler(event, context):
     # check event header 
-    print(json.dumps(event))
-    json.loads(event)
-    if (not isinstance(event['body'],str)):
-        (x,msg) =  multiEventHandler.handleVideoInPresignedUrl(event)
+    isRecievedJson = False
+    try:
+        body = json.loads(event["body"])
+        isRecievedJson = True
+    except JSONDecodeError as e:
+        pass 
+
+    if isRecievedJson:
+        (x,msg) =  multiEventHandler.handleVideoInPresignedUrl(body)
     else:
-        (x,msg) =  multiEventHandler.handleVideoInBody(event)
+        (x,msg) =  multiEventHandler.handleVideoInBody(event["body"])
     return {
         "statusCode": 200,
         "headers": CORS_HEADER,
