@@ -10,8 +10,9 @@ def lambda_handler(event, context):
     # Define the constants
     TABLE_NAME = os.environ["JOB_TABLE"]
     BUCKET_NAME = os.environ["SRC_BUCKET"]
+    EMAIL_QUEUE = os.environ["EMAIL_QUEUE"]
     PRIMARY_KEY = "id"
-    LOOKUP_BATCH_ID = event["queryStringParameters"]["id"]
+    LOOKUP_BATCH_ID = json.loads(event["Records"][0]["body"])["jobKey"]
     PRESIGNED_LINK_DURATION = 432000 # seconds (up to max of 7 days)
 
     # Create table and bucket reference
@@ -35,7 +36,7 @@ def lambda_handler(event, context):
     for file in files_json:
 
         # Get file path for s3 bucket and create file path to store in tmp
-        file_ref_s3 = file["fileRef"]
+        file_ref_s3 = os.path.join(str(LOOKUP_BATCH_ID), file["fileRef"])
         file_ref_tmp = os.path.join(tmp_dir_path, os.path.split(file["fileRef"])[-1])
 
         # Download the uploaded file
@@ -52,7 +53,7 @@ def lambda_handler(event, context):
         os.remove(file_ref_tmp)
 
         # Get file path references
-        file_ref_s3 = file["resultFileReference"]
+        file_ref_s3 = os.path.join(str(LOOKUP_BATCH_ID), file["resultFileReference"])
         file_ref_tmp = os.path.join(
             tmp_dir_path, os.path.split(file["resultFileReference"])[-1]
         )
@@ -83,8 +84,8 @@ def lambda_handler(event, context):
     # Update DynamoDB
     table.update_item(
         Key={PRIMARY_KEY: LOOKUP_BATCH_ID},
-        UpdateExpression="SET isCompressed = :bool1",
-        ExpressionAttributeValues={":bool1": True},
+        UpdateExpression="SET jobStatus = :stat1",
+        ExpressionAttributeValues={":stat1": "ZIPPED"},
     )
 
     # Clean out tmp folder
@@ -102,6 +103,16 @@ def lambda_handler(event, context):
         "get_object",
         Params={"Bucket": BUCKET_NAME, "Key": file_ref_zip_s3},
         ExpiresIn=PRESIGNED_LINK_DURATION,
+    )
+
+    sqs = boto3.client('sqs')
+
+    response = sqs.send_message(
+        QueueUrl=EMAIL_QUEUE,
+        DelaySeconds=1,
+        MessageBody=(
+            '{ "jobKey": "' + str(LOOKUP_BATCH_ID) + '" }'
+        )
     )
 
     # Send it
