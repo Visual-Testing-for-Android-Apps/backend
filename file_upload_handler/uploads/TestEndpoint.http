@@ -32,20 +32,20 @@ content-type: application/json
 POST https://knfxd86hz7.execute-api.ap-southeast-2.amazonaws.com/Prod/job HTTP/1.1
 content-type: application/json
 
-{"email": "beining0026@gmail.com","fileNames":["test_instagram.mp4", "test.jpg"]}
+{"email": "beining0026@gmail.com","fileNames":["test_instagram.mp4"]}
 
 ### request verification code
 POST https://knfxd86hz7.execute-api.ap-southeast-2.amazonaws.com/Prod/job/verify-code HTTP/1.1
 content-type: application/json
 
-{"jobID": "1c2209d5-1ca6-42c7-a800-0eb80ac9ed84","verificationCode":"625613"}
+{"jobID": "c800565d-3aca-4d2c-bc44-0fdb1cfa41d0","verificationCode":"621226"}
 
 
 ### upload completion
 POST https://knfxd86hz7.execute-api.ap-southeast-2.amazonaws.com/Prod/job/upload-done HTTP/1.1
 content-type: application/json
 
-{"jobID":"f3adbf72-dcc6-4d9f-9ff9-2d305eba5a90"}
+{"jobID":"c800565d-3aca-4d2c-bc44-0fdb1cfa41d0"}
 
 ### update email
 
