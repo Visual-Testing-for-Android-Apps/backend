@@ -210,22 +210,37 @@ Resources:
       Runtime: python3.7
       Timeout: 10
       Policies:
-        # Give Create/Read/Update/Delete Permissions to the SampleTable
-        - DynamoDBCrudPolicy:
-            TableName: !Ref JobTable
-        - S3CrudPolicy:
-            BucketName: !Ref SrcBucket
+        - AWSLambdaBasicExecutionRole
+        - Version: 2012-10-17
+          Statement:
+            - Action: dynamodb:*
+              Effect: Allow
+              Resource:
+                - !GetAtt JobTable.Arn
+            - Action: cloudwatch:PutMetricData
+              Effect: Allow
+              Resource: "*"
+            - Action:
+                - sqs:*
+              Effect: Allow
+              Resource: "*"
+            - Action: s3:*
+              Effect: Allow
+              Resource:
+                - !Sub arn:aws:s3:::${SrcBucket}/*
+                - !Sub arn:aws:s3:::${SrcBucket}
       Environment:
         Variables:
           # Make table name accessible as environment variable from function code during execution
           JOB_TABLE: !Ref JobTable
           SRC_BUCKET: !Ref SrcBucket
+          EMAIL_QUEUE: !Ref SendEmailQueue
       Events:
-        FileCompress:
-          Type: Api
+        SQSQueueEvent:
+          Type: SQS
           Properties:
-            Path: /fileCompress
-            Method: get
+            Queue: !GetAtt FileZipQueue.Arn
+            BatchSize: 1
 
   SendEmail:
     Type: AWS::Serverless::Function
@@ -235,10 +250,25 @@ Resources:
       Runtime: nodejs12.x
       Description: Endpoint for sending email with results to users
       Policies:
-        - DynamoDBCrudPolicy:
-            TableName: !Ref JobTable
-        - S3CrudPolicy:
-            BucketName: !Ref SrcBucket
+        - AWSLambdaBasicExecutionRole
+        - Version: 2012-10-17
+          Statement:
+            - Action: dynamodb:*
+              Effect: Allow
+              Resource:
+                - !GetAtt JobTable.Arn
+            - Action: cloudwatch:PutMetricData
+              Effect: Allow
+              Resource: "*"
+            - Action:
+                - sqs:*
+              Effect: Allow
+              Resource: "*"
+            - Action: s3:*
+              Effect: Allow
+              Resource:
+                - !Sub arn:aws:s3:::${SrcBucket}/*
+                - !Sub arn:aws:s3:::${SrcBucket}
       Environment:
         Variables:
           # Make table name accessible as environment variable from function code during execution
@@ -261,10 +291,25 @@ Resources:
       Timeout: 100
       Description: Endpoint for generating HTML report
       Policies:
-        - DynamoDBCrudPolicy:
-            TableName: !Ref JobTable
-        - S3CrudPolicy:
-            BucketName: !Ref SrcBucket
+        - AWSLambdaBasicExecutionRole
+        - Version: 2012-10-17
+          Statement:
+            - Action: dynamodb:*
+              Effect: Allow
+              Resource:
+                - !GetAtt JobTable.Arn
+            - Action: cloudwatch:PutMetricData
+              Effect: Allow
+              Resource: "*"
+            - Action:
+                - sqs:*
+              Effect: Allow
+              Resource: "*"
+            - Action: s3:*
+              Effect: Allow
+              Resource:
+                - !Sub arn:aws:s3:::${SrcBucket}/*
+                - !Sub arn:aws:s3:::${SrcBucket}
       Environment:
         Variables:
           # Make names accessible as environment variable from function code during execution
@@ -293,16 +338,17 @@ Resources:
       VisibilityTimeout: 10
     Type: AWS::SQS::Queue
 
-  EventInvokeConfig:
-    Type: AWS::Lambda::EventInvokeConfig
-    Properties:
-      FunctionName: !Ref JobCompletionStatus
-      Qualifier: "$LATEST"
-      DestinationConfig:
-          OnSuccess:
-              Destination: !GetAtt ReportGenerationQueue.Arn
-          OnFailure:
-              Destination: !GetAtt ReportGenerationQueue.Arn
+  #This is to set up a destination, but we can just put things in the queues manually.
+  # EventInvokeConfig:
+  #   Type: AWS::Lambda::EventInvokeConfig
+  #   Properties:
+  #     FunctionName: !Ref JobCompletionStatus
+  #     Qualifier: "$LATEST"
+  #     DestinationConfig:
+  #         OnSuccess:
+  #             Destination: !GetAtt ReportGenerationQueue.Arn
+  #         OnFailure:
+  #             Destination: !GetAtt ReportGenerationQueue.Arn
 
   ReportGenerationQueue:
     Properties:
