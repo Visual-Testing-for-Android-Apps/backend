@@ -64,10 +64,10 @@ export const getUploadedFilesInJob = async (jobId: string): Promise<string[]> =>
 export const uploadBase64EncodedImage = async (image_str:string, fileKey:string) =>{
 	const buf = Buffer.from(image_str,'base64')
 	const data = {
-	  Key: fileKey, 
-	  Body: buf,
-	  ContentEncoding: 'base64',
-	  ContentType: 'image/jpeg'
+		Key: fileKey, 
+		Body: buf,
+		ContentEncoding: 'base64',
+		ContentType: 'image/jpeg'
 	} as PutObjectRequest
 	await s3bucket.putObject(data)
 	console.log('successfully uploaded the image!');
