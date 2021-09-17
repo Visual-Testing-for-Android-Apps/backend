@@ -23,7 +23,7 @@ export const modelTrigger = async (jobID:string) =>{
 			const response = await axios.post(`${BASE_URL}/Seenomaly`,{
                 download_url :downloadURL
             })
-            console.log(response)
+            console.log(response.data)
             // save result to database 
 			continue;
 		}

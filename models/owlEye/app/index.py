@@ -16,6 +16,9 @@ ImageFile.LOAD_TRUNCATED_IMAGES = True
 import torch.nn.functional as F
 import torch.nn as nn
 from app import * 
+import json
+from json.decoder import JSONDecodeError
+import requests
 
 CORS_HEADER = {
             'Access-Control-Allow-Headers': '*',
@@ -25,34 +28,40 @@ CORS_HEADER = {
 
 def handler(event,context):
     # check event header 
-    return handleRequestFromAPIGateway(event)
+    isRecievedJson = False
+    try:
+        body = json.loads(event["body"])
+        isRecievedJson = True
+    except JSONDecodeError as e:
+        pass 
 
+    if isRecievedJson:
+        (original_img, res_image, bug_type ) = handleVideoInPresignedUrl(body)
+    else:
+        (original_img, res_image, bug_type ) = handleImageInBody(event)
+    return {
+    'statusCode': 200,
+    'headers': CORS_HEADER,
+    'body': json.dumps(
+        {
+    
+            "original_img":original_img , # this is the original image
+            'res_img': res_image,
+            'bug_type': bug_type # contain bug. Currently only have three type of bug
+        }
+    )
+}
 
-def handleRequestFromAPIGateway(event):
+def handleVideoInPresignedUrl(body):
+    url = body['download_url']
+    response = requests.get(url)
+    print("response",response)
+    res_image, bug_type = imageProcess(base64.b64decode(response.text))
+    return response.text, res_image, bug_type 
+
+def handleImageInBody(event):
 
     image_bytes = event['body'].encode('utf-8')  # here is where the app get the image data in string
     res_image, bug_type = imageProcess(base64.b64decode(image_bytes))
-    return {
-        'statusCode': 200,
-        'headers': CORS_HEADER,
-        'body': json.dumps(
-            {
-        
-                "original_img": event['body'], # this is the original image
-                'res_img': res_image,
-                'bug_type': bug_type # contain bug. Currently only have three type of bug
-                # 'res_img' : img_res_str
-            }
-        )
-    }
-    # except Exception as e:
-    #     print(e)
-    #     return {
-    #         'statusCode': 502,
-    #         'headers': CORS_HEADER,
-    #         'body': json.dumps(
-    #             {
-    #                 "error_msg": str(e)
-    #             }
-    #         )
-    #     }
+    return image_bytes, res_image, bug_type 
+ 

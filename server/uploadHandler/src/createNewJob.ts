@@ -36,7 +36,7 @@ export const createNewJob = async (eventBody: string): Promise<FileUploadRespons
 		const file = initFile(fileName, jobID)
 		// 4.1. generate preSigned Url for files to S3
 		const uploadUrl = await getUploadURL(file.s3Key, file.contentType);
-		// 4.2. save job to DB
+		// 4.2. save files to DB
 		await addFileToJob(jobID, file);
 		returnBody.uploadUrls[fileName] = uploadUrl
 	}
