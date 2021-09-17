@@ -28,10 +28,10 @@ export const createNewJobItem = async ( id: string,email: string): Promise<void>
 	const newJobItem = {
 		TableName: tableName,
 		Item: {
-			id: { S: id },
-			email: { S: email },
-			createdAt: { S: new Date().toISOString() },
-			emailVerified: {BOOL:false}
+			"id": { S: id },
+			"email": { S: email },
+			"createdAt": { S: new Date().toISOString() },
+			"emailVerified": {BOOL:true}
 		},
 	} as PutItemInput;
 	await putItem(newJobItem);
