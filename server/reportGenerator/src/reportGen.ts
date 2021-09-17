@@ -35,8 +35,8 @@ function generateVidReport (index: number, algResult: number): string {
     'UI elements behind a modal bottom sheet lack a visible scrim/filter whilst the bottom sheet is onscreen.  A visible scrim indicates to the user that these elements cannot be interacted with whilst the menu is displayed.'
   ]
 
-  let res = '<h2>Item ' + index.toString() + '</h2>'
-  res += '<p>' + titles[algResult] + '<br>' + desc[algResult] + '</p>'
+  let res = '    <h2>Item ' + index.toString() + '</h2>\n'
+  res += '    <p>' + titles[algResult] + '<br>' + desc[algResult] + '</p>\n'
   return res
 }
 
@@ -56,23 +56,23 @@ function generateImgReport (
   algResult: number
 ): string {
   const titles: string[] = [
-    'General issue heatmap',
-    'Null value',
-    'Missing image',
-    'Component occlusion'
+    "General issue heatmap",
+    "Null value",
+    "Missing image",
+    "Component occlusion"
     // no models for blurred screen or text overlap, so no description is needed
   ]
   const desc: string[] = [
-    'Heatmap highlights all potential issues.',
+    "Heatmap highlights all potential issues.",
     "'NULL' text is being displayed, instead of the correct information.",
     "A placeholder 'missing/broken image' symbol is displayed, instead of an intended image.",
-    'Text is overlapped or obscured by other components.'
+    "Text is overlapped or obscured by other components."
   ]
 
-  let res = '<h2>Item ' + index.toString() + '</h2>'
-  res += "<image src='" + filePath + "'>"
-  res += "<image src='" + algResultPath + "'>"
-  res += '<p>' + titles[algResult] + '.<br>' + desc[algResult] + '</p>'
+  let res = "    <h2>Item " + index.toString() + "</h2>\n"
+  res += "    <image src='" + filePath + "'>\n"
+  res += "    <image src='" + algResultPath + "'>\n"
+  res += "    <p>" + titles[algResult] + ".<br>" + desc[algResult] + "</p>\n"
   return res
 }
 
@@ -98,7 +98,7 @@ export const generateReport = async (event: SQSEvent, context: AWSLambda.Context
   const dbRes = await getItem(request)
 
   // construct HTML report contents
-  let res = "<!DOCTYPE html><html lang='en'><head></head><body><div>"
+  let res = "<!DOCTYPE html><html lang='en'><head></head><body><div>\n"
   if (dbRes.Item != null) {
     const files = dbRes.Item.files
     if (files.L != null) {
@@ -112,21 +112,22 @@ export const generateReport = async (event: SQSEvent, context: AWSLambda.Context
 
           // Add image/vid string to overall report string
           if (fileType != null && resultCode != null) {
-            if (fileType === 'image' && fileRef != null && resultFileRef != null) {
+			res += "  <div>\n"
+            if (fileType === "image" && fileRef != null && resultFileRef != null) {
               res += generateImgReport(index, fileRef, resultFileRef, +resultCode)
-            } else if (fileType === 'video') {
+            } else if (fileType === "video") {
               res += generateVidReport(index, +resultCode)
             }
-            res += '<p><br><br></p>'
+            res += "  </div><p><br><br></p>"
           }
         }
       })
     }
   }
-  res += '</div></body></html>'
+  res += "</div></body></html>"
 
   // Add html file to s3 bucket
-  const filepath = key + '/report.html'
+  const filepath = key + "/report.html"
   const s3params = {
     Bucket: process.env.SRC_BUCKET as string,
     Key: filepath, // File name you want to save as in S3
