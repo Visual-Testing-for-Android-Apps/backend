@@ -1,3 +1,5 @@
+
+import { integer } from "aws-sdk/clients/cloudfront"
 import {
   Converter,
   GetItemInput,
@@ -5,7 +7,6 @@ import {
   PutItemInput,
   UpdateItemInput,
 } from "aws-sdk/clients/dynamodb"
-import { table } from "console"
 
 import { EmailVerification, File, Job } from "../service/jobModel"
 import { getItem, putItem, updateItem } from "./dynamodbClient"
@@ -116,4 +117,24 @@ export const getEmail = async (id:string):Promise<string> => {
 	const ret = await getItem(getItemInput);
 	console.log(ret)
 	return Converter.unmarshall(ret.Item!).email;
+}
+
+export interface fileResult {
+	code?: string,
+	message: string,
+	outputKey?:string
+}
+
+export const saveFileProcessResult = async(jobID:string, fileIdx: integer, result:fileResult) =>{
+	const resultAtrr = Converter.marshall(result)
+	const updateItemInput = {
+		ExpressionAttributeNames: { "#result": "result", "#status":"status"},
+		ExpressionAttributeValues: {":result":{M:resultAtrr},":status":{S:"DONE"}},
+		Key: { id: { S: jobID } },
+		ReturnValues: "UPDATED_NEW",
+		TableName: tableName,
+		UpdateExpression: "SET files["+fileIdx+"].#result = :result, files["+fileIdx+"].#status = :status",
+	} as UpdateItemInput;
+	await updateItem(updateItemInput);
+
 }

@@ -1,7 +1,8 @@
 import * as AWS from "aws-sdk"
+import { PutObjectRequest } from "aws-sdk/clients/s3"
 
 const BUCKET_NAME = process.env["SRC_BUCKET"];
-const URL_EXPIRATION_SECONDS = 300;
+const URL_EXPIRATION_SECONDS = 3000;
 const s3bucket = new AWS.S3();
 
 export const uploadToS3 = (fileName: string, fileStream: string): Promise<any> => {
@@ -59,3 +60,15 @@ export const getUploadedFilesInJob = async (jobId: string): Promise<string[]> =>
 	// might need continous token to pagination
 	return uploadedFileNames;
 };
+
+export const uploadBase64EncodedImage = async (image_str:string, fileKey:string) =>{
+	const buf = Buffer.from(image_str,'base64')
+	const data = {
+	  Key: fileKey, 
+	  Body: buf,
+	  ContentEncoding: 'base64',
+	  ContentType: 'image/jpeg'
+	} as PutObjectRequest
+	await s3bucket.putObject(data)
+	console.log('successfully uploaded the image!');
+}
