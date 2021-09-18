@@ -24,7 +24,7 @@ export const getJob = async (id:string): Promise<Job> => {
 	return Converter.unmarshall(ret.Item!) as Job
 }
 
-export const createNewJobItem = async ( id: string,email: string): Promise<void> => {
+export const createNewJobItem = async ( id: string,email: string) => {
 	const newJobItem = {
 		TableName: tableName,
 		Item: {
@@ -33,9 +33,11 @@ export const createNewJobItem = async ( id: string,email: string): Promise<void>
 			"createdAt": { S: new Date().toISOString() },
 			"emailVerified": {BOOL:true}
 		},
+		ReturnValue:"UPDATED_NEW"
 	} as PutItemInput;
-	console.log(newJobItem)
-	await putItem(newJobItem);
+	console.log("newJobItem",JSON.stringify(newJobItem))
+	const ret = await putItem(newJobItem);
+	console.log(JSON.stringify(ret))
 };
 
 

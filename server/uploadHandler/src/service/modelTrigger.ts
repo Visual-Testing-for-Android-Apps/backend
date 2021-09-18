@@ -34,7 +34,7 @@ export const modelTrigger = async (jobID:string) =>{
         }
 
         if (file.type == FileType.IMAGE){
-            const outputKey  = jobID + "/result/result_" + file.s3Key.split("/")[-1]
+            const outputKey  = jobID + "/result/result_" + file.s3Key.split("/").pop()
             const response = await getModelResponse(Models.OWLEYE, file.s3Key)
             // save to dy
             if (response){

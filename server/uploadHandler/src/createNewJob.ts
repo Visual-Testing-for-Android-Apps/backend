@@ -19,15 +19,12 @@ export interface FileUploadResponseBody {
 export const createNewJob = async (eventBody: string): Promise<FileUploadResponseBody> => {
 	// 0. parse event body
 	const parsedBody = JSON.parse(eventBody);
-	const recievedJobID = parsedBody["jobID"];
 	const email = parsedBody["email"];
 	const filenames = parsedBody["fileNames"];
 
-	const jobID = recievedJobID ? recievedJobID : uuidv4();
+	const jobID = uuidv4();
 	// 2. create new job record in db
-	if (recievedJobID){
-		await createNewJobItem(jobID, email);
-	}
+	await createNewJobItem(jobID, email);
 	// 3. send verification code 
 	await handleNewEmailSes(jobID,email)
 	// 4. init file upload
