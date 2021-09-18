@@ -8,6 +8,12 @@ import { FileType } from "./jobModel"
 const seenomalySqsURL = process.env.SEENORMALY_URL as string;
 const owlEyeSqsURL = process.env.OWLEUE_URL as string;
 
+import { getJob } from "./dynamodbService"
+import { FileType } from "./jobModel"
+
+const seenomalySqsURL = process.env.SEENORMALY_URL as string;
+const owlEyeSqsURL = process.env.OWLEUE_URL as string;
+
 export interface modelTiggerSqsEvent {
 	jobID: string;
 	fileKey: string;

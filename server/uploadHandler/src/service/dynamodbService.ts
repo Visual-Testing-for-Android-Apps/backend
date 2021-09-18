@@ -7,6 +7,7 @@ import {
   PutItemInput,
   UpdateItemInput,
 } from "aws-sdk/clients/dynamodb"
+import { table } from "console"
 
 import { EmailVerification, File, Job } from "../service/jobModel"
 import { getItem, putItem, updateItem } from "./dynamodbClient"
