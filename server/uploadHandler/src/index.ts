@@ -2,17 +2,15 @@ import { createNewJob, FileUploadResponseBody } from "./createNewJob"
 import { ApiGatewayEvent, ApiGatewayResponse } from "./service/apigateway"
 import { getEmail, updateEmail } from "./service/dynamodbService"
 import { checkVerificationCode, handleNewEmailSes } from "./service/sesService"
-import {
-  modelTiggerSqsEvent,
-  sendMessage,
-  SendMessageRequest,
-} from "./service/sqsClient"
+import { modelTiggerSqsEvent, sendMessage } from "./service/sqsClient"
 
 const CORS_HEADER = {
 	"Access-Control-Allow-Headers": "*",
 	"Access-Control-Allow-Origin": "*",
 	"Access-Control-Allow-Methods": "OPTIONS,POST,GET",
 };
+
+const JOB_HANDLER_QUEUE = process.env.JOB_HANDLER_QUEUE
 
 /**
  * Sample Lambda function which creates an instance of a PostApp and executes it.
@@ -120,7 +118,10 @@ const uploadDoneHandler =  async (event:ApiGatewayEvent): Promise<ApiGatewayResp
 	//await modelTrigger(jobID);
 
 	//Push a request to our SQS queue for the next iteration
-	await sendMessage({jobKey: jobID}, process.env.JOB_STATUS_QUEUE as string);
+	if (typeof JOB_HANDLER_QUEUE == "undefined"){
+		throw Error("missing env variable JOB_HANDLER_QUEUE")
+	}
+	await sendMessage({jobKey: jobID}, JOB_HANDLER_QUEUE);
 
 	return {
 		statusCode: 200,

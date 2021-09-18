@@ -45,7 +45,7 @@ export const jobHandler = async (event: SQSEvent, context: AWSLambda.Context): P
 	//Push a request to our SQS queue for the next iteration
 	const params: SendMessageRequest = {
 		MessageBody: '{ "jobKey": "' + String(key) + '" }',
-		QueueUrl: process.env.JOB_STATUS_QUEUE as string,
+		QueueUrl: process.env.JOB_HANDLER_QUEUE as string,
 		DelaySeconds: 60 * 4, //4 minute delay
 	};
 

@@ -69,7 +69,7 @@ Resources:
           SRC_BUCKET: !Ref SrcBucket
           SES_FROM_ADDRESS: vtaa.report.response@gmail.com
           IS_PROD: !Ref isProd
-          JOB_STATUS_QUEUE: !Ref JobCompletionStatusQueue
+          JOB_HANDLER_QUEUE: !Ref JobHandlerQueue
       Events:
         Api:
           Type: Api
@@ -77,12 +77,12 @@ Resources:
             Path: /job
             Method: POST
 
-  JobCompletionStatus:
+  JobHandler:
     Type: AWS::Serverless::Function
     Metadata:
       BuildMethod: makefile
     Properties:
-      CodeUri: isJobComplete/
+      CodeUri: jobHandler/
       Handler: dist/index.handler # TODO
       Runtime: nodejs12.x
       MemorySize: 128
@@ -114,12 +114,12 @@ Resources:
           JOB_TABLE: !Ref JobTable
           SRC_BUCKET: !Ref SrcBucket
           REPORT_GENERATION_QUEUE: !Ref ReportGenerationQueue
-          JOB_STATUS_QUEUE: !Ref JobCompletionStatusQueue
+          JOB_HANDLER_QUEUE: !Ref JobHandlerQueue
       Events:
         SQSQueueEvent:
           Type: SQS
           Properties:
-            Queue: !GetAtt JobCompletionStatusQueue.Arn
+            Queue: !GetAtt JobHandlerQueue.Arn
             BatchSize: 1
 
    
@@ -249,7 +249,7 @@ Resources:
 
   # This is an SQS queue with all default configuration properties. To learn more about the available options, see
   # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-sqs-queues.html
-  JobCompletionStatusQueue:
+  JobHandlerQueue:
     Properties:
       ReceiveMessageWaitTimeSeconds: 1
       VisibilityTimeout: 10
@@ -265,7 +265,7 @@ Resources:
   # EventInvokeConfig:
   #   Type: AWS::Lambda::EventInvokeConfig
   #   Properties:
-  #     FunctionName: !Ref JobCompletionStatus
+  #     FunctionName: !Ref JobHandler
   #     Qualifier: "$LATEST"
   #     DestinationConfig:
   #         OnSuccess:
@@ -330,8 +330,8 @@ Outputs:
   #   Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/prod/"
   UploadHandlerFunction:
     Value: !Ref UploadHandler
-  JobCompletionStatusFuntion:
-    Value: !Ref JobCompletionStatus
+  JobHandlerFuntion:
+    Value: !Ref JobHandler
   # FileCompressApi:
   #   Description: "API Gateway endpoint URL for Prod stage for file compression function"
   #   Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/fileCompress/"

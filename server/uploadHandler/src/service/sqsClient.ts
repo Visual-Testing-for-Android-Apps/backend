@@ -2,21 +2,14 @@ import { AWSError, SQS } from "aws-sdk"
 import { SendMessageRequest, SendMessageResult } from "aws-sdk/clients/sqs"
 import { PromiseResult } from "aws-sdk/lib/request"
 
-import { getJob } from "./dynamodbService"
-import { FileType } from "./jobModel"
-
-export {SendMessageRequest, SendMessageResult}
-const seenomalySqsURL = process.env.SEENORMALY_URL as string;
-const owlEyeSqsURL = process.env.OWLEUE_URL as string;
-
-export interface modelTiggerSqsEvent {
-	jobKey: string;
-}
-
 const sqsClient = new SQS({
 	apiVersion: "2012-11-05",
 	maxRetries: 3,
 });
+
+export interface modelTiggerSqsEvent {
+	jobKey: string;
+}
 
 export const sendMessage = (
 	event: modelTiggerSqsEvent,
