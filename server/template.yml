@@ -34,6 +34,12 @@ Parameters:
       - true
       - false
     Default: false
+  isProd:
+      Type: String
+      AllowedValues:
+      - true
+      - false
+      Default: false
 
 Conditions:
   ifDeployOwlEye: !Equals
@@ -79,7 +85,11 @@ Resources:
             - Action: s3:*
               Effect: Allow
               Resource:
-                - !GetAtt SrcBucket.Arn
+                - !Sub arn:aws:s3:::${SrcBucket}/*
+                - !Sub arn:aws:s3:::${SrcBucket}
+            - Action: ses:SendEmail
+              Effect: Allow
+              Resource: "*"
       Environment:
         Variables:
           # Make table name accessible as environment variable from function code during execution
@@ -87,12 +97,21 @@ Resources:
           SRC_BUCKET: !Ref SrcBucket
           SEENORMALY_URL: !Ref SeenomalyQueue
           OWLEUE_URL: !Ref OwlEyeQueue
+          SES_FROM_ADDRESS: vtaa.report.response@gmail.com
+          IS_PROD: !Ref isProd
       Events:
         Api:
           Type: Api
           Properties:
             Path: /job
             Method: POST
+        ProxiedApi:
+            Type: Api
+            Properties:
+              Path: /job/{proxy+}
+              Method: POST
+
+        
 
   JobCompletionStatus:
     Type: AWS::Serverless::Function

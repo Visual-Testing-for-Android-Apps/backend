@@ -1,6 +1,6 @@
-import { handler } from "./index";
-import { ApiGatewayEvent } from "./service/apigateway";
-import { createNewJobItem } from "./service/dynamodbService";
+import { handler } from "./index"
+import { ApiGatewayEvent } from "./service/apigateway"
+import { createNewJobItem } from "./service/dynamodbService"
 
 jest.mock("./service/dynamodbService");
 
@@ -18,13 +18,16 @@ describe("main", () => {
 		const res = await handler(mockApiEvent);
 
 		expect(res).toEqual({
-			body: "SyntaxError: Unexpected token u in JSON at position 0",
+			body: JSON.stringify({
+				message: "invalid path",
+				event:{}
+			}),
 			headers: {
 				"Access-Control-Allow-Headers": "*",
 				"Access-Control-Allow-Methods": "OPTIONS,POST,GET",
 				"Access-Control-Allow-Origin": "*",
 			},
-			statusCode: 502,
+			statusCode: 404,
 		});
 	});
 });

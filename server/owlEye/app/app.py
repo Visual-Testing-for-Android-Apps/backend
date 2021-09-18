@@ -388,7 +388,7 @@ def imageProcess(image_bytes):
             # print(mask)
             img_res = show_cam_on_image(img, mask)
             # print(img_res)
-            img_res_str = cv2.imencode('.jpg', img_res)[1].tobytes()
+            img_res_str = cv2.imencode('.jpg', img_res)[1].tostring()
 
             print("process finish")
 
@@ -422,8 +422,8 @@ def imageProcess(image_bytes):
 
             idx += 1
     
-        res_image = base64.b64encode(img_res_str).decode('utf-8'), # this is the heat map
-    return res_image, bug_type
+        #res_image = base64.b64encode(img_res_str).decode('utf-8'), # this is the heat map
+    return img_res_str, bug_type
 
 
 
