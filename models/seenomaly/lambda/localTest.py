@@ -3,7 +3,9 @@
 # ####################################################
 import requests
 import io
-
+import base64
+from io import BytesIO
+from PIL import Image, ImageFile
 # TEST_VIDEO = "outfile.mp4"
 
 # class testPacket:
@@ -44,10 +46,13 @@ import io
 
 
 def getVideo():
-    url = "https://visual-testing-backend-v2-srcbucket-p3rsmcrs75qa.s3.ap-southeast-2.amazonaws.com/c800565d-3aca-4d2c-bc44-0fdb1cfa41d0/1665416.mp4?AWSAccessKeyId=ASIAYDHTZUBQ5FUC4YI3&Expires=1631786859&Signature=%2FCDVJwdnCARJt9%2BE9rlhZZvxXhA%3D&x-amz-security-token=IQoJb3JpZ2luX2VjEBoaDmFwLXNvdXRoZWFzdC0yIkcwRQIhAMbgZp0y2esq8dwQ%2BnpWwe9%2Ffg6B76%2FuWBIZ%2BmXNsvoVAiB24XwNJs9q903Akd6CqQYgWtjiixbixLsP0ctF7DwGpiq5AghzEAEaDDU1NjcwOTU1MjIyNSIMcbvsLObpo697qJCoKpYC3Fl1Xs6opvB%2BMqb2n7agnEI%2BU9837GMimEFcALQQQd6eCDjhx7RKSD5oUKRrpXY5Cg%2FVQSDVjUkg3D3H9ZBtY6%2BHpdcNWGzRNXzj2mLg6WQv5VcHEBaSRP3O2QkRZzvUCVcGE69CB1WLPh35rALpNChiIuYrxVfdSul%2Fgv%2BFGnm%2B%2F6YRcaz7%2BpzpBQlbndVuH02vmait6Z9Yldr2EyxQCx3ecytzONZ8tCcFAFZx%2BFedAW1qySKNPs9Mok%2FCFpoWprAHxV7BKUVxfPlLvqMhkaAGdkWb1WJdWHIyBeHKNIbeFkhVKeUIUEvFfOAbmvZVaHyRj475lUwMU9xIv5fHmAIiEsscQQIRLIMFFZqP1eO2uzyknYAwvqyMigY6mgG2nt7dUkcHOf6pBKXuLCpCavUYIuUsFGoObvwax7lY%2BCSwZz23iy2K35R%2Fqv2v0o2WMx%2FsXKQRN79N9SNTOGaYFl7QDDa1G%2Bnm9%2BH0Wt8qgNUqEXFGHb5Su0XzDYkNPVY5KwTr3SESnfZsDfdAqe3XX0zFacCAD4I%2BxB2nM5obw895p9EojvKGzHuEaeJacEfzsTtye%2FoLOupK"
-    content = requests.get(url).content
-    tmp = io.BytesIO(content)
-    print(tmp)
+    url = "https://visual-testing-backend-v2-srcbucket-p3rsmcrs75qa.s3.ap-southeast-2.amazonaws.com/30ecd6ed-78ab-40d6-b3cd-79c2e3c4922e/1304057.jpg?AWSAccessKeyId=ASIAYDHTZUBQSVSKOSGD&Expires=1631894156&Signature=kKxxw9PnS6GW9Lnw7y4gklnz65c%3D&x-amz-security-token=IQoJb3JpZ2luX2VjEDcaDmFwLXNvdXRoZWFzdC0yIkgwRgIhAOR7FLPjHbl4y4SCGbrYp0RduIaXe111GVjFO7OlHc9XAiEAiMScf4FdOOxC%2FQccd9ZMCL339epe7xRjZIpN2o6XaHAqwgIIkP%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FARABGgw1NTY3MDk1NTIyMjUiDE88Fmz%2BHONaqzf%2FfCqWAtmy6H71y7Rt5%2BDpxELbBUVjaSZ5scCtAlxpaw7qrum9PHdTWSRnfy%2BpKQ%2BbNHrOK1K4vd1NrEoTyPgIYQMWrb8pI%2Bxlwj1tam8opUS194YuZEoiwJadVkmMyxGS1jhQtpFiGEAaSLXB0J6XZxL3Kle%2FIdZp%2FQWUMsGchUF5m1%2FjPCj%2B4DdxUifdINePSAryg8y2xxVHNZlNaguR1ncpxl39%2Fr4msv9OGO98s%2BxCIXym1yeaEHea7TqCSl5s2gtMsqLkQ0xavdkNBztoyJT0UAf%2Bb3xmMIQY7YzhfwaegGCQsfDSku3T239HFyqcH0siy%2BpIGLnltnTJzrhzevB0d3Es%2F0vICBDWzFbNKukQUeYC9EgS34S6MIvXkooGOpkB%2B2zsQ7A37JeMQoXt1T1eDob1sw2mSZd6yGLiFal4WpwmK%2BJLzcaLDig2Inr86ZGZJ4KTVXSiIroJixiMkT33O7cS4RZiperlw7ey2qWt2Y0imzvbIh%2B4HiuA8oav%2BVLOLo1TgCnFKFmaZjX7hNHXyaDpOqwnudwo3koOFztt9LzJzTnmX%2Fq5fG1VNVPcev1UpPayINZ3pLIa"
+    # content = requests.get(url).content
+    # tmp = io.BytesIO(content)
+    response = requests.get(url)
+    #print("response",response.content)
+    img = Image.OPEN(BytesIO(response.content))
+    print(img)
 
 if __name__ == "__main__":
     getVideo()

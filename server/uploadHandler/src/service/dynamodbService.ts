@@ -34,6 +34,7 @@ export const createNewJobItem = async ( id: string,email: string): Promise<void>
 			"emailVerified": {BOOL:true}
 		},
 	} as PutItemInput;
+	console.log(newJobItem)
 	await putItem(newJobItem);
 };
 

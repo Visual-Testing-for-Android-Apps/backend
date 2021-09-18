@@ -37,8 +37,14 @@ def handler(event,context):
 
     if isRecievedJson:
         (original_img, res_image, bug_type ) = handleVideoInPresignedUrl(body)
+        print("original_image", original_img)
+        print("res_image",res_image)
+        print("bug_type",bug_type)
     else:
         (original_img, res_image, bug_type ) = handleImageInBody(event)
+        print("original_image", original_img)
+        print("res_image",res_image)
+        print("bug_type",bug_type)
     return {
     'statusCode': 200,
     'headers': CORS_HEADER,
@@ -56,11 +62,10 @@ def handleVideoInPresignedUrl(body):
     url = body['download_url']
     response = requests.get(url)
     print("response",response)
-    res_image, bug_type = imageProcess(base64.b64decode(response.text))
+    res_image, bug_type = imageProcess(response.content)
     return response.text, res_image, bug_type 
 
 def handleImageInBody(event):
-
     image_bytes = event['body'].encode('utf-8')  # here is where the app get the image data in string
     res_image, bug_type = imageProcess(base64.b64decode(image_bytes))
     return image_bytes, res_image, bug_type 

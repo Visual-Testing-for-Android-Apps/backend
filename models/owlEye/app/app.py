@@ -418,7 +418,7 @@ def imageProcess(image_bytes):
 
             idx += 1
     
-        res_image = base64.b64encode(img_res_str).decode('utf-8') # this is the heat map
+    res_image = base64.b64encode(img_res_str).decode('utf-8') # this is the heat map
     return res_image, bug_type
 
 
