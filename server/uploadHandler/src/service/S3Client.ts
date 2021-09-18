@@ -71,6 +71,6 @@ export const uploadBase64EncodedImage = async (image_str:string, fileKey:string)
 		ContentType: 'image/jpeg'
 	} as PutObjectRequest
 	console.log(JSON.stringify(data))
-	await s3bucket.putObject(data)
+	await s3bucket.upload(data)
 	console.log('successfully uploaded the image!', buf);
 }
