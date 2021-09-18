@@ -23,8 +23,6 @@ CORS_HEADER = {
             'Access-Control-Allow-Origin': '*',
             'Access-Control-Allow-Methods': 'OPTIONS,POST,GET'
         }
-TABLE_NAME =  os.environ["JOB_TABLE"]
-DBClient = boto3.resource('dynamodb').Table(TABLE_NAME)
 
 def handler(event):
     # check event header 
@@ -118,9 +116,11 @@ def getFile(jobID, fileIdx):
         raise Exception("Invalid fileIdx")
     return item["files"][fileIdx]
 
-def saveResultToDb(result,fileIdx, jobID,resultKey):
+def saveResultToDb(result,fileIdx, jobID):
+    tablename = os.getenv("JOB_TABLE")
+    table = boto3.resource('dynamodb').Table(tablename)
     # update the record. 
-    response = DBClient.update_item(
+    response = table.update_item(
     Key={'id': jobID},
     ExpressionAttributeNames= { "#status": "status" },
     UpdateExpression="SET files["+str(fileIdx)+"].resultMessage = :resultMessage," 

@@ -47,7 +47,6 @@ export const createNewJob = async (eventBody: string): Promise<FileUploadRespons
 
 
 
-
 const initFile = (fileName:string, jobID:string): File => {
 	const fileExtension = fileName.split(".").pop();
 	if (typeof fileExtension == "undefined"){

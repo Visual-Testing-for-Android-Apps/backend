@@ -11,8 +11,7 @@ CORS_HEADER = {
             'Access-Control-Allow-Origin': '*',
             'Access-Control-Allow-Methods': 'OPTIONS,POST,GET'
         }
-TABLE_NAME =  os.environ["JOB_TABLE"]
-DBClient = boto3.resource('dynamodb').Table(TABLE_NAME)
+
 netName = "gan"
 checkpoint = 29471
 modelDir = os.getenv("MODEL_DIR", "./models/gan") # local env default to ./models
