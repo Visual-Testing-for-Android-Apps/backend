@@ -33,6 +33,11 @@ export enum FileStatus {
 	DONE = "DONE",
 }
 
+export enum Models {
+	SEENOMALY = "Seenomaly",
+	OWLEYE = "owleye"
+}
+
 
 
 export const extensionToContentType: { [key:string] :string }  = {

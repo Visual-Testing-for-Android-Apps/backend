@@ -1,6 +1,12 @@
-import { AWSError, SQS } from "aws-sdk";
-import { SendMessageRequest, SendMessageResult } from "aws-sdk/clients/sqs";
-import { PromiseResult } from "aws-sdk/lib/request";
+import { AWSError, SQS } from "aws-sdk"
+import { SendMessageRequest, SendMessageResult } from "aws-sdk/clients/sqs"
+import { PromiseResult } from "aws-sdk/lib/request"
+
+import { getJob } from "./dynamodbService"
+import { FileType } from "./jobModel"
+
+const seenomalySqsURL = process.env.SEENORMALY_URL as string;
+const owlEyeSqsURL = process.env.OWLEUE_URL as string;
 
 import { getJob } from "./dynamodbService"
 import { FileType } from "./jobModel"
@@ -11,7 +17,7 @@ const owlEyeSqsURL = process.env.OWLEUE_URL as string;
 export interface modelTiggerSqsEvent {
 	jobID: string;
 	fileKey: string;
-	fileIdx: Number;
+	fileIdx: number;
 }
 
 const sqsClient = new SQS({

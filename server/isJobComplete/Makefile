@@ -1,4 +1,4 @@
-build-PostProcessHandler:
+build-JobCompletionStatus:
 	npm install
 # workaround https://github.com/aws/aws-sam-cli/issues/2565
 	npm rebuild

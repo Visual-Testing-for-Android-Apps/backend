@@ -34,9 +34,9 @@ Icon
 # server
 server/.aws-sam 
 server/samconfig.toml
-server/seenomaly/lambda/models
+/*/seenomaly/lambda/models
 
-
+*/*.toml
 
 
 
@@ -494,7 +494,7 @@ $RECYCLE.BIN/
 
 .idea/
 
-server/owlEye/app/opt/
+/*/owlEye/app/opt/
 
 server/owlEye/samconfig.toml
 
