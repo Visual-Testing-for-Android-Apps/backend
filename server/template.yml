@@ -69,6 +69,7 @@ Resources:
           SRC_BUCKET: !Ref SrcBucket
           SES_FROM_ADDRESS: vtaa.report.response@gmail.com
           IS_PROD: !Ref isProd
+          JOB_STATUS_QUEUE: !Ref JobCompletionStatusQueue
       Events:
         Api:
           Type: Api
@@ -113,6 +114,7 @@ Resources:
           JOB_TABLE: !Ref JobTable
           SRC_BUCKET: !Ref SrcBucket
           REPORT_GENERATION_QUEUE: !Ref ReportGenerationQueue
+          JOB_STATUS_QUEUE: !Ref JobCompletionStatusQueue
       Events:
         SQSQueueEvent:
           Type: SQS
@@ -128,7 +130,7 @@ Resources:
     Properties:
       CodeUri: fileCompress/
       Handler: app.lambda_handler
-      Runtime: python3.7
+      Runtime: python3.8
       Timeout: 10
       Policies:
         - AWSLambdaBasicExecutionRole

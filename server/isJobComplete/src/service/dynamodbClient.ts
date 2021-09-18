@@ -1,22 +1,20 @@
-import { SQS, AWSError, DynamoDB } from "aws-sdk";
+import { AWSError, DynamoDB, SQS } from "aws-sdk"
 import {
-	GetItemInput,
-	GetItemOutput,
-	PutItemInput,
-	PutItemOutput,
-	QueryInput,
-	QueryOutput,
-	UpdateItemInput,
-	UpdateItemOutput,
-} from "aws-sdk/clients/dynamodb";
-import {
-	SendMessageRequest,
-	SendMessageResult
-} from "aws-sdk/clients/sqs";
-export { GetItemInput, GetItemOutput, UpdateItemInput, UpdateItemOutput, SendMessageRequest };
-import { PromiseResult } from "aws-sdk/lib/request";
-import { Agent } from "https";
+  Converter,
+  GetItemInput,
+  GetItemOutput,
+  PutItemInput,
+  PutItemOutput,
+  QueryInput,
+  QueryOutput,
+  UpdateItemInput,
+  UpdateItemOutput,
+} from "aws-sdk/clients/dynamodb"
+import { SendMessageRequest, SendMessageResult } from "aws-sdk/clients/sqs"
+import { PromiseResult } from "aws-sdk/lib/request"
+import { Agent } from "https"
 
+export { GetItemInput, GetItemOutput, UpdateItemInput, UpdateItemOutput, SendMessageRequest, Converter };
 const awsRegion = process.env.AWS_REGION;
 
 const dynamoDb = new DynamoDB({

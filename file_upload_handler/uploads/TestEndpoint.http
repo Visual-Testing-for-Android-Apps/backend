@@ -34,6 +34,17 @@ content-type: application/json
 
 {"email": "beining0026@gmail.com","fileNames":["test_instagram.mp4","test.jpg"]}
 
+
+{
+    JOBID : "123",
+    pre-sign-url: {
+        "test_instagram.mp4": "url1",
+        "test.jpg":"url2"
+    }
+}
+
+PUT -> S3 
+
 ### request verification code
 POST https://knfxd86hz7.execute-api.ap-southeast-2.amazonaws.com/Prod/job/verify-code HTTP/1.1
 content-type: application/json

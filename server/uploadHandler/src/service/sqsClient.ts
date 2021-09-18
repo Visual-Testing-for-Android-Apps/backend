@@ -5,13 +5,12 @@ import { PromiseResult } from "aws-sdk/lib/request"
 import { getJob } from "./dynamodbService"
 import { FileType } from "./jobModel"
 
+export {SendMessageRequest, SendMessageResult}
 const seenomalySqsURL = process.env.SEENORMALY_URL as string;
 const owlEyeSqsURL = process.env.OWLEUE_URL as string;
 
 export interface modelTiggerSqsEvent {
-	jobID: string;
-	fileKey: string;
-	fileIdx: number;
+	jobKey: string;
 }
 
 const sqsClient = new SQS({
@@ -30,43 +29,43 @@ export const sendMessage = (
 	return sqsClient.sendMessage(params).promise();
 };
 
-export const sqsTriggerModels = async (jobID: string) : Promise<boolean> => {
-	const job = await getJob(jobID);
-	// check email if verified 
-	if (!job.emailVerified){
-		return false
-	}
-	// init job 
-	const files = job.files;
-	for (let i = 0; i < files.length; i++) {
-		const fileKey = files[i].s3Key;
-		console.log("fileKey", fileKey);
-		const event = {
-			jobID,
-			fileKey,
-			fileIdx: i,
-		} as modelTiggerSqsEvent;
+// export const sqsTriggerModels = async (jobID: string) : Promise<boolean> => {
+// 	const job = await getJob(jobID);
+// 	// check email if verified 
+// 	if (!job.emailVerified){
+// 		return false
+// 	}
+// 	// init job 
+// 	const files = job.files;
+// 	for (let i = 0; i < files.length; i++) {
+// 		const fileKey = files[i].s3Key;
+// 		console.log("fileKey", fileKey);
+// 		const event = {
+// 			jobID,
+// 			fileKey,
+// 			fileIdx: i,
+// 		} as modelTiggerSqsEvent;
 
-		if (files[i].type == FileType.VIDEO) {
-			console.log("send message to seenomaly", event);
-			await sendMessage(event, seenomalySqsURL);
-			continue;
-		}
+// 		if (files[i].type == FileType.VIDEO) {
+// 			console.log("send message to seenomaly", event);
+// 			await sendMessage(event, seenomalySqsURL);
+// 			continue;
+// 		}
 
-		// TODO get URL trigger for owl-eye
-		if (files[i].type == FileType.IMAGE) {
-			console.log("send message to owl-eye", event);
-			await sendMessage(event, owlEyeSqsURL);
-			continue;
-		}
+// 		// TODO get URL trigger for owl-eye
+// 		if (files[i].type == FileType.IMAGE) {
+// 			console.log("send message to owl-eye", event);
+// 			await sendMessage(event, owlEyeSqsURL);
+// 			continue;
+// 		}
 
-		throw Error(
-			JSON.stringify({
-				jobID,
-				fileKey,
-				message: "unrecoganised file extension",
-			})
-		);
-	}
-	return true
-};
+// 		throw Error(
+// 			JSON.stringify({
+// 				jobID,
+// 				fileKey,
+// 				message: "unrecoganised file extension",
+// 			})
+// 		);
+// 	}
+// 	return true
+// };

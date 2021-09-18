@@ -1,8 +1,12 @@
 import { createNewJob, FileUploadResponseBody } from "./createNewJob"
 import { ApiGatewayEvent, ApiGatewayResponse } from "./service/apigateway"
 import { getEmail, updateEmail } from "./service/dynamodbService"
-import { modelTrigger } from "./service/modelTrigger"
 import { checkVerificationCode, handleNewEmailSes } from "./service/sesService"
+import {
+  modelTiggerSqsEvent,
+  sendMessage,
+  SendMessageRequest,
+} from "./service/sqsClient"
 
 const CORS_HEADER = {
 	"Access-Control-Allow-Headers": "*",
@@ -113,13 +117,17 @@ const uploadDoneHandler =  async (event:ApiGatewayEvent): Promise<ApiGatewayResp
 	if (!jobID) {
 		throw Error("No jobID provided");
 	}
-	await modelTrigger(jobID);
+	//await modelTrigger(jobID);
+
+	//Push a request to our SQS queue for the next iteration
+	await sendMessage({jobKey: jobID}, process.env.JOB_STATUS_QUEUE as string);
+
 	return {
 		statusCode: 200,
 		headers: CORS_HEADER,
 		body: JSON.stringify({
 			jobID,
-			message:"upload done, trigger models ...",
+			message:"upload done, triggered job handler ...",
 		}),
 	}
 

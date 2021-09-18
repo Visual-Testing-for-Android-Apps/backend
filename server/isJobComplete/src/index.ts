@@ -1,35 +1,19 @@
-import { SQSEvent } from "aws-lambda";
+import { SQSEvent } from "aws-lambda"
+import { AttributeMap } from "aws-sdk/clients/dynamodb"
+
+import { awaitJob, isJobComplete } from "./isJobComplete.js"
 import {
-	getItem,
-	GetItemInput,
-	updateItem,
-	UpdateItemInput,
-	pushToQueue,
-	SendMessageRequest,
-} from "./service/dynamodbClient";
-import { AttributeMap } from "aws-sdk/clients/dynamodb";
+  Converter,
+  getItem,
+  GetItemInput,
+  pushToQueue,
+  SendMessageRequest,
+  updateItem,
+  UpdateItemInput,
+} from "./service/dynamodbClient"
 
-//Gets a job from the database. Exists to skip a null check and allow for mocking
-export const awaitJob = async (request: GetItemInput): Promise<AttributeMap | null> => {
-	let res = await getItem(request);
-	if (res.Item != null) {
-		return res.Item;
-	}
-	return null;
-};
-
-//Updates a job in the database. Exists for mocking.
-export const updateJob = async (request: UpdateItemInput): Promise<any> => {
-	return await updateItem(request);
-};
-
-/*
- * Checks if all files for a job are processed. If so, the job state is updated
- * and a request is sent to the report generation queue.
- */
-export const isJobComplete = async (event: SQSEvent, context: AWSLambda.Context): Promise<any> => {
+export const jobHandler = async (event: SQSEvent, context: AWSLambda.Context): Promise<any> =>{
 	const key: string = JSON.parse(event.Records[0].body).jobKey;
-	//console.log("Job key: " + String(key))
 
 	//Job request object.
 	const request: GetItemInput = {
@@ -39,70 +23,58 @@ export const isJobComplete = async (event: SQSEvent, context: AWSLambda.Context)
 		},
 	};
 
-	//Ready to be submitted for report generation
-	let ready: boolean = false;
+	const resMarshalled = await awaitJob(request);
 
-	const res = await awaitJob(request);
+	if (!resMarshalled) { return false; }
 
-	if (res) {
-		//Check current job status. If we are already generating the report, then return early (could happen due to queue buffer)
-		//If jobStatus doesn't exist, we return as the job is illformed
-		if (res.jobStatus?.S) {
-			const status = res.jobStatus.S;
-			//console.log(status);
-			if (status !== "PROCESSING") {
-				return true;
-			}
-		} else {
-			return false;
+	const res = Converter.unmarshall(resMarshalled);
+	
+	//Check if this job is already complete
+	if (res.jobStatus) {
+		if (res.jobStatus !== "PROCESSING") {
+			return true
 		}
-		//Load files from job data
-		const media = res.files;
-		ready = true;
-
-		//Iterate though every file and check the value of "finished"
-		if (media.L != null) {
-			media.L.forEach((element) => {
-				if (element.M != null) {
-					const fin = element.M.finished.BOOL;
-					if (!(fin == null)) {
-						ready &&= fin.valueOf();
-						//console.log("Is " + (element.M.fileRef.S != null ? String(element.M.fileRef.S) : "") + " finished?: " + String(fin))
-					}
-				}
-			});
-		}
-		if (ready) {
-			//A request to update the job status
-			const request: UpdateItemInput = {
-				TableName: process.env.JOB_TABLE as string,
-				Key: {
-					id: { S: key },
-				},
-				UpdateExpression: "set jobStatus = :s",
-				ExpressionAttributeValues: {
-					":s": { S: "GENERATING" },
-				},
-			};
-			await updateJob(request);
-
-			//const message: String = '{ "jobKey": "' + String(key) + '" }'
-
-			//Push a request to the SQS queue
-			const params: SendMessageRequest = {
-				MessageBody: '{ "jobKey": "' + String(key) + '" }',
-				QueueUrl: process.env.REPORT_GENERATION_QUEUE as string,
-			};
-
-			await pushToQueue(params);
-			return true; //message
-		}
+	} else {
+		return false
 	}
 
-	return false;
-};
+	if(!res.files){
+		return false
+	}
 
+	//Push a request to our SQS queue for the next iteration
+	const params: SendMessageRequest = {
+		MessageBody: '{ "jobKey": "' + String(key) + '" }',
+		QueueUrl: process.env.JOB_STATUS_QUEUE as string,
+		DelaySeconds: 60 * 4, //4 minute delay
+	};
+
+	await pushToQueue(params);
+
+	for(;;){
+		for (let file of res.files) {
+			//generate the signed URL
+			const signedUrl: string = "";
+
+			const msg: string = '{ "jobKey": "' + String(key) + '"; "signedUrl": "' + signedUrl +'" }';
+			
+			//Invoke lambda for OwlEyes/Seenomaly
+			if(file.filetype == "image"){
+				//I think we can just copy/paste this code from somewhere else
+				//await mediaRes = ...
+			} else{
+
+			}
+
+			//Write results to DB
+		}     
+	}
+	
+	//The actual checking if all jobs are complete could be redundant, but leaving it in doesn't hurt anything
+	isJobComplete(key);
+}
+ 
 //Exports isJobComplete for use with AWS lambda
 exports.handler = (event: SQSEvent, context: AWSLambda.Context): Promise<any> => {
-	return isJobComplete(event, context);
+	return jobHandler(event, context);
 };
