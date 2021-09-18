@@ -1,3 +1,5 @@
+
+import { integer } from "aws-sdk/clients/cloudfront"
 import {
   Converter,
   GetItemInput,
@@ -23,17 +25,20 @@ export const getJob = async (id:string): Promise<Job> => {
 	return Converter.unmarshall(ret.Item!) as Job
 }
 
-export const createNewJobItem = async ( id: string,email: string): Promise<void> => {
+export const createNewJobItem = async ( id: string,email: string) => {
 	const newJobItem = {
 		TableName: tableName,
 		Item: {
-			id: { S: id },
-			email: { S: email },
-			createdAt: { S: new Date().toISOString() },
-			emailVerified: {BOOL:false}
+			"id": { S: id },
+			"email": { S: email },
+			"createdAt": { S: new Date().toISOString() },
+			"emailVerified": {BOOL:true}
 		},
+		ReturnValue:"UPDATED_NEW"
 	} as PutItemInput;
-	await putItem(newJobItem);
+	console.log("newJobItem",JSON.stringify(newJobItem))
+	const ret = await putItem(newJobItem);
+	console.log(JSON.stringify(ret))
 };
 
 
@@ -116,4 +121,24 @@ export const getEmail = async (id:string):Promise<string> => {
 	const ret = await getItem(getItemInput);
 	console.log(ret)
 	return Converter.unmarshall(ret.Item!).email;
+}
+
+export interface fileResult {
+	code?: string,
+	message: string,
+	outputKey?:string
+}
+
+export const saveFileProcessResult = async(jobID:string, fileIdx: integer, result:fileResult) =>{
+	const resultAtrr = Converter.marshall(result)
+	const updateItemInput = {
+		ExpressionAttributeNames: { "#result": "result", "#status":"status"},
+		ExpressionAttributeValues: {":result":{M:resultAtrr},":status":{S:"DONE"}},
+		Key: { id: { S: jobID } },
+		ReturnValues: "UPDATED_NEW",
+		TableName: tableName,
+		UpdateExpression: "SET files["+fileIdx+"].#result = :result, files["+fileIdx+"].#status = :status",
+	} as UpdateItemInput;
+	await updateItem(updateItemInput);
+
 }

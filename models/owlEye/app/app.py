@@ -336,6 +336,8 @@ CORS_HEADER = {
             'Access-Control-Allow-Methods': 'OPTIONS,POST,GET'
         }
 
+VALID_MODEL  = ['0model.pth','comp-model.pth','image-model.pth','null-model.pth']
+
 def imageProcess(image_bytes):
     image = Image.open(BytesIO(image_bytes))  # decode the image string
 
@@ -347,14 +349,6 @@ def imageProcess(image_bytes):
         and computes intermediate activations.
         Makes the visualization. """
 
-    # file = os.listdir(image_dir)  # TODO : file is in the input event data
-    # target_dir = 'LOCATION IN S3'  # TODO target dir is some location
-    #
-    # print(file)
-    # (filename, extension) = os.path.splitext(file)
-    # image_num = filename
-    # image_name = image_dir + file
-    # args = get_args()
 
     multi_model_directory = os.getenv("MODEL_DIR", './opt/ml/')
     # this directory will contain 4 models
@@ -367,15 +361,17 @@ def imageProcess(image_bytes):
 
     img_res_str = ''
     for model_file in models:
-
+        if (not model_file in VALID_MODEL):
+            continue
         model_path = multi_model_directory + model_file
+        print("model_path",model_path)
         model = Net()
         # model.cuda()
         model = nn.DataParallel(model)
 
         # now the algorithm can run the gpu model
         model.load_state_dict(torch.load(model_path, torch.device('cpu')))  # TODO : model is in the S3 bucket
-
+        print("model loaded")
         if model_file == '0model.pth':  # this model is use to detect all the bug in side the image and generate the heatmap
             grad_cam = GradCam(model=model, target_layer_names=["40"], use_cuda=False)
             img = np.array(image)
@@ -388,7 +384,7 @@ def imageProcess(image_bytes):
             # print(mask)
             img_res = show_cam_on_image(img, mask)
             # print(img_res)
-            img_res_str = cv2.imencode('.jpg', img_res)[1].tostring()
+            img_res_str = cv2.imencode('.jpg', img_res)[1]
 
             print("process finish")
 
@@ -422,8 +418,8 @@ def imageProcess(image_bytes):
 
             idx += 1
     
-        #res_image = base64.b64encode(img_res_str).decode('utf-8'), # this is the heat map
-    return img_res_str, bug_type
+    res_image = base64.b64encode(img_res_str).decode('utf-8') # this is the heat map
+    return res_image, bug_type
 
 
 

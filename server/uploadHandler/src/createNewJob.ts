@@ -19,15 +19,12 @@ export interface FileUploadResponseBody {
 export const createNewJob = async (eventBody: string): Promise<FileUploadResponseBody> => {
 	// 0. parse event body
 	const parsedBody = JSON.parse(eventBody);
-	const recievedJobID = parsedBody["jobID"];
 	const email = parsedBody["email"];
 	const filenames = parsedBody["fileNames"];
 
-	const jobID = recievedJobID ? recievedJobID : uuidv4();
+	const jobID = uuidv4();
 	// 2. create new job record in db
-	if (recievedJobID){
-		await createNewJobItem(jobID, email);
-	}
+	await createNewJobItem(jobID, email);
 	// 3. send verification code 
 	await handleNewEmailSes(jobID,email)
 	// 4. init file upload
@@ -36,7 +33,7 @@ export const createNewJob = async (eventBody: string): Promise<FileUploadRespons
 		const file = initFile(fileName, jobID)
 		// 4.1. generate preSigned Url for files to S3
 		const uploadUrl = await getUploadURL(file.s3Key, file.contentType);
-		// 4.2. save job to DB
+		// 4.2. save files to DB
 		await addFileToJob(jobID, file);
 		returnBody.uploadUrls[fileName] = uploadUrl
 	}
@@ -44,7 +41,6 @@ export const createNewJob = async (eventBody: string): Promise<FileUploadRespons
 	console.log("Running uploadHandler");
 	return returnBody;
 };
-
 
 
 
