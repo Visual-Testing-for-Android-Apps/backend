@@ -501,6 +501,6 @@ server/owlEye/samconfig.toml
 server/owlEye/.aws-sam/build.toml
 
 models/owlEye/app/opt/
-models/seenomaly/lambda/models
-models/.aws-sam
+models/seenomaly/lambda/models/
+models/.aws-sam/
 models/samconfig.toml

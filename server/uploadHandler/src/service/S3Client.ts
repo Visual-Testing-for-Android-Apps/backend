@@ -20,7 +20,7 @@ export const getUploadURL = async (fileKey: string, fileExtension: string) => {
 	// Get signed URL from S3
 	const s3Params = {
 		Bucket: BUCKET_NAME,
-		Key: key,
+		Key: fileKey,
 		Expires: URL_EXPIRATION_SECONDS,
 		ContentType: getFileType(fileExtension),
 	};
