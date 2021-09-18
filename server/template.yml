@@ -83,7 +83,7 @@ Resources:
       BuildMethod: makefile
     Properties:
       CodeUri: jobHandler/
-      Handler: dist/index.handler # TODO
+      Handler: dist/index.handler 
       Runtime: nodejs12.x
       MemorySize: 128
       Timeout: 100

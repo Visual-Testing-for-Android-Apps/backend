@@ -11,8 +11,14 @@ import {
   updateItem,
   UpdateItemInput,
 } from "./service/dynamodbClient"
+import { selfEnvoke } from "./service/sqsClient"
 
-export const jobHandler = async (event: SQSEvent, context: AWSLambda.Context): Promise<any> =>{
+//Exports isJobComplete for use with AWS lambda
+exports.handler = (event: SQSEvent, context: AWSLambda.Context): Promise<any> => {
+	return jobHandler(event, context);
+};
+
+const jobHandler = async (event: SQSEvent, context: AWSLambda.Context): Promise<any> =>{
 	const key: string = JSON.parse(event.Records[0].body).jobKey;
 
 	//Job request object.
@@ -43,13 +49,7 @@ export const jobHandler = async (event: SQSEvent, context: AWSLambda.Context): P
 	}
 
 	//Push a request to our SQS queue for the next iteration
-	const params: SendMessageRequest = {
-		MessageBody: '{ "jobKey": "' + String(key) + '" }',
-		QueueUrl: process.env.JOB_HANDLER_QUEUE as string,
-		DelaySeconds: 60 * 4, //4 minute delay
-	};
-
-	await pushToQueue(params);
+	await selfEnvoke(key)
 
 	for(;;){
 		for (let file of res.files) {
@@ -74,7 +74,4 @@ export const jobHandler = async (event: SQSEvent, context: AWSLambda.Context): P
 	isJobComplete(key);
 }
  
-//Exports isJobComplete for use with AWS lambda
-exports.handler = (event: SQSEvent, context: AWSLambda.Context): Promise<any> => {
-	return jobHandler(event, context);
-};
+
