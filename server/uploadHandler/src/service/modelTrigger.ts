@@ -1,12 +1,13 @@
-import { integer } from "aws-sdk/clients/cloudfront"
+
 import axios, { AxiosRequestConfig } from "axios"
-import { report } from "process"
+import axiosRetry from "axios-retry"
 
 import { fileResult, getJob, saveFileProcessResult } from "./dynamodbService"
-import { File, FileStatus, FileType, Models } from "./jobModel"
+import { FileStatus, FileType, Models } from "./jobModel"
 import { getDownloadURL, uploadBase64EncodedImage } from "./S3Client"
 
 const BASE_URL = "https://u8iacl4gj0.execute-api.ap-southeast-2.amazonaws.com/Prod"
+axiosRetry(axios, { retries: 3 });
 
 export const modelTrigger = async (jobID:string) =>{
     const job = await getJob(jobID);
@@ -33,7 +34,7 @@ export const modelTrigger = async (jobID:string) =>{
         }
 
         if (file.type == FileType.IMAGE){
-            const outputKey  = jobID + "/result/result_" + file.status.split("/")[-1]
+            const outputKey  = jobID + "/result/result_" + file.s3Key.split("/")[-1]
             const response = await getModelResponse(Models.OWLEYE, file.s3Key)
             // save to dy
             if (response){
@@ -54,20 +55,20 @@ export const modelTrigger = async (jobID:string) =>{
 const getModelResponse = async (model:string, fileKey:string) => {
     const downloadURL = await getDownloadURL(fileKey)
     console.log("download url",downloadURL )
-    let response;
-    const startTime = new Date()
+    // let response;
+    // const startTime = new Date()
     // request model
-    do {
-        const curretTime = new Date()
-        const collapse = Math.abs(startTime.getTime() - curretTime.getTime())/1000 // in seconds
-        if (collapse > 300 ){
-            break // timeout
-        }
-        response = await axios.post(`${BASE_URL}/${model}`,{
-            download_url :downloadURL
-        })
-        console.log("response", response)
-    }while(response.status == 408)  // 408 => time out 
+    // do {
+    //     const curretTime = new Date()
+    //     const collapse = Math.abs(startTime.getTime() - curretTime.getTime())/1000 // in seconds
+    //     if (collapse > 300 ){
+    //         break // timeout
+    //     }
+    const response = await axios.post(`${BASE_URL}/${model}`,{
+        download_url :downloadURL
+    })
+    console.log("response", response)
+    // }while(response.status == 408)  // 408 => time out 
 
     return response
 }
