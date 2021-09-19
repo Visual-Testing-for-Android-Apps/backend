@@ -1,10 +1,15 @@
-import { Context, SQSMessageAttributes, SQSRecordAttributes, SQSRecord } from "aws-lambda";
-import { GetItemInput } from "./service/dynamodbClient";
-import { AttributeMap, AttributeValue } from "aws-sdk/clients/dynamodb";
+import {
+  Context,
+  SQSMessageAttributes,
+  SQSRecord,
+  SQSRecordAttributes,
+} from "aws-lambda"
+import { AttributeMap, AttributeValue } from "aws-sdk/clients/dynamodb"
 
-import { isJobComplete } from "./";
+import { isJobComplete } from "./isJobComplete"
+import { GetItemInput } from "./service/dynamodbClient"
 
-import f = require("./");
+import f = require("./isJobComplete");
 
 const mockContext: Context = {
 	awsRequestId: "mockRequestId",
@@ -29,7 +34,7 @@ const mockContext: Context = {
 };
 
 // Create a sample payload with SQS message format
-const createContex = (jobKey: Number): SQSRecord => {
+const createContex = (jobKey: number): SQSRecord => {
 	return {
 		body: '{ "jobKey": "' + String(jobKey) + '" }',
 		attributes: {} as SQSRecordAttributes,
@@ -47,7 +52,7 @@ const createFile = (
 	fileRef: string,
 	fileType: string,
 	finished: boolean,
-	resultCode: Number,
+	resultCode: number,
 	resultRef: string
 ): AttributeValue => {
 	return {
@@ -61,8 +66,11 @@ const createFile = (
 	};
 };
 
-const createBatch = (...files: AttributeValue[]): AttributeMap => {
+const createBatch = (jobStatus: string, ...files: AttributeValue[]): AttributeMap => {
 	return {
+		jobStatus:{
+			S: jobStatus
+		},
 		files: {
 			L: files,
 		},
@@ -75,18 +83,20 @@ describe("Main", function () {
 		//logSpy = jest.spyOn(console, "log");
 		jest.spyOn(f, "awaitJob").mockImplementation((...args: unknown[]) => {
 			return new Promise((resolve, reject) => {
-				let input = args[0] as GetItemInput;
-				var index = 0;
+				const input = args[0] as GetItemInput;
+				let index = 0;
 				if (input?.Key?.id?.S != null) {
 					index = Number(input.Key.id.S);
 				}
 
-				let batches = [
+				const batches = [
 					createBatch(
+						"PROCESSING",
 						createFile("some/path/", "image", false, 0, ""),
 						createFile("other/path/", "video", true, 1, "another/path")
 					),
 					createBatch(
+						"PROCESSING",
 						createFile("some/path/", "image", true, 0, ""),
 						createFile("other/path/", "video", true, 1, "another/path")
 					),
@@ -108,12 +118,12 @@ describe("Main", function () {
 	// This test invokes the sqs-payload-logger Lambda function and verifies that the received result is correct
 	// Database calls are mocked
 	it("HandlerA", async () => {
-		const res = await isJobComplete({ Records: [createContex(1)] }, mockContext);
+		const res = await isJobComplete("2");
 		expect(res).toEqual(false);
 	});
 
 	it("HandlerB", async () => {
-		const res = await isJobComplete({ Records: [createContex(2)] }, mockContext);
+		const res = await isJobComplete("2");
 		expect(res).toEqual(true);
 		//expect(logSpy).toBeCalledTimes(2);
 	});
