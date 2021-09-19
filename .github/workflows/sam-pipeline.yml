@@ -22,7 +22,7 @@ jobs:
       # sam build 
       - run: sam build --use-container ./server/template.yml
       # sam deploy
-      - run: | 
+      - run: >-
         sam deploy \
         --template ./server/template.yml \
         --no-confirm-changeset \
