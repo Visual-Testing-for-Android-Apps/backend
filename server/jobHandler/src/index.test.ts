@@ -9,7 +9,7 @@ import { AttributeMap, AttributeValue } from "aws-sdk/clients/dynamodb"
 import { isJobComplete } from "./isJobComplete"
 import { GetItemInput } from "./service/dynamodbClient"
 
-import f = require("./");
+import f = require("./isJobComplete");
 
 const mockContext: Context = {
 	awsRequestId: "mockRequestId",
@@ -86,7 +86,7 @@ describe("Main", function () {
 				let input = args[0] as GetItemInput;
 				var index = 0;
 				if (input?.Key?.id?.S != null) {
-					index = number(input.Key.id.S);
+					index = Number(input.Key.id.S);
 				}
 
 				let batches = [
@@ -118,12 +118,12 @@ describe("Main", function () {
 	// This test invokes the sqs-payload-logger Lambda function and verifies that the received result is correct
 	// Database calls are mocked
 	it("HandlerA", async () => {
-		const res = await isJobComplete({ Records: [createContex(1)] }, mockContext);
+		const res = await isJobComplete("2");
 		expect(res).toEqual(false);
 	});
 
 	it("HandlerB", async () => {
-		const res = await isJobComplete({ Records: [createContex(2)] }, mockContext);
+		const res = await isJobComplete("2");
 		expect(res).toEqual(true);
 		//expect(logSpy).toBeCalledTimes(2);
 	});
