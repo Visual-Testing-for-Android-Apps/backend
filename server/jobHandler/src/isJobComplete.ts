@@ -1,9 +1,10 @@
 import { AttributeMap } from "aws-sdk/clients/dynamodb"
+
 import {
-	getItem,
-	GetItemInput,
-	updateItem,
-	UpdateItemInput,
+  getItem,
+  GetItemInput,
+  updateItem,
+  UpdateItemInput,
 } from "./service/dynamodbClient"
 import { getJob, updateJobStatus } from "./service/dynamodbService"
 import { FileStatus, JobStatus } from "./service/jobModel"
@@ -44,7 +45,7 @@ export const isJobComplete = async (key: string): Promise<any> => {
 	const res = await getJob(key)
 
 	//Iterate though every file and check the value of "finished"
-	for (let element of res.files) {
+	for (const element of res.files) {
 		ready &&= (element.status == FileStatus.DONE);
 		//console.log("Is " + (element.fileRef != null ? String(element.fileRef) : "") + " finished?: " + String(element.status == FileStatus.DONE))
 	}
