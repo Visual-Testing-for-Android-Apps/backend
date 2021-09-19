@@ -41,7 +41,8 @@ export enum Models {
 
 export enum JobStatus {
 	PROCESSING = "PROCESSING",
-	GENERATING = "GENERATING"
+	GENERATING = "GENERATING",
+	ZIPPING = "ZIPPING"
 }
 
 

@@ -48,7 +48,7 @@ export const updateJobStatus = async (jobID: string, jobStatus:string) => {
 		Key: { id: { S: jobID } },
 		ReturnValues: "UPDATED_NEW",
 		TableName: tableName,
-		UpdateExpression: "set jobStatus = :jobStatus",
+		UpdateExpression: "set #jobStatus = :jobStatus",
 	} as UpdateItemInput;
 	await updateItem(updateItemInput);
 

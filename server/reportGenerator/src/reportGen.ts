@@ -108,7 +108,7 @@ export const generateReport = async (event: SQSEvent, context: AWSLambda.Context
   let res = "<!DOCTYPE html><html lang='en'><head></head><body><div>\n"
   // if (dbRes.Item != null) {
   const job: Job = await getJob(key);
-  if (job.jobStatus != JobStatus.PROCESSING){
+  if (job.jobStatus != JobStatus.GENERATING){
     console.log(`job: ${key} not ready for report generation yet`)
     return 
   }
