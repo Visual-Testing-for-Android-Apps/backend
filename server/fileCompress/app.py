@@ -5,14 +5,39 @@ import json
 import boto3
 import shutil
 
+class FileHandler:
+    def __init__(self, basePath: str, bucket, tempPath: str, zip):
+        self.basePath = basePath
+        self.bucket = bucket
+        self.tempPath = tempPath
+        self.zip = zip
+
+    def moveFileToZip(self, file):
+        # Get file path for s3 bucket and create file path to store in tmp  
+        file_ref_s3 = os.path.join(self.basePath, file)
+        file_ref_tmp = os.path.join(self.tempPath, os.path.split(file)[-1])
+
+        # Download the file to the temporary directory
+        self.bucket.download_file(file_ref_s3, file_ref_tmp)
+
+        # Add it to the zip file
+        self.zip.write(
+            file_ref_tmp,
+            file,
+            compress_type=zipfile.ZIP_DEFLATED,
+        )
+
+        # Delete the file
+        os.remove(file_ref_tmp)
 
 def lambda_handler(event, context):
     # Define the constants
     TABLE_NAME = os.environ["JOB_TABLE"]
     BUCKET_NAME = os.environ["SRC_BUCKET"]
+    EMAIL_QUEUE = os.environ["EMAIL_QUEUE"]
     PRIMARY_KEY = "id"
-    LOOKUP_BATCH_ID = event["queryStringParameters"]["id"]
-    PRESIGNED_LINK_DURATION = 432000 # seconds (up to max of 7 days)
+    LOOKUP_BATCH_ID = json.loads(event["Records"][0]["body"])["jobKey"]
+    PRESIGNED_LINK_DURATION = 60*60*24*5 # seconds (up to max of 7 days)
 
     # Create table and bucket reference
     table = boto3.resource("dynamodb").Table(TABLE_NAME)
@@ -31,44 +56,24 @@ def lambda_handler(event, context):
     zip_file_path = os.path.join(tmp_dir_path, "temp_zip.zip")
     temp_zip = zipfile.ZipFile(zip_file_path, "w")
 
+    #Create a helper object for moving files
+    fh = FileHandler(str(LOOKUP_BATCH_ID), bucket, tmp_dir_path, temp_zip)
+
     # Go through each file
     for file in files_json:
+        # Move this file to the zip
+        fh.moveFileToZip(file["fileRef"])
 
-        # Get file path for s3 bucket and create file path to store in tmp
-        file_ref_s3 = file["fileRef"]
-        file_ref_tmp = os.path.join(tmp_dir_path, os.path.split(file["fileRef"])[-1])
+        #Move the acompanying results
+        fh.moveFileToZip(file["resultFileReference"])
 
-        # Download the uploaded file
-        bucket.download_file(file_ref_s3, file_ref_tmp)
+    #Move the html report to the zip
+    fh.moveFileToZip("report.html")
 
-        # Add it to the zip file in the uploaded section
-        temp_zip.write(
-            file_ref_tmp,
-            os.path.join("uploaded", os.path.split(file["fileRef"])[-1]),
-            compress_type=zipfile.ZIP_DEFLATED,
-        )
-
-        # Delete the upload file
-        os.remove(file_ref_tmp)
-
-        # Get file path references
-        file_ref_s3 = file["resultFileReference"]
-        file_ref_tmp = os.path.join(
-            tmp_dir_path, os.path.split(file["resultFileReference"])[-1]
-        )
-
-        # Download the results file
-        bucket.download_file(file_ref_s3, file_ref_tmp)
-
-        # Add it to the zip file in the results section
-        temp_zip.write(
-            file_ref_tmp,
-            os.path.join("results", os.path.split(file["fileRef"])[-1]),
-            compress_type=zipfile.ZIP_DEFLATED,
-        )
-
-        # Delete the results file
-        os.remove(file_ref_tmp)
+    """
+    Here we will copy the generic files from a known s3 bucket location.
+    An example of such files would be the heatmap colour arrays.
+    """
 
     # Close zip file
     temp_zip.close()
@@ -80,11 +85,11 @@ def lambda_handler(event, context):
     file_ref_zip_s3 = LOOKUP_BATCH_ID + "/VisionResults.zip"
     bucket.upload_file(zip_file_path, file_ref_zip_s3)
 
-    # Update DynamoDB
+    # Update DynamoDB job status
     table.update_item(
         Key={PRIMARY_KEY: LOOKUP_BATCH_ID},
-        UpdateExpression="SET isCompressed = :bool1",
-        ExpressionAttributeValues={":bool1": True},
+        UpdateExpression="SET jobStatus = :stat1",
+        ExpressionAttributeValues={":stat1": "ZIPPED"},
     )
 
     # Clean out tmp folder
@@ -102,6 +107,16 @@ def lambda_handler(event, context):
         "get_object",
         Params={"Bucket": BUCKET_NAME, "Key": file_ref_zip_s3},
         ExpiresIn=PRESIGNED_LINK_DURATION,
+    )
+
+    #Call next service using an SQS queue
+    sqs = boto3.client('sqs')
+    sqsResponse = sqs.send_message(
+        QueueUrl=EMAIL_QUEUE,
+        DelaySeconds=1,
+        MessageBody=(
+            '{ "jobKey": "' + str(LOOKUP_BATCH_ID) + '" }'
+        )
     )
 
     # Send it

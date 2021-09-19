@@ -1,14 +1,16 @@
 import { createNewJob, FileUploadResponseBody } from "./createNewJob"
 import { ApiGatewayEvent, ApiGatewayResponse } from "./service/apigateway"
 import { getEmail, updateEmail } from "./service/dynamodbService"
-import { modelTrigger } from "./service/modelTrigger"
 import { checkVerificationCode, handleNewEmailSes } from "./service/sesService"
+import { modelTiggerSqsEvent, sendMessage } from "./service/sqsClient"
 
 const CORS_HEADER = {
 	"Access-Control-Allow-Headers": "*",
 	"Access-Control-Allow-Origin": "*",
 	"Access-Control-Allow-Methods": "OPTIONS,POST,GET",
 };
+
+const JOB_HANDLER_QUEUE = process.env.JOB_HANDLER_QUEUE
 
 /**
  * Sample Lambda function which creates an instance of a PostApp and executes it.
@@ -19,7 +21,6 @@ const CORS_HEADER = {
  * @returns {Object} object - Object containing the TodoItem stored.
  *
  */
-
 export const handler = async (event: ApiGatewayEvent): Promise<ApiGatewayResponse> => {
 	try {
 		switch (event.path){
@@ -62,7 +63,7 @@ const newJobHandler = async (event:ApiGatewayEvent): Promise<ApiGatewayResponse>
 		headers: CORS_HEADER,
 		body: JSON.stringify({
 			...returnBody,
-			message:"create new Job ...",
+			message:"Created new Job",
 		}),
 	};
 }
@@ -81,7 +82,7 @@ const updateEmailHandler = async (event:ApiGatewayEvent): Promise<ApiGatewayResp
 		body: JSON.stringify({
 			jobID,
 			newEmail,
-			message:"udpate email ... ",
+			message:"Udpated email",
 		}),
 	};
 }
@@ -101,7 +102,7 @@ const resendCodeHandler = async (event:ApiGatewayEvent): Promise<ApiGatewayRespo
 		body: JSON.stringify({
 			jobID,
 			email,
-			message: "resend code...",
+			message: "Resent verification code",
 		}),
 	}
 
@@ -113,13 +114,19 @@ const uploadDoneHandler =  async (event:ApiGatewayEvent): Promise<ApiGatewayResp
 	if (!jobID) {
 		throw Error("No jobID provided");
 	}
-	await modelTrigger(jobID);
+
+	//Push a request to our SQS queue for the next iteration
+	if (JOB_HANDLER_QUEUE === undefined){
+		throw Error("Environment variable \"JOB_HANDLER_QUEUE\" is missing!")
+	}
+	await sendMessage({jobKey: jobID}, JOB_HANDLER_QUEUE);
+
 	return {
 		statusCode: 200,
 		headers: CORS_HEADER,
 		body: JSON.stringify({
 			jobID,
-			message:"upload done, trigger models ...",
+			message:"Upload done, triggered job handler",
 		}),
 	}
 
@@ -140,7 +147,7 @@ const verifyCodeHandler = async (event:ApiGatewayEvent): Promise<ApiGatewayRespo
 		body: JSON.stringify({
 			jobID,
 			verified,
-			message:"verify code ...",
+			message:"Verified code",
 		}),
 	}
 	
