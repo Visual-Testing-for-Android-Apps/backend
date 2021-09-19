@@ -83,13 +83,13 @@ describe("Main", function () {
 		//logSpy = jest.spyOn(console, "log");
 		jest.spyOn(f, "awaitJob").mockImplementation((...args: unknown[]) => {
 			return new Promise((resolve, reject) => {
-				let input = args[0] as GetItemInput;
-				var index = 0;
+				const input = args[0] as GetItemInput;
+				let index = 0;
 				if (input?.Key?.id?.S != null) {
 					index = Number(input.Key.id.S);
 				}
 
-				let batches = [
+				const batches = [
 					createBatch(
 						"PROCESSING",
 						createFile("some/path/", "image", false, 0, ""),

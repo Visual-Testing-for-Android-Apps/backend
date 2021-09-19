@@ -8,8 +8,8 @@ import { getDownloadURL, uploadBase64EncodedImage } from "./S3Client"
 
 const BASE_URL = "https://u8iacl4gj0.execute-api.ap-southeast-2.amazonaws.com/Prod"
 axiosRetry(axios, { retries: 3 });
-// Draw runner triggers self-invoke when 5 minutes left.
-const remainingTimeThresholdInMillis = 300000
+// Draw runner triggers self-invoke when 1 minutes left.
+const remainingTimeThresholdInMillis = 60000
 
 export const modelTrigger = async (context: AWSLambda.Context,job:Job) =>{
     const files = job.files 

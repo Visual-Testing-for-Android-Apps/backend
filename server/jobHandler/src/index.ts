@@ -18,7 +18,9 @@ export const handler = async (event: SQSEvent, context: AWSLambda.Context): Prom
 		})
 		const result = await Promise.race([runJob, lambdaTimeoutMonitorTask])
 		if ((result as string) == "timeout"){
-			throw Error(JSON.stringify({ key, reason: "jobHandler time out" }))
+			// throw Error(JSON.stringify({ key, reason: "jobHandler time out" }))
+			await selfEnvoke(key)
+			return 
 		}
 		if (!(result as { skipSelfInvoke: boolean }).skipSelfInvoke) {
 			await selfEnvoke(key)
