@@ -3,3 +3,6 @@ node_modules
 
 # don't lint our output build
 dist
+
+# skip lint test
+*.test.ts

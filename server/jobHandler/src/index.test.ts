@@ -34,7 +34,7 @@ const mockContext: Context = {
 };
 
 // Create a sample payload with SQS message format
-const createContex = (jobKey: Number): SQSRecord => {
+const createContex = (jobKey: number): SQSRecord => {
 	return {
 		body: '{ "jobKey": "' + String(jobKey) + '" }',
 		attributes: {} as SQSRecordAttributes,
@@ -52,7 +52,7 @@ const createFile = (
 	fileRef: string,
 	fileType: string,
 	finished: boolean,
-	resultCode: Number,
+	resultCode: number,
 	resultRef: string
 ): AttributeValue => {
 	return {
@@ -86,7 +86,7 @@ describe("Main", function () {
 				let input = args[0] as GetItemInput;
 				var index = 0;
 				if (input?.Key?.id?.S != null) {
-					index = Number(input.Key.id.S);
+					index = number(input.Key.id.S);
 				}
 
 				let batches = [
@@ -118,12 +118,12 @@ describe("Main", function () {
 	// This test invokes the sqs-payload-logger Lambda function and verifies that the received result is correct
 	// Database calls are mocked
 	it("HandlerA", async () => {
-		const res = await isJobComplete({ Records: [createContex(1)] });
+		const res = await isJobComplete({ Records: [createContex(1)] }, mockContext);
 		expect(res).toEqual(false);
 	});
 
 	it("HandlerB", async () => {
-		const res = await isJobComplete({ Records: [createContex(2)] });
+		const res = await isJobComplete({ Records: [createContex(2)] }, mockContext);
 		expect(res).toEqual(true);
 		//expect(logSpy).toBeCalledTimes(2);
 	});

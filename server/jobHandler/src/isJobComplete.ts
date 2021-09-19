@@ -11,7 +11,7 @@ import { triggerReportGen } from "./service/sqsClient"
 
 //Gets a job from the database. Exists to skip a null check and allow for mocking
 export const awaitJob = async (request: GetItemInput): Promise<AttributeMap | null> => {
-	let res = await getItem(request);
+	const res = await getItem(request);
 	if (res.Item != null) {
 		return res.Item;
 	}
@@ -40,7 +40,7 @@ export const isJobComplete = async (key: string): Promise<any> => {
 	};
 
 	//Ready to be submitted for report generation
-	let ready: boolean = false;
+	let ready = false;
 
 	const res = await awaitJob(request);
 

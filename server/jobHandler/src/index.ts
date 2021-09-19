@@ -46,7 +46,6 @@ const jobHandler = async (context: AWSLambda.Context,key:string ): Promise<{ ski
 		throw Error(`job:${job.id} not verified`) 
 	}
 	await modelTrigger(context,job)
-	    
 	//The actual checking if all jobs are complete could be redundant, but leaving it in doesn't hurt anything
 	return {skipSelfInvoke:await isJobComplete(key)}
 }
