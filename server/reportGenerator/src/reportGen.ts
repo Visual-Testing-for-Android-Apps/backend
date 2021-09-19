@@ -1,6 +1,14 @@
-import { SQSEvent } from 'aws-lambda'
-import { S3 } from 'aws-sdk'
-import { getItem, GetItemInput, pushToQueue, SendMessageRequest } from './service/dynamodbClient'
+import { SQSEvent } from "aws-lambda"
+import { S3 } from "aws-sdk"
+
+import {
+  getItem,
+  GetItemInput,
+  pushToQueue,
+  SendMessageRequest,
+} from "./service/dynamodbClient"
+import { getJob } from "./service/dynamodbService"
+import { FileType, Job, JobStatus } from "./service/jobModel"
 
 /**
  * Generates a html report for a given video issue
@@ -89,42 +97,46 @@ function generateImgReport (
 export const generateReport = async (event: SQSEvent, context: AWSLambda.Context): Promise<any> => {
   // fetch job results from database
   const key: string = JSON.parse(event.Records[0].body).jobKey // queue batchsize = 1, so Records[0].length = 1
-  const request: GetItemInput = {
-    TableName: process.env.JOB_TABLE as string,
-    Key: {
-      id: { S: key }
-    }
-  }
-  const dbRes = await getItem(request)
-
+  // const request: GetItemInput = {
+  //   TableName: process.env.JOB_TABLE as string,
+  //   Key: {
+  //     id: { S: key }
+  //   }
+  // }
+  // const dbRes = await getItem(request)
   // construct HTML report contents
   let res = "<!DOCTYPE html><html lang='en'><head></head><body><div>\n"
-  if (dbRes.Item != null) {
-    const files = dbRes.Item.files
-    if (files.L != null) {
-      // Iterate through each file
-      files.L.forEach((element, index) => {
-        if (element.M != null) {
-          const fileRef = element.M.fileRef.S
-          const fileType = element.M.fileType.S
-          const resultCode = element.M.resultCode.N
-          const resultFileRef = element.M.resultFileReference.S
-
-          // Add image/vid string to overall report string
-          if (fileType != null && resultCode != null) {
-			res += "  <div>\n"
-            if (fileType === "image" && fileRef != null && resultFileRef != null) {
-              res += generateImgReport(index, fileRef, resultFileRef, +resultCode)
-            } else if (fileType === "video") {
-              res += generateVidReport(index, +resultCode)
-            }
-            res += "  </div><p><br><br></p>"
-          }
-        }
-      })
-    }
+  // if (dbRes.Item != null) {
+  const job: Job = await getJob(key);
+  if (job.jobStatus != JobStatus.PROCESSING){
+    console.log(`job: ${key} not ready for report generation yet`)
+    return 
   }
-  res += "</div></body></html>"
+  const files = job.files
+
+  // Iterate through each file
+  files.forEach((element, index) => {
+
+    const fileRef = element.s3Key
+    const fileType = element.type
+    const resultCode = Number(element.result.code)
+    const resultFileRef = element.result.outputKey
+
+    // Add image/vid string to overall report string
+    if (fileType != null && resultCode != null) {
+res += "  <div>\n"
+      if (fileType === FileType.IMAGE && fileRef != null && resultFileRef != null) {
+        res += generateImgReport(index, fileRef, resultFileRef, +resultCode)
+      } else if (fileType === FileType.VIDEO) {
+        res += generateVidReport(index, +resultCode)
+      }
+      res += "  </div><p><br><br></p>"
+    }
+    
+  })
+  
+
+res += "</div></body></html>"
 
   // Add html file to s3 bucket
   const filepath = key + "/report.html"
@@ -149,6 +161,7 @@ export const generateReport = async (event: SQSEvent, context: AWSLambda.Context
     QueueUrl: process.env.FILE_ZIP_QUEUE as string
   }
   await pushToQueue(params)
+  console.log("report generated ... ")
 
   return res
 }
