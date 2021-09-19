@@ -1,24 +1,43 @@
-// import { GetItemInput, GetItemOutput } from "aws-sdk/clients/dynamodb";
 
-// import { getItem } from "./dynamodbClient";
+import { integer } from "aws-sdk/clients/cloudfront"
+import {
+  Converter,
+  GetItemInput,
+  UpdateItemInput,
+} from "aws-sdk/clients/dynamodb"
 
-// const tableName = process.env.JOB_TABLE as string
+import { Job } from "../service/jobModel"
+import { getItem, updateItem } from "./dynamodbClient"
 
-// export const addNewJobToDb = async (
-//     email: string,
-//     videoFiles: string[],
-//     imageFiles: string[],
-//   ): Promise<void> => {
-//     const newJobItem = {
-//       TableName: tableName,
-//       Item:{
-//           id: uuidv4,
-//           email,
-//           videoFiles,
-//           imageFiles,
-//           updatedAt: new Date().toISOString()
-//       }
-//     } as PutItemInput
+const tableName = process.env.JOB_TABLE as string;
 
-//     await putItem(newJobItem)
-//   }
+
+export const getJob = async (id:string): Promise<Job> => {
+	const getItemInput: GetItemInput = {
+		TableName:tableName,
+		Key: {id : {S:id}},
+	}
+
+	const ret = await getItem(getItemInput);
+	return Converter.unmarshall(ret.Item!) as Job
+}
+
+export interface fileResult {
+	code?: string,
+	message: string,
+	outputKey?:string
+}
+
+export const saveFileProcessResult = async(jobID:string, fileIdx: integer, result:fileResult) =>{
+	const resultAtrr = Converter.marshall(result)
+	const updateItemInput = {
+		ExpressionAttributeNames: { "#result": "result", "#status":"status"},
+		ExpressionAttributeValues: {":result":{M:resultAtrr},":status":{S:"DONE"}},
+		Key: { id: { S: jobID } },
+		ReturnValues: "UPDATED_NEW",
+		TableName: tableName,
+		UpdateExpression: "SET files["+fileIdx+"].#result = :result, files["+fileIdx+"].#status = :status",
+	} as UpdateItemInput;
+	await updateItem(updateItemInput);
+
+}

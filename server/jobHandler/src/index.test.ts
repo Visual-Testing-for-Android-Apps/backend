@@ -1,8 +1,13 @@
-import { Context, SQSMessageAttributes, SQSRecordAttributes, SQSRecord } from "aws-lambda";
-import { GetItemInput } from "./service/dynamodbClient";
-import { AttributeMap, AttributeValue } from "aws-sdk/clients/dynamodb";
+import {
+  Context,
+  SQSMessageAttributes,
+  SQSRecord,
+  SQSRecordAttributes,
+} from "aws-lambda"
+import { AttributeMap, AttributeValue } from "aws-sdk/clients/dynamodb"
 
-import { isJobComplete } from "./";
+import { isJobComplete } from "./isJobComplete"
+import { GetItemInput } from "./service/dynamodbClient"
 
 import f = require("./");
 
@@ -113,12 +118,12 @@ describe("Main", function () {
 	// This test invokes the sqs-payload-logger Lambda function and verifies that the received result is correct
 	// Database calls are mocked
 	it("HandlerA", async () => {
-		const res = await isJobComplete({ Records: [createContex(1)] }, mockContext);
+		const res = await isJobComplete({ Records: [createContex(1)] });
 		expect(res).toEqual(false);
 	});
 
 	it("HandlerB", async () => {
-		const res = await isJobComplete({ Records: [createContex(2)] }, mockContext);
+		const res = await isJobComplete({ Records: [createContex(2)] });
 		expect(res).toEqual(true);
 		//expect(logSpy).toBeCalledTimes(2);
 	});

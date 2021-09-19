@@ -1,14 +1,13 @@
-import { SQSEvent } from "aws-lambda"
 import { AttributeMap } from "aws-sdk/clients/dynamodb"
 
 import {
   getItem,
   GetItemInput,
-  pushToQueue,
-  SendMessageRequest,
   updateItem,
   UpdateItemInput,
 } from "./service/dynamodbClient"
+import { JobStatus } from "./service/jobModel"
+import { triggerReportGen } from "./service/sqsClient"
 
 //Gets a job from the database. Exists to skip a null check and allow for mocking
 export const awaitJob = async (request: GetItemInput): Promise<AttributeMap | null> => {
@@ -82,7 +81,7 @@ export const isJobComplete = async (key: string): Promise<any> => {
 				},
 				UpdateExpression: "set jobStatus = :s",
 				ExpressionAttributeValues: {
-					":s": { S: "GENERATING" },
+					":s": { S: JobStatus.GENERATING },
 				},
 			};
 			await updateJob(request);
@@ -90,12 +89,7 @@ export const isJobComplete = async (key: string): Promise<any> => {
 			//const message: String = '{ "jobKey": "' + String(key) + '" }'
 
 			//Push a request to the SQS queue
-			const params: SendMessageRequest = {
-				MessageBody: '{ "jobKey": "' + String(key) + '" }',
-				QueueUrl: process.env.REPORT_GENERATION_QUEUE as string,
-			};
-
-			await pushToQueue(params);
+			await triggerReportGen(key)
 			return true; //message
 		}
 	}

@@ -1,77 +1,54 @@
 import { SQSEvent } from "aws-lambda"
-import { AttributeMap } from "aws-sdk/clients/dynamodb"
 
-import { awaitJob, isJobComplete } from "./isJobComplete.js"
-import {
-  Converter,
-  getItem,
-  GetItemInput,
-  pushToQueue,
-  SendMessageRequest,
-  updateItem,
-  UpdateItemInput,
-} from "./service/dynamodbClient"
-import { selfEnvoke } from "./service/sqsClient"
+import { isJobComplete } from "./isJobComplete.js"
+import { getJob } from "./service/dynamodbService"
+import { JobStatus } from "./service/jobModel"
+import { modelTrigger } from "./service/modelTrigger"
+import { selfEnvoke } from "./service/sqsClient.js"
 
 //Exports isJobComplete for use with AWS lambda
-exports.handler = (event: SQSEvent, context: AWSLambda.Context): Promise<any> => {
-	return jobHandler(event, context);
+export const handler = async (event: SQSEvent, context: AWSLambda.Context): Promise<void> => {
+	try{
+		//Push a request to our SQS queue for the next iteration
+		const key: string = JSON.parse(event.Records[0].body).jobKey;
+		const runJob =  jobHandler(context,key)
+		const timeoutPeriod = context.getRemainingTimeInMillis() - 10 * 1000
+		const lambdaTimeoutMonitorTask: Promise<string> = new Promise((resolve) => {
+		setTimeout(() => resolve("timeout"), timeoutPeriod)
+		})
+		const result = await Promise.race([runJob, lambdaTimeoutMonitorTask])
+		if ((result as string) == "timeout"){
+			throw Error(JSON.stringify({ key, reason: "jobHandler time out" }))
+		}
+		if (!(result as { skipSelfInvoke: boolean }).skipSelfInvoke) {
+			await selfEnvoke(key)
+			return
+		}
+		console.log(JSON.stringify({
+			jobID :key,
+			message: "🎉job completed"
+		}))
+		return 
+	} catch (err) {
+		console.error("DrawRunner terminated", err)
+	}
 };
 
-const jobHandler = async (event: SQSEvent, context: AWSLambda.Context): Promise<any> =>{
-	const key: string = JSON.parse(event.Records[0].body).jobKey;
-
+const jobHandler = async (context: AWSLambda.Context,key:string ): Promise<{ skipSelfInvoke: boolean }>=>{
 	//Job request object.
-	const request: GetItemInput = {
-		TableName: process.env.JOB_TABLE as string,
-		Key: {
-			id: { S: key },
-		},
-	};
-
-	const resMarshalled = await awaitJob(request);
-
-	if (!resMarshalled) { return false; }
-
-	const res = Converter.unmarshall(resMarshalled);
-	
-	//Check if this job is already complete
-	if (res.jobStatus) {
-		if (res.jobStatus !== "PROCESSING") {
-			return true
-		}
-	} else {
-		return false
+	const job = await getJob(key)
+	//(QUES1) Check if this job is already complete
+	if (job.jobStatus == JobStatus.GENERATING) {
+		throw Error(`job:${job.id} already finished`) 
 	}
-
-	if(!res.files){
-		return false
+	// check email if verified 
+	if (!job.emailVerified){
+		throw Error(`job:${job.id} not verified`) 
 	}
-
-	//Push a request to our SQS queue for the next iteration
-	await selfEnvoke(key)
-
-	for(;;){
-		for (let file of res.files) {
-			//generate the signed URL
-			const signedUrl: string = "";
-
-			const msg: string = '{ "jobKey": "' + String(key) + '"; "signedUrl": "' + signedUrl +'" }';
-			
-			//Invoke lambda for OwlEyes/Seenomaly
-			if(file.filetype == "image"){
-				//I think we can just copy/paste this code from somewhere else
-				//await mediaRes = ...
-			} else{
-
-			}
-
-			//Write results to DB
-		}     
-	}
-	
+	await modelTrigger(context,job)
+	    
 	//The actual checking if all jobs are complete could be redundant, but leaving it in doesn't hurt anything
-	isJobComplete(key);
+	return {skipSelfInvoke:await isJobComplete(key)}
 }
  
 
