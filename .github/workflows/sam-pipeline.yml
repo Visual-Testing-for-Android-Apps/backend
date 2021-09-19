@@ -31,3 +31,4 @@ jobs:
           --s3-bucket visual-testing-cd 
           --capabilities CAPABILITY_IAM 
           --region ap-southeast-2 
+
