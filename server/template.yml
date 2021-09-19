@@ -122,54 +122,51 @@ Resources:
             Queue: !GetAtt JobHandlerQueue.Arn
             BatchSize: 1
 
-   
-
-
-  # FileCompress:
-  #   Type: AWS::Serverless::Function
-  #   Properties:
-  #     CodeUri: fileCompress/
-  #     Handler: app.lambda_handler
-  #     Runtime: python3.8
-  #     Timeout: 10
-  #     Policies:
-  #       - AWSLambdaBasicExecutionRole
-  #       - Version: 2012-10-17
-  #         Statement:
-  #           - Action: dynamodb:*
-  #             Effect: Allow
-  #             Resource:
-  #               - !GetAtt JobTable.Arn
-  #           - Action: cloudwatch:PutMetricData
-  #             Effect: Allow
-  #             Resource: "*"
-  #           - Action:
-  #               - sqs:*
-  #             Effect: Allow
-  #             Resource: "*"
-  #           - Action: s3:*
-  #             Effect: Allow
-  #             Resource:
-  #               - !Sub arn:aws:s3:::${SrcBucket}/*
-  #               - !Sub arn:aws:s3:::${SrcBucket}
-  #     Environment:
-  #       Variables:
-  #         # Make table name accessible as environment variable from function code during execution
-  #         JOB_TABLE: !Ref JobTable
-  #         SRC_BUCKET: !Ref SrcBucket
-  #         EMAIL_QUEUE: !Ref SendEmailQueue
-  #     Events:
-  #       SQSQueueEvent:
-  #         Type: SQS
-  #         Properties:
-  #           Queue: !GetAtt FileZipQueue.Arn
-  #           BatchSize: 1
+  FileCompress:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: fileCompress/
+      Handler: app.lambda_handler
+      Runtime: python3.8
+      Timeout: 10
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - Version: 2012-10-17
+          Statement:
+            - Action: dynamodb:*
+              Effect: Allow
+              Resource:
+                - !GetAtt JobTable.Arn
+            - Action: cloudwatch:PutMetricData
+              Effect: Allow
+              Resource: "*"
+            - Action:
+                - sqs:*
+              Effect: Allow
+              Resource: "*"
+            - Action: s3:*
+              Effect: Allow
+              Resource:
+                - !Sub arn:aws:s3:::${SrcBucket}/*
+                - !Sub arn:aws:s3:::${SrcBucket}
+      Environment:
+        Variables:
+          # Make table name accessible as environment variable from function code during execution
+          JOB_TABLE: !Ref JobTable
+          SRC_BUCKET: !Ref SrcBucket
+          EMAIL_QUEUE: !Ref SendEmailQueue
+      Events:
+        SQSQueueEvent:
+          Type: SQS
+          Properties:
+            Queue: !GetAtt FileZipQueue.Arn
+            BatchSize: 1
 
   SendEmail:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: sendEmail/
-      Handler: dist/send-email.sendEmail
+      Handler: dist/index.sendEmail
       Runtime: nodejs12.x
       Description: Endpoint for sending email with results to users
       Policies:
@@ -321,15 +318,10 @@ Outputs:
     Value: !Ref UploadHandler
   JobHandlerFuntion:
     Value: !Ref JobHandler
-  # FileCompressApi:
-  #   Description: "API Gateway endpoint URL for Prod stage for file compression function"
-  #   Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/fileCompress/"
   SendEmailFunction:
     Value: !Ref SendEmail
   ReportGeneratorFunction:
     Value: !Ref ReportGenerator
-    # Description: "API Gateway endpoint URL for Prod stage for HTML report generation function"
-    # Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/reportGenerator/"
   SrcBucket:
     Value: !Ref SrcBucket
   JobTableName:

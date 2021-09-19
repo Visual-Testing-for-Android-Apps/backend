@@ -37,7 +37,7 @@ def lambda_handler(event, context):
     EMAIL_QUEUE = os.environ["EMAIL_QUEUE"]
     PRIMARY_KEY = "id"
     LOOKUP_BATCH_ID = json.loads(event["Records"][0]["body"])["jobKey"]
-    PRESIGNED_LINK_DURATION = 432000 # seconds (up to max of 7 days)
+    PRESIGNED_LINK_DURATION = 60*60*24*5 # seconds (up to max of 7 days)
 
     # Create table and bucket reference
     table = boto3.resource("dynamodb").Table(TABLE_NAME)
@@ -71,8 +71,8 @@ def lambda_handler(event, context):
     fh.moveFileToZip("report.html")
 
     """
-    Here we will copy the generic files form a known s3 bucket location.
-    An aexample of such files would be the heatmap colour arrays.
+    Here we will copy the generic files from a known s3 bucket location.
+    An example of such files would be the heatmap colour arrays.
     """
 
     # Close zip file

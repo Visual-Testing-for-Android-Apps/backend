@@ -7,7 +7,6 @@ export interface Job {
 	jobStatus: string;
 }
 
-
 export interface File {
 	contentType: string;
 	s3Key: string;
@@ -23,6 +22,7 @@ interface Result {
     code: string;
 	outputKey: string;
 }
+
 export enum FileType {
 	VIDEO = "VIDEO",
 	IMAGE = "IMAGE",
@@ -44,6 +44,3 @@ export enum JobStatus {
 	GENERATING = "GENERATING",
 	ZIPPING = "ZIPPING"
 }
-
-
-

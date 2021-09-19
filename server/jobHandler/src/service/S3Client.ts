@@ -2,7 +2,7 @@ import * as AWS from "aws-sdk"
 import { PutObjectRequest } from "aws-sdk/clients/s3"
 
 const BUCKET_NAME = process.env["SRC_BUCKET"];
-const URL_EXPIRATION_SECONDS = 3000;
+const URL_EXPIRATION_SECONDS = 3000; //TODO: This is 50 minutes, I don't think it needs to be any more than 5
 const s3bucket = new AWS.S3();
 
 export const uploadToS3 = (fileName: string, fileStream: string): Promise<any> => {
@@ -15,7 +15,7 @@ export const uploadToS3 = (fileName: string, fileStream: string): Promise<any> =
 	return s3bucket.upload(params).promise();
 };
 
-export const getDownloadURL = async (key: string):Promise<string> => {
+export const getDownloadURL = async (key: string): Promise<string> => {
 	// Get signed URL from S3
 	const s3Params = {
 		Bucket: BUCKET_NAME,
@@ -26,11 +26,11 @@ export const getDownloadURL = async (key: string):Promise<string> => {
 	return await s3bucket.getSignedUrlPromise("getObject", s3Params);
 };
 
-export const uploadBase64EncodedImage = async (image_str:string, fileKey:string) =>{
+export const uploadBase64EncodedImage = async (image_str: string, fileKey: string) => {
 	console.log(image_str);
-	const buf = Buffer.from(image_str,'base64')
+	const buf = Buffer.from(image_str, 'base64')
 	const data = {
-		Key: fileKey, 
+		Key: fileKey,
 		Body: buf,
 		Bucket: BUCKET_NAME,
 		ContentEncoding: 'base64',

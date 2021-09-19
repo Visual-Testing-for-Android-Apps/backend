@@ -3,14 +3,14 @@ export interface Job {
 	email: string;
 	createdAt: string;
 	files: File[];
-	emailVerified:boolean;
+	emailVerified: boolean;
 	jobStatus: string;
 }
 
 export interface File {
 	contentType: string;
 	s3Key: string;
-	orginalName:string;
+	orginalName: string;
 	type: string;
 	finishTime?: string;
 	status: FileStatus;
@@ -19,7 +19,7 @@ export interface File {
 
 interface Result {
 	message: string;
-    code: string;
+	code: string;
 	outputKey: string;
 }
 
@@ -43,6 +43,3 @@ export enum JobStatus {
 	PROCESSING = "PROCESSING",
 	GENERATING = "GENERATING"
 }
-
-
-
