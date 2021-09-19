@@ -41,3 +41,15 @@ export const saveFileProcessResult = async(jobID:string, fileIdx: integer, resul
 	await updateItem(updateItemInput);
 
 }
+export const updateJobStatus = async (jobID: string, jobStatus:string) => {
+	const updateItemInput = {
+		ExpressionAttributeNames: { "#jobStatus": "jobStatus"},
+		ExpressionAttributeValues: {":jobStatus":{S:jobStatus}},
+		Key: { id: { S: jobID } },
+		ReturnValues: "UPDATED_NEW",
+		TableName: tableName,
+		UpdateExpression: "set jobStatus = :jobStatus",
+	} as UpdateItemInput;
+	await updateItem(updateItemInput);
+
+}

@@ -1,6 +1,7 @@
 import * as AWS from "aws-sdk"
 import { PutObjectRequest } from "aws-sdk/clients/s3"
-import {getFileType} from "./jobModel"
+
+import { getFileType } from "./jobModel"
 
 const BUCKET_NAME = process.env["SRC_BUCKET"];
 const URL_EXPIRATION_SECONDS = 3000;

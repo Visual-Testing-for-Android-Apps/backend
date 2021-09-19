@@ -1,10 +1,14 @@
 
-import axios, { AxiosRequestConfig } from "axios"
+import axios from "axios"
 import axiosRetry from "axios-retry"
 
 import { fileResult, saveFileProcessResult } from "./dynamodbService"
 import { FileStatus, FileType, Job, Models } from "./jobModel"
-import { getDownloadURL, uploadBase64EncodedImage } from "./S3Client"
+import {
+  getDownloadURL,
+  uploadBase64EncodedImage,
+  uploadToS3,
+} from "./S3Client"
 
 const BASE_URL = "https://u8iacl4gj0.execute-api.ap-southeast-2.amazonaws.com/Prod"
 axiosRetry(axios, { retries: 3 });

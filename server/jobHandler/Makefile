@@ -8,6 +8,7 @@ build-JobHandler:
 ifeq ($(OS),Windows_NT)
 	Xcopy /E * $(ARTIFACTS_DIR)
 else
-	cp -r dist "$(ARTIFACTS_DIR)/"
+# cp -r dist "$(ARTIFACTS_DIR)/"
+	cp -R * $(ARTIFACTS_DIR)
 	
 endif

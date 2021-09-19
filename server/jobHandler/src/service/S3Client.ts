@@ -5,6 +5,15 @@ const BUCKET_NAME = process.env["SRC_BUCKET"];
 const URL_EXPIRATION_SECONDS = 3000;
 const s3bucket = new AWS.S3();
 
+export const uploadToS3 = (fileName: string, fileStream: string): Promise<any> => {
+	const params = {
+		Bucket: BUCKET_NAME,
+		Key: "userUploads" + "/" + fileName,
+		Body: fileStream,
+	} as AWS.S3.Types.PutObjectRequest;
+
+	return s3bucket.upload(params).promise();
+};
 
 export const getDownloadURL = async (key: string):Promise<string> => {
 	// Get signed URL from S3
@@ -18,6 +27,7 @@ export const getDownloadURL = async (key: string):Promise<string> => {
 };
 
 export const uploadBase64EncodedImage = async (image_str:string, fileKey:string) =>{
+	console.log(image_str);
 	const buf = Buffer.from(image_str,'base64')
 	const data = {
 		Key: fileKey, 
@@ -27,6 +37,6 @@ export const uploadBase64EncodedImage = async (image_str:string, fileKey:string)
 		ContentType: 'image/jpeg'
 	} as PutObjectRequest
 	console.log(JSON.stringify(data))
-	await s3bucket.upload(data)
+	await s3bucket.putObject(data)
 	console.log('successfully uploaded the image!', buf);
 }

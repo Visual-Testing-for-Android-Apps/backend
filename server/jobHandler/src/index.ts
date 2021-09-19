@@ -1,7 +1,7 @@
 import { SQSEvent } from "aws-lambda"
 
 import { isJobComplete } from "./isJobComplete.js"
-import { getJob } from "./service/dynamodbService"
+import { getJob, updateJobStatus } from "./service/dynamodbService"
 import { JobStatus } from "./service/jobModel"
 import { modelTrigger } from "./service/modelTrigger"
 import { selfEnvoke } from "./service/sqsClient.js"
@@ -32,7 +32,7 @@ export const handler = async (event: SQSEvent, context: AWSLambda.Context): Prom
 		}))
 		return 
 	} catch (err) {
-		console.error("DrawRunner terminated", err)
+		console.error("jobRunner terminated", err)
 	}
 };
 
@@ -41,12 +41,13 @@ const jobHandler = async (context: AWSLambda.Context,key:string ): Promise<{ ski
 	const job = await getJob(key)
 	//(QUES1) Check if this job is already complete
 	if (job.jobStatus == JobStatus.GENERATING) {
-		throw Error(`job:${job.id} already finished`) 
+		throw Error(`job:${job.id} has already been processed`) 
 	}
 	// check email if verified 
 	if (!job.emailVerified){
 		throw Error(`job:${job.id} not verified`) 
 	}
+	await updateJobStatus(key, JobStatus.PROCESSING)
 	await modelTrigger(context,job)
 	//The actual checking if all jobs are complete could be redundant, but leaving it in doesn't hurt anything
 	return {skipSelfInvoke:await isJobComplete(key)}

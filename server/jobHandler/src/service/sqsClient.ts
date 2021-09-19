@@ -29,6 +29,7 @@ export const selfEnvoke = async (jobID:string) =>{
 }
 
 export const triggerReportGen = async (jobID:string) =>{
+	console.log("trigger report generation...")
 	const params: SendMessageRequest = {
 		MessageBody: JSON.stringify({jobKey:jobID}),
 		QueueUrl:REPORT_GENERATION_QUEUE,

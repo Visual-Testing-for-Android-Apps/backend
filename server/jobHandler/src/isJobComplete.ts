@@ -6,7 +6,8 @@ import {
   updateItem,
   UpdateItemInput,
 } from "./service/dynamodbClient"
-import { JobStatus } from "./service/jobModel"
+import { getJob, updateJobStatus } from "./service/dynamodbService"
+import { FileStatus, JobStatus } from "./service/jobModel"
 import { triggerReportGen } from "./service/sqsClient"
 
 //Gets a job from the database. Exists to skip a null check and allow for mocking
@@ -32,6 +33,7 @@ export const isJobComplete = async (key: string): Promise<any> => {
 	//console.log("Job key: " + String(key))
 
 	//Job request object.
+	console.log("check is job Complete ... ")
 	const request: GetItemInput = {
 		TableName: process.env.JOB_TABLE as string,
 		Key: {
@@ -42,49 +44,39 @@ export const isJobComplete = async (key: string): Promise<any> => {
 	//Ready to be submitted for report generation
 	let ready = false;
 
-	const res = await awaitJob(request);
+	// const res = await awaitJob(request);
+	const res = await getJob(key)
 
 	if (res) {
 		//Check current job status. If we are already generating the report, then return early (could happen due to queue buffer)
 		//If jobStatus doesn't exist, we return as the job is illformed
-		if (res.jobStatus?.S) {
-			const status = res.jobStatus.S;
-			//console.log(status);
-			if (status !== "PROCESSING") {
-				return true;
-			}
-		} else {
-			return false;
-		}
+		// if (res.jobStatus?.S) {
+		// 	const status = res.jobStatus.S;
+		// 	//console.log(status);
+		// 	if (status !== "PROCESSING") {
+		// 		return true;
+		// 	}
+		// } else {
+		// 	return false;
+		// }
 		//Load files from job data
 		const media = res.files;
 		ready = true;
 
 		//Iterate though every file and check the value of "finished"
-		if (media.L != null) {
-			media.L.forEach((element) => {
-				if (element.M != null) {
-					const fin = element.M.finished.BOOL;
-					if (!(fin == null)) {
-						ready &&= fin.valueOf();
-						//console.log("Is " + (element.M.fileRef.S != null ? String(element.M.fileRef.S) : "") + " finished?: " + String(fin))
-					}
-				}
-			});
-		}
+		
+		media.forEach((element) => {
+			if (element != null) {
+				// const fin = element.M.finished.BOOL;
+				// if (!(fin == null)) {
+				ready &&= element.status == FileStatus.DONE;
+					//console.log("Is " + (element.M.fileRef.S != null ? String(element.M.fileRef.S) : "") + " finished?: " + String(fin))
+			}
+		});
+		
 		if (ready) {
 			//A request to update the job status
-			const request: UpdateItemInput = {
-				TableName: process.env.JOB_TABLE as string,
-				Key: {
-					id: { S: key },
-				},
-				UpdateExpression: "set jobStatus = :s",
-				ExpressionAttributeValues: {
-					":s": { S: JobStatus.GENERATING },
-				},
-			};
-			await updateJob(request);
+			await updateJobStatus(key, JobStatus.GENERATING)
 
 			//const message: String = '{ "jobKey": "' + String(key) + '" }'
 
