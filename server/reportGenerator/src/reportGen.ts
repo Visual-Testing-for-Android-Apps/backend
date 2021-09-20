@@ -10,10 +10,11 @@ import { FileType, Job, JobStatus } from "./service/jobModel"
 /**
  * Generates a html report for a given video issue
  *
+ * @param filePath - filepath to original video
  * @param algResult - issue type code
  * @returns html string containing image, heatmap, and description
  */
-function generateVidReport(algResult: number): Record<string, string> {
+function generateVidReport(filePath: string, algResult: number): Record<string, string> {
 	const titles: string[] = [
 		'Cannot place image in space',
 		'Pass through other material',
@@ -42,6 +43,7 @@ function generateVidReport(algResult: number): Record<string, string> {
 	return {
 		title: titles[algResult],
 		desc: desc[algResult],
+		video: filePath,
 	};
 }
 
@@ -101,7 +103,9 @@ export const generateReport = async (event: SQSEvent, context: AWSLambda.Context
 	const files = job.files
 
 	// construct HTML report contents
-	const content: Record<string, string>[] = [];
+	const image: Record<string, string>[] = [];
+	const video: Record<string, string>[] = [];
+
 	if (dbRes.Item != null) {
 		const files = dbRes.Item.files;
 		if (files.L != null) {
@@ -114,11 +118,11 @@ export const generateReport = async (event: SQSEvent, context: AWSLambda.Context
 					const resultFileRef = element.M.resultFileReference.S;
 
 					// Add image/vid string to overall report string
-					if (fileType != null && resultCode != null) {
-						if (fileType === "image" && fileRef != null && resultFileRef != null) {
-							content.push(generateImgReport(fileRef, resultFileRef, +resultCode));
+					if (fileType != null && fileRef != null && resultCode != null) {
+						if (fileType === "image" && resultFileRef != null) {
+							image.push(generateImgReport(fileRef, resultFileRef, +resultCode));
 						} else if (fileType === "video") {
-							content.push(generateVidReport(+resultCode));
+							video.push(generateVidReport(fileRef, +resultCode));
 						}
 					}
 				}
@@ -131,7 +135,7 @@ export const generateReport = async (event: SQSEvent, context: AWSLambda.Context
 	const s3params = {
 		Bucket: process.env.SRC_BUCKET as string,
 		Key: filepath, // File name you want to save as in S3
-		Body: JSON.stringify({ content: content }),
+		Body: JSON.stringify({ image: image, video: video }),
 	};
 
 	const s3 = new S3({
