@@ -135,7 +135,7 @@ export const generateReport = async (event: SQSEvent, context: AWSLambda.Context
 	const s3params = {
 		Bucket: process.env.SRC_BUCKET as string,
 		Key: filepath, // File name you want to save as in S3
-		Body: JSON.stringify({ image: image, video: video }),
+		Body: JSON.stringify({ images: image, videos: video }),
 	};
 
 	const s3 = new S3({
