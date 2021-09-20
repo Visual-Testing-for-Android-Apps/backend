@@ -12,7 +12,7 @@ export interface File {
 	orginalName:string;
 	type: string;
 	finishTime?: string;
-	fileStatus: FileStatus;
+	status: FileStatus;
 	resultCode?: number;
 	resultFileReference?: string;
 }
