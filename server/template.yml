@@ -62,6 +62,9 @@ Resources:
               Resource:
                 - !Sub arn:aws:s3:::${SrcBucket}/*
                 - !Sub arn:aws:s3:::${SrcBucket}
+            - Action: ses:SendEmail
+              Effect: Allow
+              Resource: "*"
       Environment:
         Variables:
           # Make table name accessible as environment variable from function code during execution

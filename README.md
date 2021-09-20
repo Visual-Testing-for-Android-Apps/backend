@@ -63,7 +63,7 @@ POST /job/verify-code
 }
 ```
 
-3.1 if user want to update their email 
+3.1 if user want to update their email (optional)
 ```
 POST /job/update-email
 
@@ -74,7 +74,7 @@ POST /job/update-email
 }
 ```
 
-3.2 resend verification code
+3.2 resend verification code (optional)
 ```
 POST /job/resend-code
 
@@ -101,25 +101,92 @@ statusCode != 200 -> error
 
 ### Single job
 
-Video Endpoint: POST https://knfxd86hz7.execute-api.ap-southeast-2.amazonaws.com/Prod/Seenomaly
+Video Endpoint: POST https://u8iacl4gj0.execute-api.ap-southeast-2.amazonaws.com/Prod/Seenomaly
+
+Image Endpoint: POST https://u8iacl4gj0.execute-api.ap-southeast-2.amazonaws.com/Prod/owleye
 
 ## Back end reads this section
-
-✅ Manual trigger owlEye and seenomaly
-In your AWS console,
-
-1. go to SQS
-2. select `send and reieve messages`.
-   Example body format
-
+After step 1,2,3 a job will be created in the database, eg.
 ```
 {
-    "jobID":123,
-    "fileKey": the file reference in S3,
-    "fileIdx": the file index in the dynmodb files list of the job.
+ "id": "98a28539-1346-49d6-96af-496850deb006",
+ "emailVerified": true,
+ "emailVerification": {
+  "createdAt": "2021-09-20T08:27:18.972Z",
+  "code": "910695"
+ },
+ "files": [
+  {
+   "contentType": "video/mp4",
+   "orginalName": "test_instagram.mp4",
+   "s3Key": "98a28539-1346-49d6-96af-496850deb006/4320171.mp4",
+   "status": "NEW",
+   "type": "VIDEO"
+  },
+  {
+   "contentType": "image/jpeg",
+   "orginalName": "test.jpg",
+   "s3Key": "98a28539-1346-49d6-96af-496850deb006/240046.jpg",
+   "status": "NEW",
+   "type": "IMAGE"
+  }
+ ],
+ "createdAt": "2021-09-20T08:25:40.984Z",
+ "email": "beining0026@gmail.com"
 }
-✅ Go to cloudwatch/log group to see the the execution logs
-✅ dynamodb to check if result has been updated
-✅ S3 to check if image is saved (only for image model)
 
 ```
+
+After step 4 
+
+* waiting for the file to be processed. -> In db, jobStatus = PROCESSING, file.statu
+* all file completed.  -> In db, jobStatus = GENERATION , file.status = DONE
+
+database looks like this ,
+```
+{
+ "id": "98a28539-1346-49d6-96af-496850deb006",
+ "emailVerified": true,
+ "emailVerification": {
+  "createdAt": "2021-09-20T08:27:18.972Z",
+  "code": "910695"
+ },
+ "files": [
+  {
+   "result": {
+    "message": "Snackbar blocks bottom app bar",
+    "code": "3"
+   },
+   "orginalName": "test_instagram.mp4",
+   "s3Key": "98a28539-1346-49d6-96af-496850deb006/4320171.mp4",
+   "type": "VIDEO",
+   "contentType": "video/mp4",
+   "status": "DONE"
+  },
+  {
+   "contentType": "image/jpeg",
+   "orginalName": "test.jpg",
+   "result": {
+    "message": [],
+    "outputKey": "98a28539-1346-49d6-96af-496850deb006/result/result_240046.jpg"
+   },
+   "s3Key": "98a28539-1346-49d6-96af-496850deb006/240046.jpg",
+   "status": "DONE",
+   "type": "IMAGE"
+  }
+ ],
+ "createdAt": "2021-09-20T08:25:40.984Z",
+ "jobStatus": "GENERATING",
+ "email": "beining0026@gmail.com"
+}
+```
+S3 bucket looks like this,
+|-jobID
+    |-file1.mp4
+    |-file2.png
+    |-result
+        |-result_file2.jpg
+    |-report.html
+
+
+
