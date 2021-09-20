@@ -7,9 +7,9 @@ on:
 jobs:
   sam-validate-build-test:
     runs-on: ubuntu-latest
-      defaults:
-        run:
-          working-directory: ./server
+    defaults:
+      run:
+        working-directory: ./server
     outputs:
       env-name: ${{ steps.env-name.outputs.environment }}
     steps:
