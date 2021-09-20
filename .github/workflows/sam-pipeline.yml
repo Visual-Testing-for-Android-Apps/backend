@@ -20,14 +20,15 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ap-southeast-2
       # sam build 
-      - run: sam build --use-container ./server/template.yml
+      - run: sam build --use-container --template ./server/template.yml
       # sam deploy
-      - run: | 
-        sam deploy \
-        --template ./server/template.yml \
-        --no-confirm-changeset \
-        --no-fail-on-empty-changeset \
-        --stack-name visual-testing \
-        --s3-bucket visual-testing-cd \
-        --capabilities CAPABILITY_IAM \
-        --region ap-southeast-2 
+      - run: >-
+          sam deploy 
+          --template ./server/template.yml 
+          --no-confirm-changeset 
+          --no-fail-on-empty-changeset 
+          --stack-name visual-testing 
+          --s3-bucket visual-testing-cd 
+          --capabilities CAPABILITY_IAM 
+          --region ap-southeast-2 
+
