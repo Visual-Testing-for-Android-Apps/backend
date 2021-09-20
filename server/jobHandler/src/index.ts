@@ -20,9 +20,13 @@ export const handler = async (event: SQSEvent, context: AWSLambda.Context): Prom
 		if (typeof result === "string"){
 			//if(result  == "timeout)
 			// throw Error(JSON.stringify({ key, reason: "jobHandler time out" }))
+			console.log("timeout1 ....")
 			await selfEnvoke(key)
 			return
-		} else if(result.skipSelfInvoke) {
+		} 
+		
+		if(!result.isCompleted) {
+			console.log("timeout2 ....")
 			await selfEnvoke(key)
 			return
 		}
@@ -35,7 +39,7 @@ export const handler = async (event: SQSEvent, context: AWSLambda.Context): Prom
 	}
 };
 
-const jobHandler = async (context: AWSLambda.Context, key: string): Promise<{ skipSelfInvoke: boolean }> => {
+const jobHandler = async (context: AWSLambda.Context, key: string): Promise<{ isCompleted: boolean }> => {
 	//Job request object.
 	const job = await getJob(key)
 	// Check if this job is already complete
@@ -50,5 +54,5 @@ const jobHandler = async (context: AWSLambda.Context, key: string): Promise<{ sk
 	await updateJobStatus(key, JobStatus.PROCESSING)
 	await modelTrigger(context, job)
 	//The actual checking if all jobs are complete could be redundant, but leaving it in doesn't hurt anything
-	return { skipSelfInvoke: await isJobComplete(key) }
+	return { isCompleted: await isJobComplete(key) }
 }
