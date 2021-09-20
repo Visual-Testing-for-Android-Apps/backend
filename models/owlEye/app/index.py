@@ -68,5 +68,5 @@ def handleVideoInPresignedUrl(body):
 def handleImageInBody(event):
     image_bytes = event['body'].encode('utf-8')  # here is where the app get the image data in string
     res_image, bug_type = imageProcess(base64.b64decode(image_bytes))
-    return image_bytes, res_image, bug_type 
+    return event['body'], res_image, bug_type 
  
