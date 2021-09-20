@@ -25,15 +25,15 @@ export const handler = async (event: ApiGatewayEvent): Promise<ApiGatewayRespons
 	try {
 		switch (event.path){
 			case "/job/upload-request":
-				return newJobHandler(event)
+				return await newJobHandler(event)
 			case "/job/update-email":
-				return updateEmailHandler(event)
+				return await updateEmailHandler(event)
 			case "/job/resend-code":
-				return resendCodeHandler(event)
+				return await resendCodeHandler(event)
 			case "/job/upload-done":
-				return uploadDoneHandler(event)
+				return await uploadDoneHandler(event)
 			case "/job/verify-code":
-				return verifyCodeHandler(event)
+				return await verifyCodeHandler(event)
 			default:
 				return {
 					statusCode: 404,
