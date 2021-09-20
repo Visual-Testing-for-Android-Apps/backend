@@ -97,9 +97,6 @@ POST /job/upload-done
 statusCode = 200 -> start to process the job
 
 statusCode != 200 -> error
-{
-    "
-}
 ```
 
 ### Single job
