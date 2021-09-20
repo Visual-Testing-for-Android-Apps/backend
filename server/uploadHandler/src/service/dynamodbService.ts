@@ -34,11 +34,9 @@ export const createNewJobItem = async ( id: string,email: string) => {
 			"createdAt": { S: new Date().toISOString() },
 			"emailVerified": {BOOL:true}
 		},
-		ReturnValue:"UPDATED_NEW"
 	} as PutItemInput;
 	console.log("newJobItem",JSON.stringify(newJobItem))
-	const ret = await putItem(newJobItem);
-	console.log(JSON.stringify(ret))
+	await putItem(newJobItem);
 };
 
 
