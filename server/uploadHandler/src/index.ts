@@ -1,6 +1,6 @@
 import { createNewJob, FileUploadResponseBody } from "./createNewJob"
 import { ApiGatewayEvent, ApiGatewayResponse } from "./service/apigateway"
-import { getEmail, updateEmail } from "./service/dynamodbService"
+import { getEmail, getJob, updateEmail } from "./service/dynamodbService"
 import { checkVerificationCode, handleNewEmailSes } from "./service/sesService"
 import { modelTiggerSqsEvent, sendMessage } from "./service/sqsClient"
 
@@ -24,7 +24,7 @@ const JOB_HANDLER_QUEUE = process.env.JOB_HANDLER_QUEUE
 export const handler = async (event: ApiGatewayEvent): Promise<ApiGatewayResponse> => {
 	try {
 		switch (event.path){
-			case "/job":
+			case "/job/upload-request":
 				return newJobHandler(event)
 			case "/job/update-email":
 				return updateEmailHandler(event)
@@ -119,6 +119,12 @@ const uploadDoneHandler =  async (event:ApiGatewayEvent): Promise<ApiGatewayResp
 	if (JOB_HANDLER_QUEUE === undefined){
 		throw Error("Environment variable \"JOB_HANDLER_QUEUE\" is missing!")
 	}
+	// Check if verified
+	const job = await getJob(jobID)
+	if (!job.emailVerified ){
+		throw Error("email not verified")
+	}
+	
 	await sendMessage({jobKey: jobID}, JOB_HANDLER_QUEUE);
 
 	return {
