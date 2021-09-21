@@ -1,10 +1,10 @@
 import { SQSEvent } from "aws-lambda"
 
-import { isJobComplete } from "./isJobComplete.js"
+import { isJobComplete } from "./isJobComplete"
 import { getJob, updateJobStatus } from "./service/dynamodbService"
 import { JobStatus } from "./service/jobModel"
 import { modelTrigger } from "./service/modelTrigger"
-import { selfEnvoke } from "./service/sqsClient.js"
+import { selfEnvoke } from "./service/sqsClient"
 
 //Exports isJobComplete for use with AWS lambda
 export const handler = async (event: SQSEvent, context: AWSLambda.Context): Promise<void> => {
