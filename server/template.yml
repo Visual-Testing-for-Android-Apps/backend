@@ -271,7 +271,7 @@ Resources:
         Api:
           Type: Api
           Properties:
-            Path: /jobdata/{proxy+}
+            Path: /jobdata
             Method: POST
 
   # This is an SQS queue with all default configuration properties. To learn more about the available options, see
