@@ -247,6 +247,33 @@ Resources:
             Queue: !GetAtt ReportGenerationQueue.Arn
             BatchSize: 1
 
+  JobData:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: jobData/
+      Handler: jobData.lambda_handler
+      Runtime: python3.9
+      Timeout: 10
+      Description: Endpoint for uploading image and videos
+      Policies:
+      # Give Create/Read/Update/Delete Permissions to the SampleTable
+      - DynamoDBCrudPolicy:
+        TableName: !Ref JobTable
+      - S3CrudPolicy:
+        BucketName: !Ref SrcBucket
+      Environment:
+      Variables:
+        # Make table name accessible as environment variable from function code during execution
+        JOB_TABLE: !Ref JobTable
+        MAPPING_TABLE: !Ref MappingTable
+        SRC_BUCKET: !Ref SrcBucket
+      Events:
+      Api:
+        Type: Api
+        Properties:
+        Path: /jobdata/{proxy+}
+        Method: POST
+
   # This is an SQS queue with all default configuration properties. To learn more about the available options, see
   # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-sqs-queues.html
   JobHandlerQueue:
@@ -296,6 +323,17 @@ Resources:
       ProvisionedThroughput:
         ReadCapacityUnits: 2
         WriteCapacityUnits: 2
+
+  # DynamoDB table to store the public/private job mappings
+  MappingTable:
+    Type: AWS::Serverless::SimpleTable
+    Properties:
+      PrimaryKey:
+      Name: publicId
+      Type: String
+    ProvisionedThroughput:
+      ReadCapacityUnits: 2
+      WriteCapacityUnits: 2
 
   # S3 bucket
   SrcBucket:
