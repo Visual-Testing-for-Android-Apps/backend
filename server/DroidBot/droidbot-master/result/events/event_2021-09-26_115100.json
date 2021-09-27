@@ -1,0 +1,49 @@
+{
+  "tag": "2021-09-26_115100",
+  "event": {
+    "event_type": "touch",
+    "log_lines": null,
+    "x": null,
+    "y": null,
+    "view": {
+      "package": "com.example.ujsAutoClock",
+      "visible": true,
+      "checkable": false,
+      "child_count": 0,
+      "editable": false,
+      "clickable": true,
+      "is_password": false,
+      "focusable": true,
+      "enabled": true,
+      "content_description": null,
+      "children": [],
+      "focused": false,
+      "bounds": [
+        [
+          321,
+          572
+        ],
+        [
+          544,
+          698
+        ]
+      ],
+      "resource_id": "com.example.ujsAutoClock:id/button_selectTime",
+      "checked": false,
+      "text": "\u672a\u8bbe\u7f6e",
+      "class": "android.widget.Button",
+      "scrollable": false,
+      "selected": false,
+      "long_clickable": false,
+      "parent": 10,
+      "temp_id": 16,
+      "size": "223*126",
+      "signature": "[class]android.widget.Button[resource_id]com.example.ujsAutoClock:id/button_selectTime[text]\u672a\u8bbe\u7f6e[enabled,,]",
+      "view_str": "0ab849a7ac14548e5fa50c5323da363d",
+      "content_free_signature": "[class]android.widget.Button[resource_id]com.example.ujsAutoClock:id/button_selectTime"
+    }
+  },
+  "start_state": "6077dd50c11c71ec61e127d99f5df72c",
+  "stop_state": "59f57db6db15c304c9fcbf9ff1572867",
+  "event_str": "TouchEvent(state=6077dd50c11c71ec61e127d99f5df72c, view=0ab849a7ac14548e5fa50c5323da363d(MainActivity/Button-\u672a\u8bbe\u7f6e))"
+}

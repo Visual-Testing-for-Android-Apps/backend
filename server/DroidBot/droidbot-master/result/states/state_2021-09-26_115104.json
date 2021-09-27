@@ -1,0 +1,1737 @@
+{
+  "tag": "2021-09-26_115104",
+  "state_str": "59f57db6db15c304c9fcbf9ff1572867",
+  "state_str_content_free": "f2cdcf5369ae5f809bc336fea5ce4ed8",
+  "foreground_activity": "com.example.ujsAutoClock/.MainActivity",
+  "activity_stack": [
+    "com.example.ujsAutoClock/.MainActivity"
+  ],
+  "background_services": [
+    "com.google.android.networkstack.tethering/com.android.networkstack.tethering.TetheringService",
+    "com.google.android.gms/.nearby.sharing.ReceiveSurfaceService",
+    "com.google.android.gms/.icing.service.AppIndexingService",
+    "com.google.android.gms/.deviceconnection.service.DeviceConnectionWatcherService",
+    "com.android.systemui/.keyguard.KeyguardService",
+    "com.android.bluetooth/.btservice.AdapterService",
+    "com.google.android.gms/.instantapps.service.InstantAppsService",
+    "com.android.systemui/.ImageWallpaper",
+    "com.google.android.gms/com.google.android.location.geocode.GeocodeService",
+    "com.google.android.gms/.auth.setup.devicesignals.LockScreenService",
+    "com.google.android.gms/.gcm.GcmService",
+    "com.google.android.gms/.auth.proximity.firstparty.SystemMemoryCacheService",
+    "com.google.android.gms/.chimera.PersistentApiService",
+    "com.android.phone/com.android.internal.telephony.CellularNetworkService",
+    "com.google.android.gms/com.google.location.nearby.direct.service.NearbyDirectService",
+    "com.google.android.gms/.chimera.PersistentBoundBrokerService",
+    "com.android.bluetooth/.gatt.GattService",
+    "com.google.android.gms/.chimera.GmsBoundBrokerService",
+    "com.google.android.gms/.chimera.GmsApiService",
+    "com.google.android.gms/.fido.fido2.pollux.CableAuthenticatorService",
+    "com.google.android.googlequicksearchbox/com.google.android.apps.gsa.nowoverlayservice.DrawerOverlayService",
+    "io.github.ylimit.droidbotapp/.DroidBotIME",
+    "com.android.bluetooth/.pbap.BluetoothPbapService",
+    "com.google.android.gms/com.google.android.location.fused.FusedLocationService",
+    "com.google.android.inputmethod.latin/com.google.android.libraries.micore.training.cache.service.TrainingCacheManagerService",
+    "com.google.android.gms/.gcm.nts.SchedulerService",
+    "com.google.android.ext.services/android.ext.services.autofill.InlineSuggestionRenderServiceImpl",
+    "com.android.bluetooth/.a2dp.A2dpService",
+    "com.google.android.providers.media.module/com.android.providers.media.fuse.ExternalStorageServiceImpl",
+    "io.github.ylimit.droidbotapp/io.github.privacystreams.accessibility.PSAccessibilityService",
+    "com.google.android.gms/.thunderbird.EmergencyPersistentService",
+    "com.google.android.apps.nexuslauncher/com.android.launcher3.notification.NotificationListener",
+    "com.android.systemui/.SystemUIService",
+    "com.google.android.gms/.nearby.exposurenotification.service.ExposureMatchingService",
+    "android/.hardware.location.GeofenceHardwareService",
+    "com.android.se/.SecureElementService",
+    "com.google.android.gms/.presencemanager.service.PresenceManagerPresenceReportService",
+    "com.google.android.ims/.services.RcsService",
+    "com.google.android.gms/.chimera.PersistentDirectBootAwareApiService",
+    "com.android.bluetooth/.hid.HidDeviceService",
+    "com.google.android.ext.services/android.ext.services.notification.Assistant",
+    "com.google.android.gms/.location.persistent.LocationPersistentService",
+    "com.google.android.gms/.nearby.discovery.service.DiscoveryService",
+    "com.google.android.gms/com.google.android.location.internal.PendingIntentCallbackService",
+    "com.google.android.gms/.nearby.messages.service.NearbyMessagesService",
+    "com.android.server.telecom/.components.BluetoothPhoneService",
+    "com.google.android.gms/com.google.android.location.internal.server.GoogleLocationService",
+    "com.google.android.gms/com.google.android.contextmanager.service.ContextManagerService",
+    "com.android.systemui/.dump.SystemUIAuxiliaryDumpService",
+    "com.google.android.gms/com.google.android.location.network.NetworkLocationService",
+    "com.android.stk/.StkAppService",
+    "com.google.android.gms/com.google.android.location.internal.GoogleLocationManagerService",
+    "com.android.phone/com.android.internal.telephony.dataconnection.CellularDataService",
+    "com.android.service.ims/.RcsService",
+    "com.android.server.telecom/.components.TelecomService",
+    "com.google.android.networkstack/com.android.server.NetworkStackService",
+    "com.android.bluetooth/.hfp.HeadsetService",
+    "com.google.android.googlequicksearchbox/com.google.android.voiceinteraction.GsaVoiceInteractionService",
+    "com.android.emulator.multidisplay/.MultiDisplayService",
+    "com.android.phone/.vvm.RemoteVvmTaskManager",
+    "com.google.android.gms/.lockbox.service.LockboxBrokerService",
+    "com.android.ons/.OpportunisticNetworkService",
+    "com.google.android.apps.messaging/.shared.datamodel.action.execution.ActionExecutorImpl",
+    "com.google.android.gms/.common.stats.GmsCoreStatsService",
+    "com.google.android.gms/.nearby.exposurenotification.WakeUpService",
+    "com.google.android.gms/com.google.android.location.internal.server.HardwareArProviderService",
+    "com.android.bluetooth/.map.BluetoothMapService",
+    "com.android.phone/com.android.services.telephony.sip.components.TelephonySipService",
+    "com.android.phone/.TelephonyDebugService",
+    "com.android.bluetooth/.hid.HidHostService",
+    "com.google.android.gms/.icing.service.IndexService",
+    "com.android.bluetooth/.opp.BluetoothOppService",
+    "com.android.bluetooth/.pan.PanService",
+    "com.android.bluetooth/.avrcp.AvrcpTargetService",
+    "com.google.android.apps.nexuslauncher/com.android.quickstep.TouchInteractionService",
+    "com.google.android.cellbroadcastservice/com.android.cellbroadcastservice.DefaultCellBroadcastService"
+  ],
+  "width": 1080,
+  "height": 1920,
+  "views": [
+    {
+      "package": "com.example.ujsAutoClock",
+      "visible": true,
+      "checkable": false,
+      "child_count": 1,
+      "editable": false,
+      "clickable": false,
+      "is_password": false,
+      "focusable": false,
+      "enabled": true,
+      "content_description": null,
+      "children": [
+        1
+      ],
+      "focused": false,
+      "bounds": [
+        [
+          120,
+          366
+        ],
+        [
+          960,
+          1491
+        ]
+      ],
+      "resource_id": null,
+      "checked": false,
+      "text": null,
+      "class": "android.widget.FrameLayout",
+      "scrollable": false,
+      "selected": false,
+      "long_clickable": false,
+      "parent": -1,
+      "temp_id": 0,
+      "size": "840*1125",
+      "signature": "[class]android.widget.FrameLayout[resource_id]None[text]None[enabled,,]",
+      "view_str": "108eace60b5ae1278b3e369e75a21274",
+      "content_free_signature": "[class]android.widget.FrameLayout[resource_id]None"
+    },
+    {
+      "package": "com.example.ujsAutoClock",
+      "visible": true,
+      "checkable": false,
+      "child_count": 1,
+      "editable": false,
+      "clickable": false,
+      "is_password": false,
+      "focusable": false,
+      "enabled": true,
+      "content_description": null,
+      "children": [
+        2
+      ],
+      "focused": false,
+      "bounds": [
+        [
+          162,
+          408
+        ],
+        [
+          918,
+          1449
+        ]
+      ],
+      "resource_id": null,
+      "checked": false,
+      "text": null,
+      "class": "android.widget.LinearLayout",
+      "scrollable": false,
+      "selected": false,
+      "long_clickable": false,
+      "parent": 0,
+      "temp_id": 1,
+      "size": "756*1041",
+      "signature": "[class]android.widget.LinearLayout[resource_id]None[text]None[enabled,,]",
+      "view_str": "4173461b22a99d05abe1a93b168060c3",
+      "content_free_signature": "[class]android.widget.LinearLayout[resource_id]None"
+    },
+    {
+      "package": "com.example.ujsAutoClock",
+      "visible": true,
+      "checkable": false,
+      "child_count": 1,
+      "editable": false,
+      "clickable": false,
+      "is_password": false,
+      "focusable": false,
+      "enabled": true,
+      "content_description": null,
+      "children": [
+        3
+      ],
+      "focused": false,
+      "bounds": [
+        [
+          162,
+          408
+        ],
+        [
+          918,
+          1449
+        ]
+      ],
+      "resource_id": "android:id/content",
+      "checked": false,
+      "text": null,
+      "class": "android.widget.FrameLayout",
+      "scrollable": false,
+      "selected": false,
+      "long_clickable": false,
+      "parent": 1,
+      "temp_id": 2,
+      "size": "756*1041",
+      "signature": "[class]android.widget.FrameLayout[resource_id]android:id/content[text]None[enabled,,]",
+      "view_str": "973cbc5b338b7912250f39f49fcc35b5",
+      "content_free_signature": "[class]android.widget.FrameLayout[resource_id]android:id/content"
+    },
+    {
+      "package": "com.example.ujsAutoClock",
+      "visible": true,
+      "checkable": false,
+      "child_count": 1,
+      "editable": false,
+      "clickable": false,
+      "is_password": false,
+      "focusable": false,
+      "enabled": true,
+      "content_description": null,
+      "children": [
+        4
+      ],
+      "focused": false,
+      "bounds": [
+        [
+          162,
+          408
+        ],
+        [
+          918,
+          1449
+        ]
+      ],
+      "resource_id": "android:id/parentPanel",
+      "checked": false,
+      "text": null,
+      "class": "android.widget.LinearLayout",
+      "scrollable": false,
+      "selected": false,
+      "long_clickable": false,
+      "parent": 2,
+      "temp_id": 3,
+      "size": "756*1041",
+      "signature": "[class]android.widget.LinearLayout[resource_id]android:id/parentPanel[text]None[enabled,,]",
+      "view_str": "c39e834c274c82cb4b1f873e0fbf6a7e",
+      "content_free_signature": "[class]android.widget.LinearLayout[resource_id]android:id/parentPanel"
+    },
+    {
+      "package": "com.example.ujsAutoClock",
+      "visible": true,
+      "checkable": false,
+      "child_count": 1,
+      "editable": false,
+      "clickable": false,
+      "is_password": false,
+      "focusable": false,
+      "enabled": true,
+      "content_description": null,
+      "children": [
+        5
+      ],
+      "focused": false,
+      "bounds": [
+        [
+          162,
+          408
+        ],
+        [
+          918,
+          1449
+        ]
+      ],
+      "resource_id": "android:id/customPanel",
+      "checked": false,
+      "text": null,
+      "class": "android.widget.FrameLayout",
+      "scrollable": false,
+      "selected": false,
+      "long_clickable": false,
+      "parent": 3,
+      "temp_id": 4,
+      "size": "756*1041",
+      "signature": "[class]android.widget.FrameLayout[resource_id]android:id/customPanel[text]None[enabled,,]",
+      "view_str": "179027348a064b77eb82155af37bf253",
+      "content_free_signature": "[class]android.widget.FrameLayout[resource_id]android:id/customPanel"
+    },
+    {
+      "package": "com.example.ujsAutoClock",
+      "visible": true,
+      "checkable": false,
+      "child_count": 1,
+      "editable": false,
+      "clickable": false,
+      "is_password": false,
+      "focusable": false,
+      "enabled": true,
+      "content_description": null,
+      "children": [
+        6
+      ],
+      "focused": false,
+      "bounds": [
+        [
+          162,
+          408
+        ],
+        [
+          918,
+          1449
+        ]
+      ],
+      "resource_id": "android:id/custom",
+      "checked": false,
+      "text": null,
+      "class": "android.widget.FrameLayout",
+      "scrollable": false,
+      "selected": false,
+      "long_clickable": false,
+      "parent": 4,
+      "temp_id": 5,
+      "size": "756*1041",
+      "signature": "[class]android.widget.FrameLayout[resource_id]android:id/custom[text]None[enabled,,]",
+      "view_str": "667f74e77d8ac13f6b753787293e8b6c",
+      "content_free_signature": "[class]android.widget.FrameLayout[resource_id]android:id/custom"
+    },
+    {
+      "package": "com.example.ujsAutoClock",
+      "visible": true,
+      "checkable": false,
+      "child_count": 1,
+      "editable": false,
+      "clickable": false,
+      "is_password": false,
+      "focusable": false,
+      "enabled": true,
+      "content_description": null,
+      "children": [
+        7
+      ],
+      "focused": false,
+      "bounds": [
+        [
+          162,
+          408
+        ],
+        [
+          918,
+          1449
+        ]
+      ],
+      "resource_id": "android:id/timePicker",
+      "checked": false,
+      "text": null,
+      "class": "android.widget.TimePicker",
+      "scrollable": false,
+      "selected": false,
+      "long_clickable": false,
+      "parent": 5,
+      "temp_id": 6,
+      "size": "756*1041",
+      "signature": "[class]android.widget.TimePicker[resource_id]android:id/timePicker[text]None[enabled,,]",
+      "view_str": "79d12764a635901efa1c71a7e2aa919c",
+      "content_free_signature": "[class]android.widget.TimePicker[resource_id]android:id/timePicker"
+    },
+    {
+      "package": "com.example.ujsAutoClock",
+      "visible": true,
+      "checkable": false,
+      "child_count": 3,
+      "editable": false,
+      "clickable": false,
+      "is_password": false,
+      "focusable": false,
+      "enabled": true,
+      "content_description": null,
+      "children": [
+        8,
+        12,
+        37
+      ],
+      "focused": false,
+      "bounds": [
+        [
+          162,
+          408
+        ],
+        [
+          918,
+          1449
+        ]
+      ],
+      "resource_id": null,
+      "checked": false,
+      "text": null,
+      "class": "android.widget.LinearLayout",
+      "scrollable": false,
+      "selected": false,
+      "long_clickable": false,
+      "parent": 6,
+      "temp_id": 7,
+      "size": "756*1041",
+      "signature": "[class]android.widget.LinearLayout[resource_id]None[text]None[enabled,,]",
+      "view_str": "fa7686c2e3275013536771c0d1fb0ee5",
+      "content_free_signature": "[class]android.widget.LinearLayout[resource_id]None"
+    },
+    {
+      "package": "com.example.ujsAutoClock",
+      "visible": true,
+      "checkable": false,
+      "child_count": 3,
+      "editable": false,
+      "clickable": false,
+      "is_password": false,
+      "focusable": false,
+      "enabled": true,
+      "content_description": null,
+      "children": [
+        9,
+        10,
+        11
+      ],
+      "focused": false,
+      "bounds": [
+        [
+          162,
+          408
+        ],
+        [
+          918,
+          671
+        ]
+      ],
+      "resource_id": "android:id/time_header",
+      "checked": false,
+      "text": null,
+      "class": "android.widget.RelativeLayout",
+      "scrollable": false,
+      "selected": false,
+      "long_clickable": false,
+      "parent": 7,
+      "temp_id": 8,
+      "size": "756*263",
+      "signature": "[class]android.widget.RelativeLayout[resource_id]android:id/time_header[text]None[enabled,,]",
+      "view_str": "01209ef5152fb727cbcef9c77abb1a38",
+      "content_free_signature": "[class]android.widget.RelativeLayout[resource_id]android:id/time_header"
+    },
+    {
+      "package": "com.example.ujsAutoClock",
+      "visible": true,
+      "checkable": false,
+      "child_count": 0,
+      "editable": false,
+      "clickable": true,
+      "is_password": false,
+      "focusable": true,
+      "enabled": true,
+      "content_description": null,
+      "children": [],
+      "focused": false,
+      "bounds": [
+        [
+          338,
+          429
+        ],
+        [
+          516,
+          639
+        ]
+      ],
+      "resource_id": "android:id/hours",
+      "checked": false,
+      "text": "00",
+      "class": "android.widget.TextView",
+      "scrollable": false,
+      "selected": false,
+      "long_clickable": false,
+      "parent": 8,
+      "temp_id": 9,
+      "size": "178*210",
+      "signature": "[class]android.widget.TextView[resource_id]android:id/hours[text]00[enabled,,]",
+      "view_str": "ac13cb108c9aabf20bf4819850b3c02c",
+      "content_free_signature": "[class]android.widget.TextView[resource_id]android:id/hours"
+    },
+    {
+      "package": "com.example.ujsAutoClock",
+      "visible": true,
+      "checkable": false,
+      "child_count": 0,
+      "editable": false,
+      "clickable": false,
+      "is_password": false,
+      "focusable": false,
+      "enabled": true,
+      "content_description": null,
+      "children": [],
+      "focused": false,
+      "bounds": [
+        [
+          521,
+          429
+        ],
+        [
+          559,
+          650
+        ]
+      ],
+      "resource_id": "android:id/separator",
+      "checked": false,
+      "text": ":",
+      "class": "android.widget.TextView",
+      "scrollable": false,
+      "selected": false,
+      "long_clickable": false,
+      "parent": 8,
+      "temp_id": 10,
+      "size": "38*221",
+      "signature": "[class]android.widget.TextView[resource_id]android:id/separator[text]:[enabled,,]",
+      "view_str": "be19a71b48e8f67067ee20e152e856ad",
+      "content_free_signature": "[class]android.widget.TextView[resource_id]android:id/separator"
+    },
+    {
+      "package": "com.example.ujsAutoClock",
+      "visible": true,
+      "checkable": false,
+      "child_count": 0,
+      "editable": false,
+      "clickable": true,
+      "is_password": false,
+      "focusable": true,
+      "enabled": true,
+      "content_description": null,
+      "children": [],
+      "focused": false,
+      "bounds": [
+        [
+          564,
+          429
+        ],
+        [
+          742,
+          639
+        ]
+      ],
+      "resource_id": "android:id/minutes",
+      "checked": false,
+      "text": "00",
+      "class": "android.widget.TextView",
+      "scrollable": false,
+      "selected": false,
+      "long_clickable": false,
+      "parent": 8,
+      "temp_id": 11,
+      "size": "178*210",
+      "signature": "[class]android.widget.TextView[resource_id]android:id/minutes[text]00[enabled,,]",
+      "view_str": "e4514b7db5943ee64df54d4b76d92676",
+      "content_free_signature": "[class]android.widget.TextView[resource_id]android:id/minutes"
+    },
+    {
+      "package": "com.example.ujsAutoClock",
+      "visible": true,
+      "checkable": false,
+      "child_count": 24,
+      "editable": false,
+      "clickable": false,
+      "is_password": false,
+      "focusable": false,
+      "enabled": true,
+      "content_description": null,
+      "children": [
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36
+      ],
+      "focused": false,
+      "bounds": [
+        [
+          204,
+          713
+        ],
+        [
+          876,
+          1301
+        ]
+      ],
+      "resource_id": "android:id/radial_picker",
+      "checked": false,
+      "text": null,
+      "class": "android.view.View",
+      "scrollable": false,
+      "selected": false,
+      "long_clickable": false,
+      "parent": 7,
+      "temp_id": 12,
+      "size": "672*588",
+      "signature": "[class]android.view.View[resource_id]android:id/radial_picker[text]None[enabled,,]",
+      "view_str": "d59b732cf3036e2b70b85cf9281f860a",
+      "content_free_signature": "[class]android.view.View[resource_id]android:id/radial_picker"
+    },
+    {
+      "package": "com.example.ujsAutoClock",
+      "visible": true,
+      "checkable": false,
+      "child_count": 0,
+      "editable": false,
+      "clickable": false,
+      "is_password": false,
+      "focusable": false,
+      "enabled": true,
+      "content_description": "0",
+      "children": [],
+      "focused": false,
+      "bounds": [
+        [
+          487,
+          812
+        ],
+        [
+          593,
+          918
+        ]
+      ],
+      "resource_id": null,
+      "checked": false,
+      "text": null,
+      "class": "android.widget.RadialTimePickerView$RadialPickerTouchHelper",
+      "scrollable": false,
+      "selected": true,
+      "long_clickable": false,
+      "parent": 12,
+      "temp_id": 13,
+      "size": "106*106",
+      "signature": "[class]android.widget.RadialTimePickerView$RadialPickerTouchHelper[resource_id]None[text]None[enabled,,selected]",
+      "view_str": "db87485dd4c38b5c66073afd5c48d8e1",
+      "content_free_signature": "[class]android.widget.RadialTimePickerView$RadialPickerTouchHelper[resource_id]None"
+    },
+    {
+      "package": "com.example.ujsAutoClock",
+      "visible": true,
+      "checkable": false,
+      "child_count": 0,
+      "editable": false,
+      "clickable": false,
+      "is_password": false,
+      "focusable": false,
+      "enabled": true,
+      "content_description": "1",
+      "children": [],
+      "focused": false,
+      "bounds": [
+        [
+          605,
+          749
+        ],
+        [
+          711,
+          855
+        ]
+      ],
+      "resource_id": null,
+      "checked": false,
+      "text": null,
+      "class": "android.widget.RadialTimePickerView$RadialPickerTouchHelper",
+      "scrollable": false,
+      "selected": false,
+      "long_clickable": false,
+      "parent": 12,
+      "temp_id": 14,
+      "size": "106*106",
+      "signature": "[class]android.widget.RadialTimePickerView$RadialPickerTouchHelper[resource_id]None[text]None[enabled,,]",
+      "view_str": "09135c13876b41df4ea75fd493cd33ac",
+      "content_free_signature": "[class]android.widget.RadialTimePickerView$RadialPickerTouchHelper[resource_id]None"
+    },
+    {
+      "package": "com.example.ujsAutoClock",
+      "visible": true,
+      "checkable": false,
+      "child_count": 0,
+      "editable": false,
+      "clickable": false,
+      "is_password": false,
+      "focusable": false,
+      "enabled": true,
+      "content_description": "2",
+      "children": [],
+      "focused": false,
+      "bounds": [
+        [
+          691,
+          836
+        ],
+        [
+          797,
+          942
+        ]
+      ],
+      "resource_id": null,
+      "checked": false,
+      "text": null,
+      "class": "android.widget.RadialTimePickerView$RadialPickerTouchHelper",
+      "scrollable": false,
+      "selected": false,
+      "long_clickable": false,
+      "parent": 12,
+      "temp_id": 15,
+      "size": "106*106",
+      "signature": "[class]android.widget.RadialTimePickerView$RadialPickerTouchHelper[resource_id]None[text]None[enabled,,]",
+      "view_str": "09135c13876b41df4ea75fd493cd33ac",
+      "content_free_signature": "[class]android.widget.RadialTimePickerView$RadialPickerTouchHelper[resource_id]None"
+    },
+    {
+      "package": "com.example.ujsAutoClock",
+      "visible": true,
+      "checkable": false,
+      "child_count": 0,
+      "editable": false,
+      "clickable": false,
+      "is_password": false,
+      "focusable": false,
+      "enabled": true,
+      "content_description": "3",
+      "children": [],
+      "focused": false,
+      "bounds": [
+        [
+          723,
+          954
+        ],
+        [
+          829,
+          1060
+        ]
+      ],
+      "resource_id": null,
+      "checked": false,
+      "text": null,
+      "class": "android.widget.RadialTimePickerView$RadialPickerTouchHelper",
+      "scrollable": false,
+      "selected": false,
+      "long_clickable": false,
+      "parent": 12,
+      "temp_id": 16,
+      "size": "106*106",
+      "signature": "[class]android.widget.RadialTimePickerView$RadialPickerTouchHelper[resource_id]None[text]None[enabled,,]",
+      "view_str": "09135c13876b41df4ea75fd493cd33ac",
+      "content_free_signature": "[class]android.widget.RadialTimePickerView$RadialPickerTouchHelper[resource_id]None"
+    },
+    {
+      "package": "com.example.ujsAutoClock",
+      "visible": true,
+      "checkable": false,
+      "child_count": 0,
+      "editable": false,
+      "clickable": false,
+      "is_password": false,
+      "focusable": false,
+      "enabled": true,
+      "content_description": "4",
+      "children": [],
+      "focused": false,
+      "bounds": [
+        [
+          691,
+          1072
+        ],
+        [
+          797,
+          1178
+        ]
+      ],
+      "resource_id": null,
+      "checked": false,
+      "text": null,
+      "class": "android.widget.RadialTimePickerView$RadialPickerTouchHelper",
+      "scrollable": false,
+      "selected": false,
+      "long_clickable": false,
+      "parent": 12,
+      "temp_id": 17,
+      "size": "106*106",
+      "signature": "[class]android.widget.RadialTimePickerView$RadialPickerTouchHelper[resource_id]None[text]None[enabled,,]",
+      "view_str": "09135c13876b41df4ea75fd493cd33ac",
+      "content_free_signature": "[class]android.widget.RadialTimePickerView$RadialPickerTouchHelper[resource_id]None"
+    },
+    {
+      "package": "com.example.ujsAutoClock",
+      "visible": true,
+      "checkable": false,
+      "child_count": 0,
+      "editable": false,
+      "clickable": false,
+      "is_password": false,
+      "focusable": false,
+      "enabled": true,
+      "content_description": "5",
+      "children": [],
+      "focused": false,
+      "bounds": [
+        [
+          605,
+          1158
+        ],
+        [
+          711,
+          1264
+        ]
+      ],
+      "resource_id": null,
+      "checked": false,
+      "text": null,
+      "class": "android.widget.RadialTimePickerView$RadialPickerTouchHelper",
+      "scrollable": false,
+      "selected": false,
+      "long_clickable": false,
+      "parent": 12,
+      "temp_id": 18,
+      "size": "106*106",
+      "signature": "[class]android.widget.RadialTimePickerView$RadialPickerTouchHelper[resource_id]None[text]None[enabled,,]",
+      "view_str": "09135c13876b41df4ea75fd493cd33ac",
+      "content_free_signature": "[class]android.widget.RadialTimePickerView$RadialPickerTouchHelper[resource_id]None"
+    },
+    {
+      "package": "com.example.ujsAutoClock",
+      "visible": true,
+      "checkable": false,
+      "child_count": 0,
+      "editable": false,
+      "clickable": false,
+      "is_password": false,
+      "focusable": false,
+      "enabled": true,
+      "content_description": "6",
+      "children": [],
+      "focused": false,
+      "bounds": [
+        [
+          487,
+          1190
+        ],
+        [
+          593,
+          1296
+        ]
+      ],
+      "resource_id": null,
+      "checked": false,
+      "text": null,
+      "class": "android.widget.RadialTimePickerView$RadialPickerTouchHelper",
+      "scrollable": false,
+      "selected": false,
+      "long_clickable": false,
+      "parent": 12,
+      "temp_id": 19,
+      "size": "106*106",
+      "signature": "[class]android.widget.RadialTimePickerView$RadialPickerTouchHelper[resource_id]None[text]None[enabled,,]",
+      "view_str": "09135c13876b41df4ea75fd493cd33ac",
+      "content_free_signature": "[class]android.widget.RadialTimePickerView$RadialPickerTouchHelper[resource_id]None"
+    },
+    {
+      "package": "com.example.ujsAutoClock",
+      "visible": true,
+      "checkable": false,
+      "child_count": 0,
+      "editable": false,
+      "clickable": false,
+      "is_password": false,
+      "focusable": false,
+      "enabled": true,
+      "content_description": "7",
+      "children": [],
+      "focused": false,
+      "bounds": [
+        [
+          369,
+          1158
+        ],
+        [
+          475,
+          1264
+        ]
+      ],
+      "resource_id": null,
+      "checked": false,
+      "text": null,
+      "class": "android.widget.RadialTimePickerView$RadialPickerTouchHelper",
+      "scrollable": false,
+      "selected": false,
+      "long_clickable": false,
+      "parent": 12,
+      "temp_id": 20,
+      "size": "106*106",
+      "signature": "[class]android.widget.RadialTimePickerView$RadialPickerTouchHelper[resource_id]None[text]None[enabled,,]",
+      "view_str": "09135c13876b41df4ea75fd493cd33ac",
+      "content_free_signature": "[class]android.widget.RadialTimePickerView$RadialPickerTouchHelper[resource_id]None"
+    },
+    {
+      "package": "com.example.ujsAutoClock",
+      "visible": true,
+      "checkable": false,
+      "child_count": 0,
+      "editable": false,
+      "clickable": false,
+      "is_password": false,
+      "focusable": false,
+      "enabled": true,
+      "content_description": "8",
+      "children": [],
+      "focused": false,
+      "bounds": [
+        [
+          282,
+          1072
+        ],
+        [
+          388,
+          1178
+        ]
+      ],
+      "resource_id": null,
+      "checked": false,
+      "text": null,
+      "class": "android.widget.RadialTimePickerView$RadialPickerTouchHelper",
+      "scrollable": false,
+      "selected": false,
+      "long_clickable": false,
+      "parent": 12,
+      "temp_id": 21,
+      "size": "106*106",
+      "signature": "[class]android.widget.RadialTimePickerView$RadialPickerTouchHelper[resource_id]None[text]None[enabled,,]",
+      "view_str": "09135c13876b41df4ea75fd493cd33ac",
+      "content_free_signature": "[class]android.widget.RadialTimePickerView$RadialPickerTouchHelper[resource_id]None"
+    },
+    {
+      "package": "com.example.ujsAutoClock",
+      "visible": true,
+      "checkable": false,
+      "child_count": 0,
+      "editable": false,
+      "clickable": false,
+      "is_password": false,
+      "focusable": false,
+      "enabled": true,
+      "content_description": "9",
+      "children": [],
+      "focused": false,
+      "bounds": [
+        [
+          251,
+          954
+        ],
+        [
+          357,
+          1060
+        ]
+      ],
+      "resource_id": null,
+      "checked": false,
+      "text": null,
+      "class": "android.widget.RadialTimePickerView$RadialPickerTouchHelper",
+      "scrollable": false,
+      "selected": false,
+      "long_clickable": false,
+      "parent": 12,
+      "temp_id": 22,
+      "size": "106*106",
+      "signature": "[class]android.widget.RadialTimePickerView$RadialPickerTouchHelper[resource_id]None[text]None[enabled,,]",
+      "view_str": "09135c13876b41df4ea75fd493cd33ac",
+      "content_free_signature": "[class]android.widget.RadialTimePickerView$RadialPickerTouchHelper[resource_id]None"
+    },
+    {
+      "package": "com.example.ujsAutoClock",
+      "visible": true,
+      "checkable": false,
+      "child_count": 0,
+      "editable": false,
+      "clickable": false,
+      "is_password": false,
+      "focusable": false,
+      "enabled": true,
+      "content_description": "10",
+      "children": [],
+      "focused": false,
+      "bounds": [
+        [
+          282,
+          836
+        ],
+        [
+          388,
+          942
+        ]
+      ],
+      "resource_id": null,
+      "checked": false,
+      "text": null,
+      "class": "android.widget.RadialTimePickerView$RadialPickerTouchHelper",
+      "scrollable": false,
+      "selected": false,
+      "long_clickable": false,
+      "parent": 12,
+      "temp_id": 23,
+      "size": "106*106",
+      "signature": "[class]android.widget.RadialTimePickerView$RadialPickerTouchHelper[resource_id]None[text]None[enabled,,]",
+      "view_str": "09135c13876b41df4ea75fd493cd33ac",
+      "content_free_signature": "[class]android.widget.RadialTimePickerView$RadialPickerTouchHelper[resource_id]None"
+    },
+    {
+      "package": "com.example.ujsAutoClock",
+      "visible": true,
+      "checkable": false,
+      "child_count": 0,
+      "editable": false,
+      "clickable": false,
+      "is_password": false,
+      "focusable": false,
+      "enabled": true,
+      "content_description": "11",
+      "children": [],
+      "focused": false,
+      "bounds": [
+        [
+          369,
+          749
+        ],
+        [
+          475,
+          855
+        ]
+      ],
+      "resource_id": null,
+      "checked": false,
+      "text": null,
+      "class": "android.widget.RadialTimePickerView$RadialPickerTouchHelper",
+      "scrollable": false,
+      "selected": false,
+      "long_clickable": false,
+      "parent": 12,
+      "temp_id": 24,
+      "size": "106*106",
+      "signature": "[class]android.widget.RadialTimePickerView$RadialPickerTouchHelper[resource_id]None[text]None[enabled,,]",
+      "view_str": "09135c13876b41df4ea75fd493cd33ac",
+      "content_free_signature": "[class]android.widget.RadialTimePickerView$RadialPickerTouchHelper[resource_id]None"
+    },
+    {
+      "package": "com.example.ujsAutoClock",
+      "visible": true,
+      "checkable": false,
+      "child_count": 0,
+      "editable": false,
+      "clickable": false,
+      "is_password": false,
+      "focusable": false,
+      "enabled": true,
+      "content_description": "12",
+      "children": [],
+      "focused": false,
+      "bounds": [
+        [
+          487,
+          718
+        ],
+        [
+          593,
+          824
+        ]
+      ],
+      "resource_id": null,
+      "checked": false,
+      "text": null,
+      "class": "android.widget.RadialTimePickerView$RadialPickerTouchHelper",
+      "scrollable": false,
+      "selected": false,
+      "long_clickable": false,
+      "parent": 12,
+      "temp_id": 25,
+      "size": "106*106",
+      "signature": "[class]android.widget.RadialTimePickerView$RadialPickerTouchHelper[resource_id]None[text]None[enabled,,]",
+      "view_str": "09135c13876b41df4ea75fd493cd33ac",
+      "content_free_signature": "[class]android.widget.RadialTimePickerView$RadialPickerTouchHelper[resource_id]None"
+    },
+    {
+      "package": "com.example.ujsAutoClock",
+      "visible": true,
+      "checkable": false,
+      "child_count": 0,
+      "editable": false,
+      "clickable": false,
+      "is_password": false,
+      "focusable": false,
+      "enabled": true,
+      "content_description": "13",
+      "children": [],
+      "focused": false,
+      "bounds": [
+        [
+          558,
+          831
+        ],
+        [
+          664,
+          937
+        ]
+      ],
+      "resource_id": null,
+      "checked": false,
+      "text": null,
+      "class": "android.widget.RadialTimePickerView$RadialPickerTouchHelper",
+      "scrollable": false,
+      "selected": false,
+      "long_clickable": false,
+      "parent": 12,
+      "temp_id": 26,
+      "size": "106*106",
+      "signature": "[class]android.widget.RadialTimePickerView$RadialPickerTouchHelper[resource_id]None[text]None[enabled,,]",
+      "view_str": "09135c13876b41df4ea75fd493cd33ac",
+      "content_free_signature": "[class]android.widget.RadialTimePickerView$RadialPickerTouchHelper[resource_id]None"
+    },
+    {
+      "package": "com.example.ujsAutoClock",
+      "visible": true,
+      "checkable": false,
+      "child_count": 0,
+      "editable": false,
+      "clickable": false,
+      "is_password": false,
+      "focusable": false,
+      "enabled": true,
+      "content_description": "14",
+      "children": [],
+      "focused": false,
+      "bounds": [
+        [
+          609,
+          883
+        ],
+        [
+          715,
+          989
+        ]
+      ],
+      "resource_id": null,
+      "checked": false,
+      "text": null,
+      "class": "android.widget.RadialTimePickerView$RadialPickerTouchHelper",
+      "scrollable": false,
+      "selected": false,
+      "long_clickable": false,
+      "parent": 12,
+      "temp_id": 27,
+      "size": "106*106",
+      "signature": "[class]android.widget.RadialTimePickerView$RadialPickerTouchHelper[resource_id]None[text]None[enabled,,]",
+      "view_str": "09135c13876b41df4ea75fd493cd33ac",
+      "content_free_signature": "[class]android.widget.RadialTimePickerView$RadialPickerTouchHelper[resource_id]None"
+    },
+    {
+      "package": "com.example.ujsAutoClock",
+      "visible": true,
+      "checkable": false,
+      "child_count": 0,
+      "editable": false,
+      "clickable": false,
+      "is_password": false,
+      "focusable": false,
+      "enabled": true,
+      "content_description": "15",
+      "children": [],
+      "focused": false,
+      "bounds": [
+        [
+          629,
+          954
+        ],
+        [
+          735,
+          1060
+        ]
+      ],
+      "resource_id": null,
+      "checked": false,
+      "text": null,
+      "class": "android.widget.RadialTimePickerView$RadialPickerTouchHelper",
+      "scrollable": false,
+      "selected": false,
+      "long_clickable": false,
+      "parent": 12,
+      "temp_id": 28,
+      "size": "106*106",
+      "signature": "[class]android.widget.RadialTimePickerView$RadialPickerTouchHelper[resource_id]None[text]None[enabled,,]",
+      "view_str": "09135c13876b41df4ea75fd493cd33ac",
+      "content_free_signature": "[class]android.widget.RadialTimePickerView$RadialPickerTouchHelper[resource_id]None"
+    },
+    {
+      "package": "com.example.ujsAutoClock",
+      "visible": true,
+      "checkable": false,
+      "child_count": 0,
+      "editable": false,
+      "clickable": false,
+      "is_password": false,
+      "focusable": false,
+      "enabled": true,
+      "content_description": "16",
+      "children": [],
+      "focused": false,
+      "bounds": [
+        [
+          609,
+          1025
+        ],
+        [
+          715,
+          1131
+        ]
+      ],
+      "resource_id": null,
+      "checked": false,
+      "text": null,
+      "class": "android.widget.RadialTimePickerView$RadialPickerTouchHelper",
+      "scrollable": false,
+      "selected": false,
+      "long_clickable": false,
+      "parent": 12,
+      "temp_id": 29,
+      "size": "106*106",
+      "signature": "[class]android.widget.RadialTimePickerView$RadialPickerTouchHelper[resource_id]None[text]None[enabled,,]",
+      "view_str": "09135c13876b41df4ea75fd493cd33ac",
+      "content_free_signature": "[class]android.widget.RadialTimePickerView$RadialPickerTouchHelper[resource_id]None"
+    },
+    {
+      "package": "com.example.ujsAutoClock",
+      "visible": true,
+      "checkable": false,
+      "child_count": 0,
+      "editable": false,
+      "clickable": false,
+      "is_password": false,
+      "focusable": false,
+      "enabled": true,
+      "content_description": "17",
+      "children": [],
+      "focused": false,
+      "bounds": [
+        [
+          558,
+          1076
+        ],
+        [
+          664,
+          1182
+        ]
+      ],
+      "resource_id": null,
+      "checked": false,
+      "text": null,
+      "class": "android.widget.RadialTimePickerView$RadialPickerTouchHelper",
+      "scrollable": false,
+      "selected": false,
+      "long_clickable": false,
+      "parent": 12,
+      "temp_id": 30,
+      "size": "106*106",
+      "signature": "[class]android.widget.RadialTimePickerView$RadialPickerTouchHelper[resource_id]None[text]None[enabled,,]",
+      "view_str": "09135c13876b41df4ea75fd493cd33ac",
+      "content_free_signature": "[class]android.widget.RadialTimePickerView$RadialPickerTouchHelper[resource_id]None"
+    },
+    {
+      "package": "com.example.ujsAutoClock",
+      "visible": true,
+      "checkable": false,
+      "child_count": 0,
+      "editable": false,
+      "clickable": false,
+      "is_password": false,
+      "focusable": false,
+      "enabled": true,
+      "content_description": "18",
+      "children": [],
+      "focused": false,
+      "bounds": [
+        [
+          487,
+          1096
+        ],
+        [
+          593,
+          1202
+        ]
+      ],
+      "resource_id": null,
+      "checked": false,
+      "text": null,
+      "class": "android.widget.RadialTimePickerView$RadialPickerTouchHelper",
+      "scrollable": false,
+      "selected": false,
+      "long_clickable": false,
+      "parent": 12,
+      "temp_id": 31,
+      "size": "106*106",
+      "signature": "[class]android.widget.RadialTimePickerView$RadialPickerTouchHelper[resource_id]None[text]None[enabled,,]",
+      "view_str": "09135c13876b41df4ea75fd493cd33ac",
+      "content_free_signature": "[class]android.widget.RadialTimePickerView$RadialPickerTouchHelper[resource_id]None"
+    },
+    {
+      "package": "com.example.ujsAutoClock",
+      "visible": true,
+      "checkable": false,
+      "child_count": 0,
+      "editable": false,
+      "clickable": false,
+      "is_password": false,
+      "focusable": false,
+      "enabled": true,
+      "content_description": "19",
+      "children": [],
+      "focused": false,
+      "bounds": [
+        [
+          416,
+          1076
+        ],
+        [
+          522,
+          1182
+        ]
+      ],
+      "resource_id": null,
+      "checked": false,
+      "text": null,
+      "class": "android.widget.RadialTimePickerView$RadialPickerTouchHelper",
+      "scrollable": false,
+      "selected": false,
+      "long_clickable": false,
+      "parent": 12,
+      "temp_id": 32,
+      "size": "106*106",
+      "signature": "[class]android.widget.RadialTimePickerView$RadialPickerTouchHelper[resource_id]None[text]None[enabled,,]",
+      "view_str": "09135c13876b41df4ea75fd493cd33ac",
+      "content_free_signature": "[class]android.widget.RadialTimePickerView$RadialPickerTouchHelper[resource_id]None"
+    },
+    {
+      "package": "com.example.ujsAutoClock",
+      "visible": true,
+      "checkable": false,
+      "child_count": 0,
+      "editable": false,
+      "clickable": false,
+      "is_password": false,
+      "focusable": false,
+      "enabled": true,
+      "content_description": "20",
+      "children": [],
+      "focused": false,
+      "bounds": [
+        [
+          364,
+          1025
+        ],
+        [
+          470,
+          1131
+        ]
+      ],
+      "resource_id": null,
+      "checked": false,
+      "text": null,
+      "class": "android.widget.RadialTimePickerView$RadialPickerTouchHelper",
+      "scrollable": false,
+      "selected": false,
+      "long_clickable": false,
+      "parent": 12,
+      "temp_id": 33,
+      "size": "106*106",
+      "signature": "[class]android.widget.RadialTimePickerView$RadialPickerTouchHelper[resource_id]None[text]None[enabled,,]",
+      "view_str": "09135c13876b41df4ea75fd493cd33ac",
+      "content_free_signature": "[class]android.widget.RadialTimePickerView$RadialPickerTouchHelper[resource_id]None"
+    },
+    {
+      "package": "com.example.ujsAutoClock",
+      "visible": true,
+      "checkable": false,
+      "child_count": 0,
+      "editable": false,
+      "clickable": false,
+      "is_password": false,
+      "focusable": false,
+      "enabled": true,
+      "content_description": "21",
+      "children": [],
+      "focused": false,
+      "bounds": [
+        [
+          345,
+          954
+        ],
+        [
+          451,
+          1060
+        ]
+      ],
+      "resource_id": null,
+      "checked": false,
+      "text": null,
+      "class": "android.widget.RadialTimePickerView$RadialPickerTouchHelper",
+      "scrollable": false,
+      "selected": false,
+      "long_clickable": false,
+      "parent": 12,
+      "temp_id": 34,
+      "size": "106*106",
+      "signature": "[class]android.widget.RadialTimePickerView$RadialPickerTouchHelper[resource_id]None[text]None[enabled,,]",
+      "view_str": "09135c13876b41df4ea75fd493cd33ac",
+      "content_free_signature": "[class]android.widget.RadialTimePickerView$RadialPickerTouchHelper[resource_id]None"
+    },
+    {
+      "package": "com.example.ujsAutoClock",
+      "visible": true,
+      "checkable": false,
+      "child_count": 0,
+      "editable": false,
+      "clickable": false,
+      "is_password": false,
+      "focusable": false,
+      "enabled": true,
+      "content_description": "22",
+      "children": [],
+      "focused": false,
+      "bounds": [
+        [
+          364,
+          883
+        ],
+        [
+          470,
+          989
+        ]
+      ],
+      "resource_id": null,
+      "checked": false,
+      "text": null,
+      "class": "android.widget.RadialTimePickerView$RadialPickerTouchHelper",
+      "scrollable": false,
+      "selected": false,
+      "long_clickable": false,
+      "parent": 12,
+      "temp_id": 35,
+      "size": "106*106",
+      "signature": "[class]android.widget.RadialTimePickerView$RadialPickerTouchHelper[resource_id]None[text]None[enabled,,]",
+      "view_str": "09135c13876b41df4ea75fd493cd33ac",
+      "content_free_signature": "[class]android.widget.RadialTimePickerView$RadialPickerTouchHelper[resource_id]None"
+    },
+    {
+      "package": "com.example.ujsAutoClock",
+      "visible": true,
+      "checkable": false,
+      "child_count": 0,
+      "editable": false,
+      "clickable": false,
+      "is_password": false,
+      "focusable": false,
+      "enabled": true,
+      "content_description": "23",
+      "children": [],
+      "focused": false,
+      "bounds": [
+        [
+          416,
+          831
+        ],
+        [
+          522,
+          937
+        ]
+      ],
+      "resource_id": null,
+      "checked": false,
+      "text": null,
+      "class": "android.widget.RadialTimePickerView$RadialPickerTouchHelper",
+      "scrollable": false,
+      "selected": false,
+      "long_clickable": false,
+      "parent": 12,
+      "temp_id": 36,
+      "size": "106*106",
+      "signature": "[class]android.widget.RadialTimePickerView$RadialPickerTouchHelper[resource_id]None[text]None[enabled,,]",
+      "view_str": "09135c13876b41df4ea75fd493cd33ac",
+      "content_free_signature": "[class]android.widget.RadialTimePickerView$RadialPickerTouchHelper[resource_id]None"
+    },
+    {
+      "package": "com.example.ujsAutoClock",
+      "visible": true,
+      "checkable": false,
+      "child_count": 2,
+      "editable": false,
+      "clickable": false,
+      "is_password": false,
+      "focusable": false,
+      "enabled": true,
+      "content_description": null,
+      "children": [
+        38,
+        39
+      ],
+      "focused": false,
+      "bounds": [
+        [
+          162,
+          1301
+        ],
+        [
+          918,
+          1449
+        ]
+      ],
+      "resource_id": null,
+      "checked": false,
+      "text": null,
+      "class": "android.widget.LinearLayout",
+      "scrollable": false,
+      "selected": false,
+      "long_clickable": false,
+      "parent": 7,
+      "temp_id": 37,
+      "size": "756*148",
+      "signature": "[class]android.widget.LinearLayout[resource_id]None[text]None[enabled,,]",
+      "view_str": "2d9783a2d7a36bf85b06485ed99e5358",
+      "content_free_signature": "[class]android.widget.LinearLayout[resource_id]None"
+    },
+    {
+      "package": "com.example.ujsAutoClock",
+      "visible": true,
+      "checkable": false,
+      "child_count": 0,
+      "editable": false,
+      "clickable": true,
+      "is_password": false,
+      "focusable": true,
+      "enabled": true,
+      "content_description": "Switch to text input mode for the time input.",
+      "children": [],
+      "focused": false,
+      "bounds": [
+        [
+          194,
+          1311
+        ],
+        [
+          321,
+          1438
+        ]
+      ],
+      "resource_id": "android:id/toggle_mode",
+      "checked": false,
+      "text": null,
+      "class": "android.widget.ImageButton",
+      "scrollable": false,
+      "selected": false,
+      "long_clickable": false,
+      "parent": 37,
+      "temp_id": 38,
+      "size": "127*127",
+      "signature": "[class]android.widget.ImageButton[resource_id]android:id/toggle_mode[text]None[enabled,,]",
+      "view_str": "8c5d2e94667fe16abbbe19f240c8aa5d",
+      "content_free_signature": "[class]android.widget.ImageButton[resource_id]android:id/toggle_mode"
+    },
+    {
+      "package": "com.example.ujsAutoClock",
+      "visible": true,
+      "checkable": false,
+      "child_count": 1,
+      "editable": false,
+      "clickable": false,
+      "is_password": false,
+      "focusable": true,
+      "enabled": true,
+      "content_description": null,
+      "children": [
+        40
+      ],
+      "focused": false,
+      "bounds": [
+        [
+          504,
+          1301
+        ],
+        [
+          918,
+          1449
+        ]
+      ],
+      "resource_id": "android:id/buttonPanel",
+      "checked": false,
+      "text": null,
+      "class": "android.widget.ScrollView",
+      "scrollable": false,
+      "selected": false,
+      "long_clickable": false,
+      "parent": 37,
+      "temp_id": 39,
+      "size": "414*148",
+      "signature": "[class]android.widget.ScrollView[resource_id]android:id/buttonPanel[text]None[enabled,,]",
+      "view_str": "1c0dabf04eb26e9175decace5e035219",
+      "content_free_signature": "[class]android.widget.ScrollView[resource_id]android:id/buttonPanel"
+    },
+    {
+      "package": "com.example.ujsAutoClock",
+      "visible": true,
+      "checkable": false,
+      "child_count": 2,
+      "editable": false,
+      "clickable": false,
+      "is_password": false,
+      "focusable": false,
+      "enabled": true,
+      "content_description": null,
+      "children": [
+        41,
+        42
+      ],
+      "focused": false,
+      "bounds": [
+        [
+          504,
+          1301
+        ],
+        [
+          918,
+          1449
+        ]
+      ],
+      "resource_id": null,
+      "checked": false,
+      "text": null,
+      "class": "android.widget.LinearLayout",
+      "scrollable": false,
+      "selected": false,
+      "long_clickable": false,
+      "parent": 39,
+      "temp_id": 40,
+      "size": "414*148",
+      "signature": "[class]android.widget.LinearLayout[resource_id]None[text]None[enabled,,]",
+      "view_str": "96d2e6aff5ecd0bcaca853ef0fb6223e",
+      "content_free_signature": "[class]android.widget.LinearLayout[resource_id]None"
+    },
+    {
+      "package": "com.example.ujsAutoClock",
+      "visible": true,
+      "checkable": false,
+      "child_count": 0,
+      "editable": false,
+      "clickable": true,
+      "is_password": false,
+      "focusable": true,
+      "enabled": true,
+      "content_description": null,
+      "children": [],
+      "focused": false,
+      "bounds": [
+        [
+          536,
+          1312
+        ],
+        [
+          718,
+          1438
+        ]
+      ],
+      "resource_id": "android:id/button2",
+      "checked": false,
+      "text": "CANCEL",
+      "class": "android.widget.Button",
+      "scrollable": false,
+      "selected": false,
+      "long_clickable": false,
+      "parent": 40,
+      "temp_id": 41,
+      "size": "182*126",
+      "signature": "[class]android.widget.Button[resource_id]android:id/button2[text]CANCEL[enabled,,]",
+      "view_str": "5b73ce32582c9db4bb3c565ae5e99cb4",
+      "content_free_signature": "[class]android.widget.Button[resource_id]android:id/button2"
+    },
+    {
+      "package": "com.example.ujsAutoClock",
+      "visible": true,
+      "checkable": false,
+      "child_count": 0,
+      "editable": false,
+      "clickable": true,
+      "is_password": false,
+      "focusable": true,
+      "enabled": true,
+      "content_description": null,
+      "children": [],
+      "focused": false,
+      "bounds": [
+        [
+          718,
+          1312
+        ],
+        [
+          886,
+          1438
+        ]
+      ],
+      "resource_id": "android:id/button1",
+      "checked": false,
+      "text": "OK",
+      "class": "android.widget.Button",
+      "scrollable": false,
+      "selected": false,
+      "long_clickable": false,
+      "parent": 40,
+      "temp_id": 42,
+      "size": "168*126",
+      "signature": "[class]android.widget.Button[resource_id]android:id/button1[text]OK[enabled,,]",
+      "view_str": "f4334904443eae9e21076e697f6eb7d0",
+      "content_free_signature": "[class]android.widget.Button[resource_id]android:id/button1"
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "tag": "2021-09-26_115659",
+  "event": {
+    "event_type": "kill_app",
+    "log_lines": null,
+    "stop_intent": "am force-stop com.chessclock.android"
+  },
+  "start_state": "37a2fa66f7174c8aa6b195157db98421",
+  "stop_state": "37a2fa66f7174c8aa6b195157db98421",
+  "event_str": "KillAppEvent()"
+}

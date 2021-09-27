@@ -1,0 +1,49 @@
+{
+  "tag": "2021-09-26_115027",
+  "event": {
+    "event_type": "touch",
+    "log_lines": null,
+    "x": null,
+    "y": null,
+    "view": {
+      "package": "com.example.ujsAutoClock",
+      "visible": true,
+      "checkable": false,
+      "child_count": 0,
+      "editable": false,
+      "clickable": true,
+      "is_password": false,
+      "focusable": true,
+      "enabled": true,
+      "content_description": "More options",
+      "children": [],
+      "focused": false,
+      "bounds": [
+        [
+          975,
+          73
+        ],
+        [
+          1080,
+          199
+        ]
+      ],
+      "resource_id": null,
+      "checked": false,
+      "text": null,
+      "class": "android.widget.ImageView",
+      "scrollable": false,
+      "selected": false,
+      "long_clickable": true,
+      "parent": 7,
+      "temp_id": 8,
+      "size": "105*126",
+      "signature": "[class]android.widget.ImageView[resource_id]None[text]None[enabled,,]",
+      "view_str": "fd275cde43eb374c5ff5b4bab07f0b4e",
+      "content_free_signature": "[class]android.widget.ImageView[resource_id]None"
+    }
+  },
+  "start_state": "6077dd50c11c71ec61e127d99f5df72c",
+  "stop_state": "a8be3522f75e663b83ea6eec0853557b",
+  "event_str": "TouchEvent(state=6077dd50c11c71ec61e127d99f5df72c, view=fd275cde43eb374c5ff5b4bab07f0b4e(MainActivity/ImageView-))"
+}

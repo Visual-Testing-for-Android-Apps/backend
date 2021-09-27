@@ -1,0 +1,11 @@
+{
+  "tag": "2021-09-26_115015",
+  "event": {
+    "event_type": "kill_app",
+    "log_lines": null,
+    "stop_intent": "am force-stop com.example.ujsAutoClock"
+  },
+  "start_state": "5a8114d01b38d31f993d62bc50771fdd",
+  "stop_state": "5a8114d01b38d31f993d62bc50771fdd",
+  "event_str": "KillAppEvent()"
+}
