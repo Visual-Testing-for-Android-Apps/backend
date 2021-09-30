@@ -12,8 +12,8 @@ def getReportJson(event, context):
     """
 
     # Load id/password from html request
-    linkId = event["Records"][0]["body"]["linkId"]
-    linkPassword = event["Records"][0]["body"]["linkPassword"]
+    linkId = event["Records"][0]["body"]["publicKey"]
+    linkPassword = event["Records"][0]["body"]["pwd"]
 
     # Constants
     TABLE_NAME = os.environ["JOB_TABLE"]
