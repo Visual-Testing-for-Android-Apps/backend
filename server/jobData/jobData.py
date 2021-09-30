@@ -4,7 +4,9 @@ import json
 
 def getReportJson(event, context):
     """
-    Input: the ID and PASSWORD from link to display batch job report
+    Input: POST request where the body is a stringified json of the form:
+    "{"publicKey":"1", "pwd":"password"}"
+    Where the values for publicKey and pwd are the ID and PASSWORD from link to display batch job report
     Eg. https://afternoon-woodland-24079.herokuapp.com/batchreportpage/8944s61gdgds300187?pwd=blhTelphY
         where ID = 8944s61gdgds300187, PASSWORD = blhTelphY
 
@@ -12,8 +14,9 @@ def getReportJson(event, context):
     """
 
     # Load id/password from html request
-    linkId = event["Records"][0]["body"]["publicKey"]
-    linkPassword = event["Records"][0]["body"]["pwd"]
+    json_body = json.loads(event["body"])
+    linkId = json_body["publicKey"]
+    linkPassword = json_body["pwd"]
 
     # Constants
     TABLE_NAME = os.environ["JOB_TABLE"]
@@ -21,13 +24,24 @@ def getReportJson(event, context):
     LOOKUP_BATCH_ID = linkId # may lookup batch job id in another table using linkId for extra security
     PRESIGNED_LINK_DURATION = 60*5 # 5 minutes in seconds
 
-    # Check password
+    # fetch from database
     table = boto3.resource("dynamodb").Table(TABLE_NAME)
     data = table.get_item(Key={"id": LOOKUP_BATCH_ID})
+
+    # check if job id exists
+    try:
+        data["Item"]
+    except KeyError:
+        return {
+            "statusCode": 404,  # job id not found
+            "body": "{}",
+        }
+
+    # Check password
     if linkPassword != data["Item"]["password"]:
         return {
             "statusCode": 401, # unauthorised, incorrect password
-            "body": {},
+            "body": "{}",
         }
 
     # Send url to report.json
