@@ -238,7 +238,7 @@ Resources:
           # Make names accessible as environment variable from function code during execution
           JOB_TABLE: !Ref JobTable
           SRC_BUCKET: !Ref SrcBucket
-          FILE_ZIP_QUEUE: !Ref FileZipQueue
+          EMAIL_QUEUE: !Ref SendEmailQueue
       Events:
         # Specifies the event that trigger this function.
         SQSQueueEvent:

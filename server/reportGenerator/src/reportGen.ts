@@ -146,11 +146,10 @@ export const generateReport = async (event: SQSEvent, context: AWSLambda.Context
 	// need to await, otherwise if the lambda function terminates before the upload is finished, it won't complete
 	await s3.upload(s3params).promise()
 
-	// Add batch to file zip queue
-	// TODO: change call to frontend code for viewing report
+	// Add batch to email queue
 	const params: SendMessageRequest = {
-		MessageBody: '{ "queryStringParameters": { "id": "' + String(key) + '" } }', // zipfile accesses event["queryStringParameters"]["id"]
-		QueueUrl: process.env.FILE_ZIP_QUEUE as string,
+		MessageBody: '{ "jobKey": "' + String(key) + '" }',
+		QueueUrl: process.env.EMAIL_QUEUE as string,
 	};
 	pushToQueue(params);
 };
