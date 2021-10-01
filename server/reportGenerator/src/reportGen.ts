@@ -8,11 +8,11 @@ import { getJob } from "./service/dynamodbService"
 import { FileType, Job, JobStatus } from "./service/jobModel"
 
 /**
- * Generates a html report for a given video issue
+ * Creates an object related to a given video issue
  *
  * @param filePath - filepath to original video
  * @param algResult - issue type code
- * @returns html string containing image, heatmap, and description
+ * @returns object containing video issue, description and video file path
  */
 function generateVidReport(filePath: string, algResult: number): Record<string, string> {
 	const titles: string[] = [
@@ -48,12 +48,12 @@ function generateVidReport(filePath: string, algResult: number): Record<string, 
 }
 
 /**
- * Generates a html report for a given image issue
+ * Creates an object related to a given image issue
  *
  * @param filePath - filepath to original image
  * @param algResultPath - filepath to heatmap outputted from OwlEyes algorithm
  * @param algResult - issue type code
- * @returns html string containing image, heatmap, and description
+ * @returns object containing image issue, description, image and heatmap path
  */
 function generateImgReport(
 	filePath: string,
@@ -83,14 +83,14 @@ function generateImgReport(
 }
 
 /**
- * Adds html report for a batch to s3 bucket, then adds the batch to a queue for file zipping.
- * The report is saved in the bucket as <batch_id>/report.html
+ * Adds report contents as json for a batch to s3 bucket, then adds the batch to a queue for emailing the user.
+ * The report is saved in the bucket as <batch_id>/report.json
  * DynamoDB data about a batch is assumed to be in the format defined here: https://github.com/Visual-Testing-for-Android-Apps/backend/issues/15#issuecomment-898450609
  * with the exception of "batch_id" being "id" instead due to issues.
  *
  * @param event object containing information about the job. Its body attribute is a stringified json object containing a batch's id as jobKey
  * @param context object containing information about the invocation, function, and execution environment
- * @returns html string describing issues identified for each image and/or video
+ * @returns json object describing issues identified for each image and/or video
  */
 export const generateReport = async (event: SQSEvent, context: AWSLambda.Context): Promise<any> => {
 	// fetch job results from database
@@ -102,7 +102,7 @@ export const generateReport = async (event: SQSEvent, context: AWSLambda.Context
 	}
 	const files = job.files
 
-	// construct HTML report contents
+	// construct report contents as arrays
 	const image: Record<string, string>[] = [];
 	const video: Record<string, string>[] = [];
 
@@ -117,7 +117,7 @@ export const generateReport = async (event: SQSEvent, context: AWSLambda.Context
 					const resultCode = element.M.resultCode.N;
 					const resultFileRef = element.M.resultFileReference.S;
 
-					// Add image/vid string to overall report string
+					// Add image/vid string to relevant array
 					if (fileType != null && fileRef != null && resultCode != null) {
 						if (fileType === "image" && resultFileRef != null) {
 							image.push(generateImgReport(fileRef, resultFileRef, +resultCode));
@@ -130,7 +130,7 @@ export const generateReport = async (event: SQSEvent, context: AWSLambda.Context
 		}
 	}
 
-	// Add html file to s3 bucket
+	// Add json file to s3 bucket
 	const filepath = key + "/report.json";
 	const s3params = {
 		Bucket: process.env.SRC_BUCKET as string,
