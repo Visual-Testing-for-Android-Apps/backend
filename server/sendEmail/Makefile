@@ -7,7 +7,7 @@ build-sendEmail:
 	npm run test
 	npm prune --production
 ifeq ($(OS),Windows_NT)
-	Xcopy /E * $(ARTIFACTS_DIR)
+	Xcopy /E * "$(ARTIFACTS_DIR)"
 else
 	cp -r dist "$(ARTIFACTS_DIR)/"
 	
