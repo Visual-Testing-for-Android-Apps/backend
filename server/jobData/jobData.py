@@ -34,14 +34,22 @@ def getReportJson(event, context):
     except KeyError:
         return {
             "statusCode": 404,  # job id not found
-            "body": "{}",
+            "body": json.dumps(
+				{
+					"error": "Job id: " + str(id) + " not found",
+				}
+			),
         }
 
     # Check password
     if linkPassword != data["Item"]["password"]:
         return {
             "statusCode": 401, # unauthorised, incorrect password
-            "body": "{}",
+            "body": json.dumps(
+				{
+					"error": "Unauthorised",
+				}
+			),
         }
 
     # Send url to report.json
