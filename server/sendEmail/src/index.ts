@@ -85,7 +85,7 @@ export const sendEmail = async (event: SQSEvent, context: AWSLambda.Context): Pr
 	const info = await transporter.sendMail({
 		from: process.env.EMAIL,
 		to: recipientEmail,
-		subject: "<p>Vision Job Results<p>",
+		subject: "<p>Vision Job Results</p>",
 		text: "",
 		html:
 			'<p>Job Processing Complete. <br>Your <a href="' +
