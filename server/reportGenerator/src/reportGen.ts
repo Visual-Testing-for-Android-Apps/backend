@@ -66,8 +66,8 @@ function generateImgReport (
   ]
   const desc: string[] = [
     'Heatmap highlights all potential issues.',
-    "'NULL' text is being displayed, instead of the correct information.",
-    "A placeholder 'missing/broken image' symbol is displayed, instead of an intended image.",
+    '"NULL" text is being displayed, instead of the correct information.',
+    'A placeholder "missing/broken image" symbol is displayed, instead of an intended image.',
     'Text is overlapped or obscured by other components.'
   ]
 
@@ -105,13 +105,13 @@ export const generateReport = async (event: SQSEvent, context: AWSLambda.Context
   const video: Array<Record<string, string>> = []
 
   console.log(`Generating report for ${files.length} files...`)
-  files.forEach((element, index) => {
+  files.forEach((element) => {
     const fileRef = element.s3Key
     const fileType = element.type
     const resultCode = Number(element.result.code)
     const resultFileRef = element.result.outputKey
-    if (fileType != null && resultCode != null) {
-      if (fileType === FileType.IMAGE && fileRef != null && resultFileRef != null) {
+    if (fileType != null && fileRef != null && resultCode != null) {
+      if (fileType === FileType.IMAGE && resultFileRef != null) {
         image.push(generateImgReport(fileRef, resultFileRef, +resultCode))
         console.log(`Image ${fileRef} added to report`)
       } else if (fileType === FileType.VIDEO) {
