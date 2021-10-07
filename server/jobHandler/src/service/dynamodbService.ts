@@ -52,3 +52,37 @@ export const updateJobStatus = async (jobID: string, jobStatus: string) => {
 	await updateItem(updateItemInput);
 
 }
+
+/**
+ * Gets the email associated with the given job id
+ * @param jobId job id in db
+ * @returns email address for user
+ */
+export const getEmail = async (jobId:string):Promise<string> => {
+	const getItemInput: GetItemInput = {
+		TableName:tableName,
+		Key: {id : {S:jobId}},
+		ProjectionExpression: "email"
+	}
+
+	const ret = await getItem(getItemInput);
+	console.log(ret)
+	return Converter.unmarshall(ret.Item!).email;
+}
+
+
+/**
+ * Gets the job status associated with the given job id
+ * @param jobId job id in db
+ * @returns job status
+ */
+export const getJobStatus = async (jobId:string):Promise<string> => {
+	const getItemInput: GetItemInput = {
+		TableName:tableName,
+		Key: {id : {S:jobId}},
+		ProjectionExpression: "jobStatus"
+	}
+	const ret = await getItem(getItemInput);
+	console.log(ret)
+	return Converter.unmarshall(ret.Item!).jobStatus;
+}

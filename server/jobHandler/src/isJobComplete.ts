@@ -39,7 +39,7 @@ export const isJobComplete = async (key: string): Promise<any> => {
 
 	//Iterate though every file and check the value of "finished"
 	for (const element of res.files) {
-		ready &&= (element.status == FileStatus.DONE);
+		ready && (element.status == FileStatus.DONE);
 		//console.log("Is " + (element.fileRef != null ? String(element.fileRef) : "") + " finished?: " + String(element.status == FileStatus.DONE))
 	}
 

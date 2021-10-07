@@ -1,13 +1,13 @@
 import { getItem, GetItemInput } from "./service/dynamodbClient";
 import { AttributeMap } from "aws-sdk/clients/dynamodb";
+import { getEmail, getJobStatus } from "./service/dynamodbService"
 import * as dotenv from "dotenv";
 dotenv.config(); // configure environment vars
 import * as nodemailer from "nodemailer";
 
 
 /**
- * Gets a job from the database. 
- * Exists to skip a null check and allow for mocking
+ * Gets a job from the database.
  * @param request 
  */
 export const awaitJob = async (request: GetItemInput): Promise<AttributeMap | null> => {
@@ -36,12 +36,14 @@ export const sendProcessingEmail = async (key: string): Promise<any> => {
     };
 
     // make request, store result in res
-	const res = await awaitJob(request);
+    const res = await awaitJob(request);
+    // get user email 
+    const recipientEmail = await getEmail(key); 
+    // get job status
+    const currJobStatus = await getJobStatus(key);
     
-    // check that email exists and job is processing
-    if (res?.email?.S != null && res?.jobStatus?.S === "PROCESSING") {
-        // get user's email from job
-        const recipientEmail = res.email.S;
+    // check that job is processing or generating report
+    if (currJobStatus === "PROCESSING" || currJobStatus === "GENERATING") {
 
         // create transport for email
         console.log("creating transporter...");
