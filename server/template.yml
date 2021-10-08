@@ -17,12 +17,11 @@ Globals:
 
 Parameters:
   isProd:
-      Type: String
-      AllowedValues:
+    Type: String
+    AllowedValues:
       - true
       - false
-      Default: false
-
+    Default: false
 
 # Resources declares the AWS resources that you want to include in the stack
 # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/resources-section-structure.html
@@ -86,7 +85,7 @@ Resources:
       BuildMethod: makefile
     Properties:
       CodeUri: jobHandler/
-      Handler: dist/index.handler 
+      Handler: dist/index.handler
       Runtime: nodejs12.x
       MemorySize: 128
       Timeout: 800 # give 800 sec to jobHandler
@@ -247,6 +246,33 @@ Resources:
             Queue: !GetAtt ReportGenerationQueue.Arn
             BatchSize: 1
 
+  JobData:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: jobData/
+      Handler: jobData.getReportJson
+      Runtime: python3.9
+      Timeout: 10
+      Description: Endpoint for uploading image and videos
+      Policies:
+        # Give Create/Read/Update/Delete Permissions to the SampleTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref JobTable
+        - S3CrudPolicy:
+            BucketName: !Ref SrcBucket
+      Environment:
+        Variables:
+          # Make table name accessible as environment variable from function code during execution
+          JOB_TABLE: !Ref JobTable
+          MAPPING_TABLE: !Ref MappingTable
+          SRC_BUCKET: !Ref SrcBucket
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /jobdata
+            Method: POST
+
   # This is an SQS queue with all default configuration properties. To learn more about the available options, see
   # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-sqs-queues.html
   JobHandlerQueue:
@@ -279,7 +305,6 @@ Resources:
       VisibilityTimeout: 1000
     Type: AWS::SQS::Queue
 
-
   SendEmailQueue:
     Properties:
       ReceiveMessageWaitTimeSeconds: 1
@@ -292,6 +317,17 @@ Resources:
     Properties:
       PrimaryKey:
         Name: id
+        Type: String
+      ProvisionedThroughput:
+        ReadCapacityUnits: 2
+        WriteCapacityUnits: 2
+
+  # DynamoDB table to store the public/private job mappings
+  MappingTable:
+    Type: AWS::Serverless::SimpleTable
+    Properties:
+      PrimaryKey:
+        Name: publicId
         Type: String
       ProvisionedThroughput:
         ReadCapacityUnits: 2
