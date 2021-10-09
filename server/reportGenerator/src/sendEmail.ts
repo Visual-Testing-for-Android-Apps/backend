@@ -24,17 +24,12 @@ export const awaitJob = async (request: GetItemInput): Promise<AttributeMap | nu
 /**
  * Sends an email to the user associated with the job that triggered the SQS Event.
  * The email contains a url link that is used to access the batch job results report,
- * 
- * @param event SQS event indicating that job has finished and email can be sent
- * @param context 
+ * @param key job key to get job details from DB
  */
-export const sendEmail = async (event: SQSEvent, context: AWSLambda.Context): Promise<any> => {
+export const sendEmail = async (key: string): Promise<any> => {
 
 	const port = 465; 	// port connecting to the SMTP server.
 	const baseUrl = 'https://afternoon-woodland-24079.herokuapp.com/batchreportpage/'; // url to add job id and pwd to
-
-	// get job key from DB
-	const key: string = JSON.parse(event.Records[0].body).jobKey;
 
 	// make request for DB info using job key, store in request
 	const request: GetItemInput = {
@@ -51,27 +46,15 @@ export const sendEmail = async (event: SQSEvent, context: AWSLambda.Context): Pr
 	// create transport for email (if account in sandbox email needs to be verified)
 	console.log("creating transporter...");
 	const transporter = nodemailer.createTransport({
-		host: process.env.SMTP_EMAIL, // email with aws region
+		host: process.env.HOST_EMAIL, // email through smtp gmail server
 		port: port,
 		secure: true, // use SSL (with port 465)
 		requireTLS: true,
 		auth: {
-			user: process.env.SMTP_USERNAME,
-			pass: process.env.SMTP_PASSWORD,
+			user: process.env.EMAIL,  	// Vision email address
+			pass: process.env.PASSWORD, // Vision email password
 		},
 	});
-
-	console.log("verifying transporter...");
-	// verify connection
-	/*
-	transporter.verify(function (error, success) {
-		if (error) {
-			console.log(error);
-		} else {
-			console.log("Server is ready to take our messages");
-		}
-	});
-	*/
 
 	// create unique password
 	const password = uuidv4();
@@ -96,8 +79,5 @@ export const sendEmail = async (event: SQSEvent, context: AWSLambda.Context): Pr
 
 	// log response
 	console.log("message sent! message id: ", info.messageId);
-};
-
-exports.handler = async (event: SQSEvent, context: AWSLambda.Context): Promise<any> => {
-	return await sendEmail(event, context);
+	return info; 
 };

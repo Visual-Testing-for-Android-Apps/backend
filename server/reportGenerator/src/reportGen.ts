@@ -3,6 +3,7 @@ import { S3 } from 'aws-sdk'
 import { pushToQueue, SendMessageRequest } from './service/dynamodbClient'
 import { getJob } from './service/dynamodbService'
 import { FileType, Job, JobStatus } from './service/jobModel'
+import { sendEmail } from './sendEmail'
 
 /**
  * Creates an object related to a given video issue
@@ -141,12 +142,11 @@ export const generateReport = async (event: SQSEvent, context: AWSLambda.Context
   await s3.upload(s3params).promise()
   console.log('JSON uploaded!')
 
-  // Add batch to email queue
-  const params: SendMessageRequest = {
-    MessageBody: '{ "jobKey": "' + String(key) + '" }',
-    QueueUrl: process.env.EMAIL_QUEUE as string
+  // request to send email
+  try {
+    await sendEmail(key);
+  } catch (error) {
+    throw Error(`failed to send results email for job: ${job.id}`);
   }
-  console.log('Adding to email queue...')
-  await pushToQueue(params)
-  console.log('Added to queue!')
+
 }
