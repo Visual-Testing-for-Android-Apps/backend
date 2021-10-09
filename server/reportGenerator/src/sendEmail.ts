@@ -68,7 +68,7 @@ export const sendEmail = async (key: string): Promise<any> => {
 	const info = await transporter.sendMail({
 		from: process.env.EMAIL,
 		to: recipientEmail,
-		subject: "<p>Vision Job Results</p>",
+		subject: "Vision Job Results",
 		text: "",
 		html:
 			'<p>Job Processing Complete. <br>Your <a href="' +
