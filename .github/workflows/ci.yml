@@ -31,7 +31,7 @@ jobs:
           # Regex to validate the branch name
           branch-name-regex: 'develop|[a-zA-Z0-9-_]+\/[a-zA-Z0-9-_]+\/[a-zA-Z0-9-_]+' # optional, default is .*
           # Min branch name length
-          branch-name-min-length: 10 # optional, default is 10
+          branch-name-min-length: 7 # optional, default is 10
           # Max branch name length
           branch-name-max-length: 72 # optional, default is 72
 
