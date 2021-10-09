@@ -52,14 +52,17 @@ const jobHandler = async (context: AWSLambda.Context, key: string): Promise<{ is
 	if (!job.emailVerified) {
 		throw Error(`job:${job.id} not verified`)
 	}
-	//Set the job status to processing, 
-	await updateJobStatus(key, JobStatus.PROCESSING)
-	// send email telling user job is processing
-	try {
-		await sendProcessingEmail(key);
-	} catch (error) {
-		throw Error(`failed to send processing email for job:${job.id}`);
+	if (job.jobStatus != JobStatus.PROCESSING) {
+		// send email telling user job is processing
+		try {
+			await sendProcessingEmail(key);
+		} catch (error) {
+			throw Error(`failed to send processing email for job:${job.id}`);
+		}
+		//Set the job status to processing
+		await updateJobStatus(key, JobStatus.PROCESSING)
 	}
+
 	await modelTrigger(context, job)
 	//The actual checking if all jobs are complete could be redundant, but leaving it in doesn't hurt anything
 	return { isCompleted: await isJobComplete(key) }

@@ -28,6 +28,9 @@
 		"@types/jest": "^27.0.1",
 		"@types/nodemailer": "^6.4.4",
 		"@types/uuid": "^8.3.1",
+		"@typescript-eslint/eslint-plugin": "^4.33.0",
+		"@typescript-eslint/parser": "^4.33.0",
+		"eslint": "^7.32.0",
 		"husky": "^7.0.2",
 		"lint-staged": "^11.1.1",
 		"npm-run-all": "^4.1.5",
@@ -37,7 +40,7 @@
 	},
 	"dependencies": {
 		"aws-sdk": "^2.978.0",
-		"axios": "^0.21.1",
+		"axios": "^0.21.4",
 		"axios-retry": "^3.1.9",
 		"crypto-secure-random-digit": "^1.0.9",
 		"dotenv": "^10.0.0",

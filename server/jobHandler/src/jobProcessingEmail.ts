@@ -42,39 +42,32 @@ export const sendProcessingEmail = async (key: string): Promise<any> => {
     // get job status
     const currJobStatus = await getJobStatus(key);
     
-    // check that job is processing or generating report
-    if (currJobStatus === "PROCESSING" || currJobStatus === "GENERATING") {
-
-        // create transport for email
-        console.log("creating transporter...");
-        const transporter = nodemailer.createTransport({
-			host: smtpEndpoint,
-			port: port,
-			secure: true, // use SSL (with port 465)
-			requireTLS: true,
-			auth: {
-				user: process.env.SMTP_USERNAME,
-				pass: process.env.SMTP_PASSWORD,
-			},
-        });
-        
-        // send email with defined transport object
-        console.log("sending email...");
-        const info = await transporter.sendMail({
-			from: process.env.EMAIL,
-			to: recipientEmail,
-			subject: "<p>Vision Job Status</p>",
-            text: "",
-            html:"<p>Hooray! Your Job is now processing.</p>" +
-            "<br><p>A report will be sent to you when finished.</p>",
-        });
-        
-        // log response
-        console.log("message sent! message id: ", info.messageId);
-        return info;
-
-    } else {
-        return null; 
-    }
+    // create transport for email
+    console.log("creating transporter...");
+    const transporter = nodemailer.createTransport({
+        host: smtpEndpoint,
+        port: port,
+        secure: true, // use SSL (with port 465)
+        requireTLS: true,
+        auth: {
+            user: process.env.SMTP_USERNAME,
+            pass: process.env.SMTP_PASSWORD,
+        },
+    });
+    
+    // send email with defined transport object
+    console.log("sending email...");
+    const info = await transporter.sendMail({
+        from: process.env.EMAIL,
+        to: recipientEmail,
+        subject: "<p>Vision Job Status</p>",
+        text: "",
+        html:"<p>Hooray! Your Job is now processing.</p>" +
+        "<br><p>A report will be sent to you when finished.</p>",
+    });
+    
+    // log response
+    console.log("message sent! message id: ", info.messageId);
+    return info;
 
 };
