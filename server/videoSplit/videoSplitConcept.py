@@ -1,18 +1,42 @@
 import cv2
 from skimage.metrics import structural_similarity
 from moviepy.video.io.ffmpeg_tools import ffmpeg_extract_subclip
-import math
+import os
 
-def video_split(filename):
+# Creates new directory for output files if no directory is set
+def create_new_target_directory(filename):
+    print(__file__)
+    os.makedirs(os.path.dirname(__file__) + "/" + os.path.basename(filename), exist_ok=True)
+    return os.path.dirname(__file__) + "/" + os.path.basename(filename) + "/"
+
+
+
+def video_split(filename, video_threshold = 0.9, image_threshold = 0.97, min_video_duration = 16, still_video_duration = 0.5, target_file_destination = False):
+    """Splits video into smaller videos and images.
+    
+    Parameters:
+        Mandatory:
+            filename (str): Name of file to be split
+
+        Optional:
+            video_threshold (int): Structural similarity must be lower than this to be considered a video. 
+                Values range from 0-1, with 1 being identical. Default = 0.9
+            image_threshold (int): Structural similarity must be higher than this to be considered an image. 
+                Values range from 0-1, with 1 being identical. Default = 0.97
+            min_video_duration (int): Minimum number of frames per video. Default = 16
+            still_video_duration (int): Number of seconds of unchanging video to extract an image. Default = 0.5
+            target_file_destination (str): target directory for output videos and images. Default = new directory created in the same directory as this file    
+    """
     # Define constants
-    start_frame = 2                         # Start frame to check video
-    ssim_transition_threshold = 0.9         # Ceiling for when the frames change enough to record a video
-    ssim_stable_threshold = 0.97            # Floor for when the frames stay constant enough to process an image
-    split_video_min_duration = 16           # Minimum number of frames per video
-    change_buffer = 1                       # Number of frames prior to the transition included in the video
-    repeat_video_buffer = 5                 # Number of frames between each video
-    still_video_duration = 0.5              # Number of seconds video has to remain stable to output an image
-    target_file_destination = "./server/videoSplit/"  # target directory for output files
+    start_frame = 2                                 # Start frame to check video
+    ssim_transition_threshold = video_threshold     # Ceiling for when the frames change enough to record a video
+    ssim_stable_threshold = image_threshold         # Floor for when the frames stay constant enough to process an image
+    split_video_min_duration = min_video_duration   # Minimum number of frames per video
+    change_buffer = 1                               # Number of frames prior to the transition included in the video
+    still_video_duration = 0.5                      # Number of seconds video has to remain stable to output an image
+    
+    if not target_file_destination:
+        target_file_destination = create_new_target_directory(filename)  # target directory for output files
 
     # Open video
     cap = cv2.VideoCapture(filename)
@@ -117,8 +141,6 @@ def video_split(filename):
     else:
         current_video_frames.append((first_transition_frame - change_buffer, first_transition_frame + split_video_min_duration - change_buffer))
 
-    print(current_video_frames)
-
     # Extract individual image frames from video
     for frames in current_image_frames:
         cv2.imwrite(target_file_destination + str(round(frames[1]/frames_per_second)) + ".jpg", frames[0])
@@ -130,6 +152,3 @@ def video_split(filename):
     for frames in current_video_frames:
         ffmpeg_extract_subclip(filename, frames[0]/frames_per_second, frames[1]/frames_per_second, targetname = target_file_destination + str(round(frames[0]/frames_per_second)) + "-" + str(round(frames[1]/frames_per_second)) + ".mp4")
 
-
-
-video_split('./server/videoSplit/test2.mp4')
