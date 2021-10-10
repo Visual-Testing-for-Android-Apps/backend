@@ -61,6 +61,7 @@ def video_split(filename):
 
             if current_video_split == False:
                 
+                # Add previous video to current_video_frames
                 # Check length of transition video
                 if last_transition_frame - first_transition_frame > split_video_min_duration:
                     # Add first and last frame tuple to array
@@ -69,20 +70,25 @@ def video_split(filename):
                     # Add video from first frame until the minimum video duration
                     current_video_frames.append((first_transition_frame - change_buffer, first_transition_frame + split_video_min_duration - change_buffer))
 
-
+                # Check to help remove double up videos
                 if count > last_included_frame:
                     current_video_split = True
                     first_transition_frame = count              
-                
+
+            # Set the current final frame of the video to the current frame    
             else:
                 last_transition_frame = count
+            
+            # Set the final included frame for the function to the current frame
             last_included_frame = count
         else:
             current_video_split = False
 
         
+        # Check if ssim is over the threshold to be considered an image
         if (ssim > ssim_stable_threshold):
             if current_image_split == False:
+                # Attempts to extract the previous included frame in a video to ensure multiple of the same images do not get extracted
                 try:
                     if last_included_frame > current_image_frames[-1][1]:
                         current_image_split = True
@@ -91,16 +97,21 @@ def video_split(filename):
                     current_image_split = True
                     image_length_check_frame = count
             else:
+
+                # Check if the video has been still for enough time
                 if count - image_length_check_frame > still_video_duration * frames_per_second:
                     current_image_frames.append((current_frame, count))
                     current_image_split = False
         else:
             current_image_split = False
 
-
+        # Extract previous frame for comparison
         previous_frame = current_frame
+        
+        # Iterate loop
         count += 1
 
+    # Include final video
     if last_transition_frame - first_transition_frame > split_video_min_duration:
         current_video_frames.append((first_transition_frame, last_transition_frame))
     else:
@@ -108,11 +119,14 @@ def video_split(filename):
 
     print(current_video_frames)
 
+    # Extract individual image frames from video
     for frames in current_image_frames:
         cv2.imwrite(target_file_destination + str(round(frames[1]/frames_per_second)) + ".jpg", frames[0])
 
+    # Remove first video as it is included by default from the function and is unwanted
     current_video_frames.pop(0)
 
+    # Extract smaller videos from uploaded video
     for frames in current_video_frames:
         ffmpeg_extract_subclip(filename, frames[0]/frames_per_second, frames[1]/frames_per_second, targetname = target_file_destination + str(round(frames[0]/frames_per_second)) + "-" + str(round(frames[1]/frames_per_second)) + ".mp4")
 
