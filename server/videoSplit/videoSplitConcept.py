@@ -3,56 +3,119 @@ from skimage.metrics import structural_similarity
 from moviepy.video.io.ffmpeg_tools import ffmpeg_extract_subclip
 import math
 
-filename = './server/videoSplit/testVideo.mp4'
-cap = cv2.VideoCapture(filename)
+def video_split(filename):
+    # Define constants
+    start_frame = 2                         # Start frame to check video
+    ssim_transition_threshold = 0.9         # Ceiling for when the frames change enough to record a video
+    ssim_stable_threshold = 0.97            # Floor for when the frames stay constant enough to process an image
+    split_video_min_duration = 16           # Minimum number of frames per video
+    change_buffer = 1                       # Number of frames prior to the transition included in the video
+    repeat_video_buffer = 5                 # Number of frames between each video
+    still_video_duration = 0.5              # Number of seconds video has to remain stable to output an image
+    target_file_destination = "./server/videoSplit/"  # target directory for output files
 
-frames_per_second = int(cap.get(cv2.CAP_PROP_FPS))
-frame_width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
-frame_height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
-number_of_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+    # Open video
+    cap = cv2.VideoCapture(filename)
+
+    # Record metrics about the video
+    frames_per_second = int(cap.get(cv2.CAP_PROP_FPS))
+    frame_width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+    frame_height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+    number_of_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
 
 
-print(frames_per_second)
-print(frame_width)
-print(frame_height)
-print(number_of_frames)
-count = 2
+    # Output image metrics
+    print(frames_per_second)
+    print(frame_width)
+    print(frame_height)
+    print(number_of_frames)
+    
+    # Loop condition
+    count = start_frame
 
-ret, previous_frame = cap.read()
+    # Get the first frame
+    _, previous_frame = cap.read()
 
-current_image_splits = []
-current_split = False
-last_included_frame = 0
-first_transition_frame = 0
-last_transition_frame = 0
+    # Definitions for loop
+    current_image_frames = []           # Array of individual frames to be passed into OwlEyes
+    current_video_frames = []           # Array of tuples of start and end frames to be passed into Seenomaly
+    current_video_split = False         # Condition on whether a video is currently being split
+    current_image_split = False         # Condition on whether an image is currently being split
+    last_included_frame = 0             # Previous included frame for either video or image
+    first_transition_frame = 0          # First frame of created video
+    last_transition_frame = 0           # Last frame of created video
+    image_length_check_frame = 0        # First frame for checking if the video is stable for long enough to output an image
 
-while (count != number_of_frames - 7):
-    ret, current_frame = cap.read()
-    ssim = structural_similarity(current_frame, previous_frame, multichannel=True)
+    # Loop to read in frames, compare their similarity, and divide into images and videos
+    while (count != number_of_frames - split_video_min_duration + change_buffer):
+        
+        # Read in current frame
+        _, current_frame = cap.read()
 
-    if (ssim < 0.7 and current_split == False):
-        if count - last_included_frame > 5:
-            if last_transition_frame - first_transition_frame > 8:
-                current_image_splits.append((first_transition_frame, last_transition_frame))
+        # Measure similarity between current frame and previous frame
+        # multichannel = True indicates that the frames have colour
+        ssim = structural_similarity(current_frame, previous_frame, multichannel=True)
+
+        # Check if the similarity is under the threshold to be considered a transition
+        if (ssim < ssim_transition_threshold):
+
+            if current_video_split == False:
+                
+                # Check length of transition video
+                if last_transition_frame - first_transition_frame > split_video_min_duration:
+                    # Add first and last frame tuple to array
+                    current_video_frames.append((first_transition_frame, last_transition_frame))
+                else:
+                    # Add video from first frame until the minimum video duration
+                    current_video_frames.append((first_transition_frame - change_buffer, first_transition_frame + split_video_min_duration - change_buffer))
+
+
+                if count > last_included_frame:
+                    current_video_split = True
+                    first_transition_frame = count              
+                
             else:
-                current_image_splits.append((first_transition_frame - 1, first_transition_frame + 7))
-            first_transition_frame = count
-            current_split = True
+                last_transition_frame = count
+            last_included_frame = count
         else:
-            last_transition_frame = count
-        last_included_frame = count
+            current_video_split = False
+
+        
+        if (ssim > ssim_stable_threshold):
+            if current_image_split == False:
+                try:
+                    if last_included_frame > current_image_frames[-1][1]:
+                        current_image_split = True
+                        image_length_check_frame = count
+                except:
+                    current_image_split = True
+                    image_length_check_frame = count
+            else:
+                if count - image_length_check_frame > still_video_duration * frames_per_second:
+                    current_image_frames.append((current_frame, count))
+                    current_image_split = False
+        else:
+            current_image_split = False
+
+
+        previous_frame = current_frame
+        count += 1
+
+    if last_transition_frame - first_transition_frame > split_video_min_duration:
+        current_video_frames.append((first_transition_frame, last_transition_frame))
     else:
-        current_split = False
+        current_video_frames.append((first_transition_frame - change_buffer, first_transition_frame + split_video_min_duration - change_buffer))
 
-    previous_frame = current_frame
-    count += 1
+    print(current_video_frames)
 
-if last_transition_frame - first_transition_frame > 8:
-    current_image_splits.append((first_transition_frame, last_transition_frame))
-else:
-    current_image_splits.append((first_transition_frame - 1, first_transition_frame + 7))
+    for frames in current_image_frames:
+        cv2.imwrite(target_file_destination + str(round(frames[1]/frames_per_second)) + ".jpg", frames[0])
 
-current_image_splits.pop(0)
+    current_video_frames.pop(0)
 
-for frames in current_image_splits:
-    ffmpeg_extract_subclip(filename, frames[0]/frames_per_second, frames[1]/frames_per_second, targetname = "./server/videoSplit/" + str(math.floor(frames[0]/frames_per_second)) + "-" + str(math.ceil(frames[1]/frames_per_second)) + ".mp4")
+    for frames in current_video_frames:
+        ffmpeg_extract_subclip(filename, frames[0]/frames_per_second, frames[1]/frames_per_second, targetname = target_file_destination + str(round(frames[0]/frames_per_second)) + "-" + str(round(frames[1]/frames_per_second)) + ".mp4")
+
+
+
+video_split('./server/videoSplit/test2.mp4')
