@@ -164,6 +164,39 @@ Resources:
             Queue: !GetAtt FileZipQueue.Arn
             BatchSize: 1
 
+  PeriodicFileRemoval:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: periodicFileRemoval/
+      Handler: app.lambda_handler
+      Runtime: python3.8
+      Timeout: 10
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - Version: 2012-10-17
+          Statement:
+            - Action: dynamodb:*
+              Effect: Allow
+              Resource:
+                - !GetAtt JobTable.Arn
+            - Action: cloudwatch:PutMetricData
+              Effect: Allow
+              Resource: "*"
+            - Action:
+                - sqs:*
+              Effect: Allow
+              Resource: "*"
+            - Action: s3:*
+              Effect: Allow
+              Resource:
+                - !Sub arn:aws:s3:::${SrcBucket}/*
+                - !Sub arn:aws:s3:::${SrcBucket}
+      Environment:
+        Variables:
+          JOB_TABLE: !Ref JobTable
+          SRC_BUCKET: !Ref SrcBucket
+    #No Queue required as this is intended to be triggered manually
+
   SendEmail:
     Type: AWS::Serverless::Function
     Properties:
