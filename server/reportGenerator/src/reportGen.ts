@@ -1,6 +1,5 @@
 import { SQSEvent } from 'aws-lambda'
 import { S3 } from 'aws-sdk'
-import { pushToQueue, SendMessageRequest } from './service/dynamodbClient'
 import { getJob } from './service/dynamodbService'
 import { FileType, Job, JobStatus } from './service/jobModel'
 import { sendEmail } from './sendEmail'
@@ -143,10 +142,5 @@ export const generateReport = async (event: SQSEvent, context: AWSLambda.Context
   console.log('JSON uploaded!')
 
   // request to send email
-  try {
-    await sendEmail(key);
-  } catch (error) {
-    throw Error(`failed to send results email for job: ${job.id}`);
-  }
-
+  await sendEmail(key)
 }

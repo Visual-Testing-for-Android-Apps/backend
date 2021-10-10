@@ -198,6 +198,8 @@ Resources:
           # Make names accessible as environment variable from function code during execution
           JOB_TABLE: !Ref JobTable
           SRC_BUCKET: !Ref SrcBucket
+          HOST_EMAIL: smtp.gmail.com
+          EMAIL: vision.report.response@gmail.com
       Events:
         # Specifies the event that trigger this function.
         SQSQueueEvent:
