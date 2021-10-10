@@ -184,7 +184,8 @@ def preprocess_image(img, heatmap=False):
     imgs_data = torch.stack(imgs_data)
     if heatmap:  # for heatmap model
         input = Variable(imgs_data, requires_grad=True)
-        return input
+        print("input",input)
+        return input[:3] # trime to 3 channels 
     else:  # for other model
         return imgs_data
 
