@@ -28,7 +28,7 @@ POST /job/upload-request
     "jobID" : "jobId"
 }
 ```
-📧 At this point, you will receive a verification code in your email. However for now, the email service is in sendbox mode, can't send email to unverified email address. Let me (Rebecca) know if you want to be verified.  All verification codes are 6 digit numbers. You can still use unverified email for submiting jobs, then the verification is just skipped. 
+~~📧 At this point, you will receive a verification code in your email. However for now, the email service is in sendbox mode, can't send email to unverified email address. Let me (Rebecca) know if you want to be verified.  All verification codes are 6 digit numbers. You can still use unverified email for submiting jobs, then the verification is just skipped.~~
 
 
 🔵 2. (for each file) Send a PUT request on the preSigned URL with file
@@ -37,9 +37,8 @@ PUT {uploadUrl returned from step 1}
 ```
 
 
-(skipped ) 3. After the user entered the verification code 
-missing verification only prevent the models to process the file, it doesn't stop you to upload.
-Verification code expires in 500 seconds (can be adjusted)
+~~(skipped) 3. After the user entered the verification code 
+missing verification only prevent the models to process the file, it doesn't stop you to upload. Verification code expires in 500 seconds (can be adjusted)~~
 ```
 POST /job/verify-code
 // Sample request body
@@ -55,7 +54,7 @@ POST /job/verify-code
 }
 ```
 
-3.1 if user want to update their email (optional)
+~~3.1 if user want to update their email (optional)~~
 ```
 POST /job/update-email
 // Sample request body
@@ -65,7 +64,7 @@ POST /job/update-email
 }
 ```
 
-3.2 resend verification code (optional)
+~~3.2 resend verification code (optional)~~
 ```
 POST /job/resend-code
 // Sample request body

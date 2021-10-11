@@ -1,12 +1,11 @@
 import { SQSEvent } from "aws-lambda"
 
 import { isJobComplete } from "./isJobComplete.js"
+import { sendProcessingEmail } from "./jobProcessingEmail"
 import { getJob, updateJobStatus } from "./service/dynamodbService"
 import { JobStatus } from "./service/jobModel"
 import { modelTrigger } from "./service/modelTrigger"
 import { selfEnvoke } from "./service/sqsClient.js"
-import { sendProcessingEmail } from "./jobProcessingEmail";
-
 
 //Exports isJobComplete for use with AWS lambda
 export const handler = async (event: SQSEvent, context: AWSLambda.Context): Promise<void> => {
@@ -54,11 +53,9 @@ const jobHandler = async (context: AWSLambda.Context, key: string): Promise<{ is
 	}
 	if (job.jobStatus != JobStatus.PROCESSING) {
 		// send email telling user job is processing
-		try {
-			await sendProcessingEmail(key);
-		} catch (error) {
-			throw Error(`failed to send processing email for job:${job.id}`);
-		}
+	
+		await sendProcessingEmail(key);
+
 		//Set the job status to processing
 		await updateJobStatus(key, JobStatus.PROCESSING)
 	}

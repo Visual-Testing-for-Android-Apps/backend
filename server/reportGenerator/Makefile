@@ -9,6 +9,7 @@ build-ReportGenerator:
 ifeq ($(OS),Windows_NT)
 	Xcopy /E * "$(ARTIFACTS_DIR)"
 else
-	cp -r dist "$(ARTIFACTS_DIR)/"
+	cp -R dist "$(ARTIFACTS_DIR)/"
+	cp -R node_modules "$(ARTIFACTS_DIR)/"
 	
 endif
