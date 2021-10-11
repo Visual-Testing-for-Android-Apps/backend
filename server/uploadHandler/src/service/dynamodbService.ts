@@ -12,7 +12,6 @@ import { EmailVerification, File, fileResult, Job } from "../service/jobModel"
 import { getItem, putItem, updateItem } from "./dynamodbClient"
 
 const tableName = process.env.JOB_TABLE as string;
-const mappingTableName = process.env.MAPPING_TABLE as string
 
 export const getJob = async (id:string): Promise<Job> => {
 	const getItemInput: GetItemInput = {
