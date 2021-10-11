@@ -163,7 +163,6 @@ Resources:
   #         # Make table name accessible as environment variable from function code during execution
   #         JOB_TABLE: !Ref JobTable
   #         SRC_BUCKET: !Ref SrcBucket
-  #         EMAIL_QUEUE: !Ref SendEmailQueue
   #     Events:
   #       SQSQueueEvent:
   #         Type: SQS
