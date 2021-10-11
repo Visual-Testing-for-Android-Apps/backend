@@ -1,10 +1,11 @@
-import { SQSEvent } from "aws-lambda";
-import { getItem, GetItemInput } from "./service/dynamodbClient";
-import { AttributeMap } from "aws-sdk/clients/dynamodb";
+import { AttributeMap } from "aws-sdk/clients/dynamodb"
+import * as dotenv from "dotenv"
+import * as nodemailer from "nodemailer"
+import { v4 as uuidv4 } from "uuid"
+
+import { getItem, GetItemInput } from "./service/dynamodbClient"
 import { addPasswordToJob, getEmail } from "./service/dynamodbService"
-import { v4 as uuidv4 } from "uuid";
-import * as nodemailer from "nodemailer";
-import * as dotenv from "dotenv";
+
 dotenv.config();
 //const nodemailer = require("nodemailer");
 
@@ -78,6 +79,9 @@ export const sendEmail = async (key: string): Promise<any> => {
 	});
 
 	// log response
-	console.log("message sent! message id: ", info.messageId);
+	console.log("message sent! message id: ", {
+	...info, 
+	recipientEmail,
+	});
 	return info; 
 };
