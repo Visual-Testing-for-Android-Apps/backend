@@ -10,7 +10,7 @@ import {
 const ses = new SES();
 const EXPIRE_DURATION  = 500; // in seconds
 const isProd = process.env['IS_PROD'] === "true"
-
+const comm = process.env['NO_COMM'] === "false"
 export const handleNewEmailSes = async (jobID:string ,emailAddress:string) => {
     const verificationCode = randomDigits(6).join('');
     Promise.all([
@@ -81,15 +81,8 @@ const sendVerificationCodeEmail = async (emailAddress: string, verificationCode:
         },
         Source: process.env.SES_FROM_ADDRESS!
     };
-    if (!isProd){
-        //  catch email validation error if not in production environment
-        console.log("sending verification code...")
-        try{
-            await ses.sendEmail(params).promise();
-        }catch (e) {
-            console.log(JSON.stringify(e))
-        }
-        return 
+    console.log("sending verification code...")
+    if (comm) {
+        await ses.sendEmail(params).promise();
     }
-    await ses.sendEmail(params).promise();
 }
