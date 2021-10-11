@@ -29,15 +29,15 @@ export const handler = async (event: ApiGatewayEvent): Promise<ApiGatewayRespons
 	try {
 		switch (event.path){
 			case "/job/upload-request":
-				return newJobHandler(event)
+				return await newJobHandler(event)
 			case "/job/update-email":
-				return updateEmailHandler(event)
+				return await updateEmailHandler(event)
 			case "/job/resend-code":
-				return resendCodeHandler(event)
+				return await resendCodeHandler(event)
 			case "/job/upload-done":
-				return uploadDoneHandler(event)
+				return await uploadDoneHandler(event)
 			case "/job/verify-code":
-				return verifyCodeHandler(event)
+				return await verifyCodeHandler(event)
 			default:
 				return {
 					statusCode: 404,
@@ -49,7 +49,7 @@ export const handler = async (event: ApiGatewayEvent): Promise<ApiGatewayRespons
 				}
 		}
 	} catch (e) {
-		console.log(e);
+		console.error(e);
 		return {
 			statusCode: 502,
 			headers: CORS_HEADER,
@@ -95,7 +95,7 @@ const resendCodeHandler = async (event:ApiGatewayEvent): Promise<ApiGatewayRespo
 	const parsedBody = JSON.parse(event.body);
 	const jobID = parsedBody["jobID"];
 	if (!jobID){
-		throw Error("No jobID or new email provided");
+		throw Error("No jobID provided");
 	}
 
 	const email = await getEmail(jobID)

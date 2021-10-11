@@ -5,6 +5,7 @@ export interface Job {
 	files: File[];
 	emailVerified: boolean;
 	jobStatus: string;
+	password: string;
 }
 
 export interface File {

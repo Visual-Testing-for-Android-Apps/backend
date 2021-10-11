@@ -26,17 +26,15 @@ export const getDownloadURL = async (key: string): Promise<string> => {
 	return await s3bucket.getSignedUrlPromise("getObject", s3Params);
 };
 
-export const uploadBase64EncodedImage = async (image_str: string, fileKey: string) => {
-	console.log(image_str);
-	const buf = Buffer.from(image_str, 'base64')
+export const uploadBase64EncodedImage = async (image_str:string, fileKey:string) =>{
+	const buf = Buffer.from(image_str,'base64')
 	const data = {
-		Key: fileKey,
+		Key: fileKey, 
 		Body: buf,
 		Bucket: BUCKET_NAME,
-		ContentEncoding: 'base64',
 		ContentType: 'image/jpeg'
 	} as PutObjectRequest
 	console.log(JSON.stringify(data))
-	await s3bucket.putObject(data)
-	console.log('successfully uploaded the image!', buf);
+	const ret = await s3bucket.putObject(data).promise()
+	console.log('successfully uploaded the image!', ret);
 }

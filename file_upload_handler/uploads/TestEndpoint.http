@@ -1,70 +1,45 @@
-POST https://knfxd86hz7.execute-api.ap-southeast-2.amazonaws.com/Prod/job HTTP/1.1
-content-type: application/json
 
-{
-    "name": "sample",
-    "time": "Wed, 21 Oct 2015 18:27:50 GMT",
-    "time2": "{{$localDatetime iso8601}}"
-}
-
-###
-
-POST http://127.0.0.1:3000/job HTTP/1.1
-content-type: application/json
-
-{
-    "name": "sample",
-    "time": "Wed, 21 Oct 2015 18:27:50 GMT",
-    "time2": "{{$localDatetime iso8601}}"
-}
-
-
-###
-
-
+@root_url = https://knfxd86hz7.execute-api.ap-southeast-2.amazonaws.com/Prod/
+//@root_url = https://2fr7fj3ota.execute-api.ap-southeast-2.amazonaws.com/Prod/job/
 
 
 ### request upload 
-POST https://knfxd86hz7.execute-api.ap-southeast-2.amazonaws.com/Prod/job/upload-request HTTP/1.1
+POST {{root_url}}/job/upload-request HTTP/1.1
 content-type: application/json
 
 {"email": "beining0026@gmail.com","fileNames":["test_instagram.mp4","test.jpg"]}
 
+
+### send verification code
+POST {{root_url}}/job/verify-code HTTP/1.1
+content-type: application/json
+
+{"jobID": "98a28539-1346-49d6-96af-496850deb006","verificationCode":"276931"}
+
+### update email
+POST {{root_url}}/job/update-email HTTP/1.1
+content-type: application/json
+
+{"jobID": "dca52485-50a2-4817-bd14-ece6ed6648a5","email":"beining0026@gmail.com"}
+
 ### resend code
-POST https://knfxd86hz7.execute-api.ap-southeast-2.amazonaws.com/Prod/job/resend-code HTTP/1.1
+POST {{root_url}}/job/resend-code HTTP/1.1
 content-type: application/json
 
 {"jobID": "08a4e002-37b0-4a94-89ae-cd0551099dd0"}
 
 
-### check verification code
-POST https://knfxd86hz7.execute-api.ap-southeast-2.amazonaws.com/Prod/job/verify-code HTTP/1.1
-content-type: application/json
-
-{"jobID": "08a4e002-37b0-4a94-89ae-cd0551099dd0","verificationCode":"276931"}
-
-
 ### upload completion
-POST https://2fr7fj3ota.execute-api.ap-southeast-2.amazonaws.com/Prod/job/upload-done HTTP/1.1
+POST {{root_url}}/job/upload-done HTTP/1.1
 content-type: application/json
 
-{"jobID2":"30ecd6ed-78ab-40d6-b3cd-79c2e3c4922e"}
+{"jobID2":"98a28539-1346-49d6-96af-496850deb006"}
 
 ### update email
 
-POST https://knfxd86hz7.execute-api.ap-southeast-2.amazonaws.com/Prod/job/update-email HTTP/1.1
+POST {{root_url}}/job/update-email HTTP/1.1
 content-type: application/json
 
 {"jobID": "1c2209d5-1ca6-42c7-a800-0eb80ac9ed84","email":"bche0026@studnet.monash.edu"}
 
-### 
 
-GET https://visual-testing-backend-v2-srcbucket-p3rsmcrs75qa.s3.ap-southeast-2.amazonaws.com/c800565d-3aca-4d2c-bc44-0fdb1cfa41d0/1665416.mp4?AWSAccessKeyId=ASIAYDHTZUBQZKW7ONMH&Expires=1631786366&Signature=Vz1Z3mk1XL8kxX%2FLknt%2FZ1peiRs%3D&x-amz-security-token=IQoJb3JpZ2luX2VjEBoaDmFwLXNvdXRoZWFzdC0yIkYwRAIgI0vY4mv%2FlGXMgVMaXmjeYOZXgVk9mqrU73EHo0oQeX4CICgPBOBs6uz7%2Bzp9v%2BnMRzUMLuKwHTS%2FLhoq5o7oY1WWKrkCCHMQARoMNTU2NzA5NTUyMjI1Igy%2B%2Bv9Po0BQzO8PNfUqlgK%2FNLsdDThpdnMw0u0IK3ejcs7E4AFURDU6o%2F8%2B2Vm9Fl%2FCs4f69nVvk2GzfInZ26V%2FhVsXTL7StmuXeoo8KbuPPInKfhJh3JYhF2my1zzqEqo%2FGSeUEiQVHEwhxMyxWEf6MPNMkYIpnIa8pUMSmNhoMj%2FhHtl3RLvBs%2FySZSRokCEAO6nzlCIQJs2kPvEEcac4DXMtL5kkjDV8cRVovag9KTMT5D%2F5pRBENomHXSCjdn4fO3QsnrpMtdJCj4AkWNXOXJj%2BOEDTTCN6Go04fd5pp3qZmLdI6UruZyeY2CApeoZBqu9oVj%2FrbUrHQIahu5KASYEqG3sOJFAtI8oI62i0EkLx1UW%2B1T0JANf5SZ4UYA77YYY1sDDQqIyKBjqbAUOC70PFSi2%2Bq3TjtXjFVcjUBPZvpB7sHuaxFmsuRWGwfhS3AlALNW%2Fi8M49yzhR7jLm6CRMdEXZE28YQ1YxroV4jApZfsFMYbGK4q54BqMoS2BOJv6d3ZVVHdC%2BVj60pYjeK4eTaRLZJmNW4bMscg3DCwmtaKS67fEmW%2Ft019NGOQ2XAldkQnxeWoTUZfOhAl4ghkf8vlmvYwfS
-
-
-
-### 
-POST https://2fr7fj3ota.execute-api.ap-southeast-2.amazonaws.com/Prod/job HTTP/1.1
-content-type: application/json
-
-{"email": "beining0026@gmail.com","fileNames":["test_instagram.mp4","test.jpg"]}

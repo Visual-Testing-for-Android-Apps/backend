@@ -31,13 +31,6 @@ export const updateJob = async (request: UpdateItemInput): Promise<any> => {
 export const isJobComplete = async (key: string): Promise<any> => {
 	//Job request object.
 	console.log("check is job Complete ... ")
-	const request: GetItemInput = {
-		TableName: process.env.JOB_TABLE as string,
-		Key: {
-			id: { S: key },
-		},
-	};
-
 	//Ready to be submitted for report generation
 	let ready = true;
 
@@ -58,5 +51,5 @@ export const isJobComplete = async (key: string): Promise<any> => {
 		return true;
 	}
 
-	return ready;
+	return false;
 };
