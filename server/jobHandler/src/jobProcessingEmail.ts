@@ -1,11 +1,11 @@
-import { getItem, GetItemInput } from "./service/dynamodbClient";
-import { AttributeMap } from "aws-sdk/clients/dynamodb";
+import { AttributeMap } from "aws-sdk/clients/dynamodb"
+import * as dotenv from "dotenv"
+import * as nodemailer from "nodemailer"
+
+import { getItem, GetItemInput } from "./service/dynamodbClient"
 import { getEmail, getJobStatus } from "./service/dynamodbService"
-import * as dotenv from "dotenv";
+
 dotenv.config(); // configure environment vars
-import * as nodemailer from "nodemailer";
-
-
 /**
  * Gets a job from the database.
  * @param request 
@@ -44,7 +44,7 @@ export const sendProcessingEmail = async (key: string): Promise<any> => {
     // create transport for email
     console.log("creating transporter...");
     const transporter = nodemailer.createTransport({
-        host: process.env.HOST_EMAIL,
+        host: "smtp.gmail.com",
         port: port,
         secure: true, // use SSL (with port 465)
         requireTLS: true,
