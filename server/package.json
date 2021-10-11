@@ -1,0 +1,56 @@
+{
+	"name": "visiondroid",
+	"version": "1.0.0",
+	"description": " Visual testing for android apps ",
+	"scripts": {
+		"compile-jobHandler": "cd jobHandler && npm install && npm run compile",
+		"compile-postProcessHandler": "cd postProcessHandler && npm install && npm run compile",
+		"compile-reportGenerator": "cd reportGenerator && npm install && npm run compile",
+		"compile-uploadHandler": "cd uploadHandler && npm install && npm run compile",
+		"compile-all": "npm-run-all --parallel compile-jobHandler compile-postProcessHandler compile-reportGenerator compile-uploadHandler",
+		"compile-and-deploy": "npm run compile-all && sam deploy",
+		"prepare": "husky install",
+		"pretty": "prettier --write --ignore-unknown \"**/*\""
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/Visual-Testing-for-Android-Apps/backend.git"
+	},
+	"author": "",
+	"license": "MIT",
+	"bugs": {
+		"url": "https://github.com/Visual-Testing-for-Android-Apps/backend/issues"
+	},
+	"homepage": "https://github.com/Visual-Testing-for-Android-Apps/backend#readme",
+	"devDependencies": {
+		"@types/aws-lambda": "^8.10.83",
+		"@types/jest": "^27.0.1",
+		"@types/nodemailer": "^6.4.4",
+		"@types/uuid": "^8.3.1",
+		"husky": "^7.0.1",
+		"lint-staged": "^11.1.1",
+		"npm-run-all": "^4.1.5",
+		"prettier": "^2.3.2",
+		"standard": "^16.0.3",
+		"ts-standard": "^10.0.0"
+	},
+	"dependencies": {
+		"aws-sdk": "^2.978.0",
+		"axios": "^0.21.1",
+		"axios-retry": "^3.1.9",
+		"crypto-secure-random-digit": "^1.0.9",
+		"dotenv": "^10.0.0",
+		"express": "^4.17.1",
+		"nodemailer": "^6.6.3",
+		"typescript": "^4.3.5"
+	},
+	"lint-staged": {
+		"**/*": "prettier --write --ignore-unknown",
+		"**/*.js": "standard --fix",
+		"**/*.ts": "ts-standard --fix"
+	},
+	"prettier": {
+		"printWidth": 100,
+		"useTabs": true
+	}
+}

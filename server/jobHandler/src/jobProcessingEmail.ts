@@ -20,12 +20,12 @@ export const awaitJob = async (request: GetItemInput): Promise<AttributeMap | nu
 
 /**
  * Sends an email to the user telling them that their job is processing.
- * @param key job key to be accessed from db
+ * @param key job key to get job details from DB
  */
 export const sendProcessingEmail = async (key: string): Promise<any> => {
+
     console.log("attempting to send job processing email...");
-    const smtpEndpoint = process.env.SMTP_EMAIL; // aws email endpoint email
-    const port = 465;
+    const port = 465;   // port connecting to the SMTP server.
 
 	// make request for DB info using job key, store in request
 	const request: GetItemInput = {
@@ -37,21 +37,20 @@ export const sendProcessingEmail = async (key: string): Promise<any> => {
 
     // make request, store result in res
     const res = await awaitJob(request);
+    
     // get user email 
     const recipientEmail = await getEmail(key); 
-    // get job status
-    const currJobStatus = await getJobStatus(key);
     
     // create transport for email
     console.log("creating transporter...");
     const transporter = nodemailer.createTransport({
-        host: smtpEndpoint,
+        host: process.env.HOST_EMAIL,
         port: port,
         secure: true, // use SSL (with port 465)
         requireTLS: true,
         auth: {
-            user: process.env.SMTP_USERNAME,
-            pass: process.env.SMTP_PASSWORD,
+            user: process.env.EMAIL,
+            pass: process.env.PASSWORD,
         },
     });
     
@@ -60,7 +59,7 @@ export const sendProcessingEmail = async (key: string): Promise<any> => {
     const info = await transporter.sendMail({
         from: process.env.EMAIL,
         to: recipientEmail,
-        subject: "<p>Vision Job Status</p>",
+        subject: "Vision Job Status",
         text: "",
         html:"<p>Hooray! Your Job is now processing.</p>" +
         "<br><p>A report will be sent to you when finished.</p>",

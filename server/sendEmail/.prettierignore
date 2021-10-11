@@ -1,7 +1,0 @@
-.cache/
-package-lock.json
-package.json
-target/
-README.md
-node_modules/
-Makefile

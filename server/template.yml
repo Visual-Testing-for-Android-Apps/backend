@@ -69,7 +69,7 @@ Resources:
           # Make table name accessible as environment variable from function code during execution
           JOB_TABLE: !Ref JobTable
           SRC_BUCKET: !Ref SrcBucket
-          SES_FROM_ADDRESS: vtaa.report.response@gmail.com
+          SES_FROM_ADDRESS: vision.report.response@gmail.com
           IS_PROD: !Ref isProd
           JOB_HANDLER_QUEUE: !Ref JobHandlerQueue
       Events:
@@ -156,51 +156,12 @@ Resources:
           # Make table name accessible as environment variable from function code during execution
           JOB_TABLE: !Ref JobTable
           SRC_BUCKET: !Ref SrcBucket
-          EMAIL_QUEUE: !Ref SendEmailQueue
       Events:
         SQSQueueEvent:
           Type: SQS
           Properties:
             Queue: !GetAtt FileZipQueue.Arn
             BatchSize: 1
-
-  SendEmail:
-    Type: AWS::Serverless::Function
-    Properties:
-      CodeUri: sendEmail/
-      Handler: dist/index.sendEmail
-      Runtime: nodejs12.x
-      Description: Endpoint for sending email with results to users
-      Policies:
-        - AWSLambdaBasicExecutionRole
-        - Version: 2012-10-17
-          Statement:
-            - Action: dynamodb:*
-              Effect: Allow
-              Resource:
-                - !GetAtt JobTable.Arn
-            - Action: cloudwatch:PutMetricData
-              Effect: Allow
-              Resource: "*"
-            - Action:
-                - sqs:*
-              Effect: Allow
-              Resource: "*"
-            - Action: s3:*
-              Effect: Allow
-              Resource:
-                - !Sub arn:aws:s3:::${SrcBucket}/*
-                - !Sub arn:aws:s3:::${SrcBucket}
-      Environment:
-        Variables:
-          # Make table name accessible as environment variable from function code during execution
-          JOB_TABLE: !Ref JobTable
-          SRC_BUCKET: !Ref SrcBucket
-      Events:
-        SQSQueueEvent:
-          Type: SQS
-          Properties:
-            Queue: !GetAtt SendEmailQueue.Arn
 
   ReportGenerator:
     Type: AWS::Serverless::Function
@@ -237,7 +198,8 @@ Resources:
           # Make names accessible as environment variable from function code during execution
           JOB_TABLE: !Ref JobTable
           SRC_BUCKET: !Ref SrcBucket
-          EMAIL_QUEUE: !Ref SendEmailQueue
+          HOST_EMAIL: smtp.gmail.com
+          EMAIL: vision.report.response@gmail.com
       Events:
         # Specifies the event that trigger this function.
         SQSQueueEvent:
@@ -305,12 +267,6 @@ Resources:
       VisibilityTimeout: 1000
     Type: AWS::SQS::Queue
 
-  SendEmailQueue:
-    Properties:
-      ReceiveMessageWaitTimeSeconds: 1
-      VisibilityTimeout: 1000
-    Type: AWS::SQS::Queue
-
   # DynamoDB table to store job information
   JobTable:
     Type: AWS::Serverless::SimpleTable
@@ -357,8 +313,6 @@ Outputs:
     Value: !Ref UploadHandler
   JobHandlerFuntion:
     Value: !Ref JobHandler
-  SendEmailFunction:
-    Value: !Ref SendEmail
   ReportGeneratorFunction:
     Value: !Ref ReportGenerator
   SrcBucket:
