@@ -28,6 +28,8 @@ Parameters:
       - true
       - false
     Default: true
+  emailPassword:
+    Type: String
 
 # Resources declares the AWS resources that you want to include in the stack
 # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/resources-section-structure.html
@@ -124,6 +126,8 @@ Resources:
           SRC_BUCKET: !Ref SrcBucket
           REPORT_GENERATION_QUEUE: !Ref ReportGenerationQueue
           JOB_HANDLER_QUEUE: !Ref JobHandlerQueue
+          EMAIL: vision.report.response@gmail.com
+          PASSWORD: !Ref emailPassword
       Events:
         SQSQueueEvent:
           Type: SQS
@@ -207,6 +211,7 @@ Resources:
           SRC_BUCKET: !Ref SrcBucket
           HOST_EMAIL: smtp.gmail.com
           EMAIL: vision.report.response@gmail.com
+          PASSWORD: !Ref emailPassword
       Events:
         # Specifies the event that trigger this function.
         SQSQueueEvent:
