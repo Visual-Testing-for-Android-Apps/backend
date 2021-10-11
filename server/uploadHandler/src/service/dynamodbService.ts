@@ -32,7 +32,7 @@ export const createNewJobItem = async ( id: string,email: string) => {
 			"id": { S: id },
 			"email": { S: email },
 			"createdAt": { S: new Date().toISOString() },
-			"emailVerified": {BOOL:true}
+			"emailVerified": {BOOL:true} // initalise to true since we don't do email verification
 		},
 	} as PutItemInput;
 	console.log("newJobItem",JSON.stringify(newJobItem))

@@ -22,6 +22,12 @@ Parameters:
       - true
       - false
     Default: false
+  noComm:
+    Type: String
+    AllowedValues:
+      - true
+      - false
+    Default: true
 
 # Resources declares the AWS resources that you want to include in the stack
 # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/resources-section-structure.html
@@ -71,6 +77,7 @@ Resources:
           SRC_BUCKET: !Ref SrcBucket
           SES_FROM_ADDRESS: vision.report.response@gmail.com
           IS_PROD: !Ref isProd
+          NO_COMM: !Ref noComm
           JOB_HANDLER_QUEUE: !Ref JobHandlerQueue
       Events:
         Api:
