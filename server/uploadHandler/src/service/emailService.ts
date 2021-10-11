@@ -1,4 +1,4 @@
-import { SES } from "aws-sdk"
+import { integer } from "aws-sdk/clients/cloudfront"
 import { randomDigits } from "crypto-secure-random-digit"
 
 import {
@@ -6,8 +6,9 @@ import {
   saveVerificationCode,
   updateEmailVerified,
 } from "./dynamodbService"
+import { FileType, Job } from "./jobModel"
+import { EmailOption, sendEmail } from "./nodemailerClient"
 
-const ses = new SES();
 const EXPIRE_DURATION  = 500; // in seconds
 const isProd = process.env['IS_PROD'] === "true"
 
@@ -59,37 +60,31 @@ export const checkVerificationCode = async (jobID:string, userVerificationCode:s
 
 
 const sendVerificationCodeEmail = async (emailAddress: string, verificationCode:string) => {
-    const params:  SES.SendEmailRequest= {
-        Destination: { ToAddresses: [emailAddress] },
-        Message: {
-            Body: {
-                Html: {
-                    Charset: 'UTF-8',
-                    Data: `<html><body><p>Thanks for verifying your ${emailAddress} account!</p>
-                            <p>your code is:</p>
-                           <h3>${verificationCode}</h3></body></html>`
-                },
-                Text: {
-                    Charset: 'UTF-8',
-                    Data: `Your secret login code: ${verificationCode}`
-                }
-            },
-            Subject: {
-                Charset: 'UTF-8',
-                Data: 'VVTA: verify your email'
-            }
-        },
-        Source: process.env.SES_FROM_ADDRESS!
-    };
-    if (!isProd){
-        //  catch email validation error if not in production environment
-        console.log("sending verification code...")
-        try{
-            await ses.sendEmail(params).promise();
-        }catch (e) {
-            console.log(JSON.stringify(e))
-        }
-        return 
+    const params: EmailOption = {
+        to: emailAddress,
+        text: `Your secret login code: ${verificationCode}`,
+        html: `<html><body><p>Thanks for verifying your ${emailAddress} account!</p>
+        <p>your code is:</p>
+       <h3>${verificationCode}</h3></body></html>`,
+        subject: 'VVTA: verify your email'
     }
-    await ses.sendEmail(params).promise();
+    await sendEmail(params);
 }
+
+export const emailJobReceived = async (job: Job) =>{
+    const videoFileCount = job.files.filter((file)=> file.type = FileType.VIDEO).length
+    const imageFileCount = job.files.filter((file)=> file.type = FileType.IMAGE).length
+    const params: EmailOption = {
+        to: job.email,
+        text: `Your visual testing job has been received`,
+        html: `<html><body>
+        <p>Your visual testing job has been received.<p>
+        <p>Your job contains <b>${videoFileCount}</b> video files and <b>${imageFileCount}</b> image files.<p>
+        <p>Thanks for using VISION, a visual bug detecting tool for Android apps</p>
+        </body></html>`,
+        subject: 'VISION: Upload Job Received'
+    }
+    await sendEmail(params);
+
+}
+

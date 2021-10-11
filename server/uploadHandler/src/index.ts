@@ -1,7 +1,11 @@
 import { createNewJob, FileUploadResponseBody } from "./createNewJob"
 import { ApiGatewayEvent, ApiGatewayResponse } from "./service/apigateway"
 import { getEmail, getJob, updateEmail } from "./service/dynamodbService"
-import { checkVerificationCode, handleNewEmailSes } from "./service/sesService"
+import {
+  checkVerificationCode,
+  emailJobReceived,
+  handleNewEmailSes,
+} from "./service/emailService"
 import { modelTiggerSqsEvent, sendMessage } from "./service/sqsClient"
 
 const CORS_HEADER = {
@@ -125,7 +129,11 @@ const uploadDoneHandler =  async (event:ApiGatewayEvent): Promise<ApiGatewayResp
 		throw Error("email not verified")
 	}
 	
+	// Send job to jobHandler 
 	await sendMessage({jobKey: jobID}, JOB_HANDLER_QUEUE);
+
+	// Send email to user for receiving the job
+	await emailJobReceived(job);
 
 	return {
 		statusCode: 200,

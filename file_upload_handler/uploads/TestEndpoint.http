@@ -21,10 +21,6 @@ content-type: application/json
 
 ###
 
-GET https://k10ddj41h3.execute-api.ap-southeast-2.amazonaws.com/test/uploads3 HTTP/1.1
-content-type: application/json
-
-{"email": "sample_email@gmail.com","jobID": "Wed, 21 Oct 2015 18:27:50 GMT"}
 
 
 
@@ -34,14 +30,18 @@ content-type: application/json
 
 {"email": "beining0026@gmail.com","fileNames":["test_instagram.mp4","test.jpg"]}
 
+### resend code
+POST https://knfxd86hz7.execute-api.ap-southeast-2.amazonaws.com/Prod/job/resend-code HTTP/1.1
+content-type: application/json
 
-PUT -> S3 
+{"jobID": "08a4e002-37b0-4a94-89ae-cd0551099dd0"}
 
-### request verification code
+
+### check verification code
 POST https://knfxd86hz7.execute-api.ap-southeast-2.amazonaws.com/Prod/job/verify-code HTTP/1.1
 content-type: application/json
 
-{"jobID": "30ecd6ed-78ab-40d6-b3cd-79c2e3c4922e","verificationCode":"276931"}
+{"jobID": "08a4e002-37b0-4a94-89ae-cd0551099dd0","verificationCode":"276931"}
 
 
 ### upload completion

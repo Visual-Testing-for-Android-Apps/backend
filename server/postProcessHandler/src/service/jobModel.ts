@@ -9,7 +9,7 @@ export interface file {
 	fileReference: string;
 	fileType: FileType;
 	finishTime: string;
-	fileStatus: FileStatus;
+	status: FileStatus;
 	resultCode: number;
 	resultFileReference: string;
 }

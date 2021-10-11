@@ -11,7 +11,8 @@
   "dependencies": {
     "dotenv": "^10.0.0",
     "esm": "^3.2.25",
-    "nodemailer": "^6.6.5"
+    "nodemailer": "^6.6.5",
+    "nodemailer-smtp-transport": "^2.7.4"
   },
   "type": "module"
 }

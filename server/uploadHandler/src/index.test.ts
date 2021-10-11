@@ -3,6 +3,7 @@ import { ApiGatewayEvent } from "./service/apigateway"
 import { createNewJobItem } from "./service/dynamodbService"
 
 jest.mock("./service/dynamodbService");
+jest.mock("./service/nodemailerClient")
 
 const mockAddNewJobToDb = createNewJobItem as jest.Mock;
 describe("main", () => {

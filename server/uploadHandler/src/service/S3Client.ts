@@ -17,13 +17,13 @@ export const uploadToS3 = (fileName: string, fileStream: string): Promise<any> =
 	return s3bucket.upload(params).promise();
 };
 
-export const getUploadURL = async (fileKey: string, fileExtension: string) => {
+export const getUploadURL = async (fileKey: string, fileContentType: string) => {
 	// Get signed URL from S3
 	const s3Params = {
 		Bucket: BUCKET_NAME,
 		Key: fileKey,
 		Expires: URL_EXPIRATION_SECONDS,
-		ContentType: getFileType(fileExtension),
+		ContentType: fileContentType,
 	};
 
 	const uploadURL = await s3bucket.getSignedUrlPromise("putObject", s3Params);

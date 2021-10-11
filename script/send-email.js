@@ -13,7 +13,7 @@ dotenv.config()
 
 const sendEmail = async (emailString, htmlResult)  => {
     
-    const hostname = "smtp.gmail.com";  // hostname to connect to
+    const hostname = "email-smtp.ap-southeast-2.amazonaws.com";  // hostname to connect to
     // console.log(process.env.EMAIL);
     console.log("password",process.env.EMAIL_PASSWORD);
     const transporter = nodemailer.createTransport({
@@ -42,7 +42,6 @@ const sendEmail = async (emailString, htmlResult)  => {
     // send email with define transport object
     // currently test email
     const info = await transporter.sendMail({
-        from: "vtaa.report.response@gmail.com",
         to: emailString,
         subject: "Vision Job Results",
         text: "",
@@ -51,8 +50,12 @@ const sendEmail = async (emailString, htmlResult)  => {
     }) // add callback to get response
     // log response
     console.log("message sent: %s", info.response);
+
     // inform front end email has been sent
 }
+
+
+
 
 sendEmail("beining0026@gmail.com", "https://www.google.com/");
 sendEmail("jeanne_chen@126.com", "https://www.google.com/");

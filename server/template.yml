@@ -40,7 +40,7 @@ Resources:
       Handler: dist/index.handler # TODO
       Runtime: nodejs12.x
       MemorySize: 128
-      Timeout: 100
+      Timeout: 200
       Description: Endpoint for uploading image and videos
       Policies:
         - AWSLambdaBasicExecutionRole
@@ -122,45 +122,45 @@ Resources:
             Queue: !GetAtt JobHandlerQueue.Arn
             BatchSize: 1
 
-  FileCompress:
-    Type: AWS::Serverless::Function
-    Properties:
-      CodeUri: fileCompress/
-      Handler: app.lambda_handler
-      Runtime: python3.8
-      Timeout: 10
-      Policies:
-        - AWSLambdaBasicExecutionRole
-        - Version: 2012-10-17
-          Statement:
-            - Action: dynamodb:*
-              Effect: Allow
-              Resource:
-                - !GetAtt JobTable.Arn
-            - Action: cloudwatch:PutMetricData
-              Effect: Allow
-              Resource: "*"
-            - Action:
-                - sqs:*
-              Effect: Allow
-              Resource: "*"
-            - Action: s3:*
-              Effect: Allow
-              Resource:
-                - !Sub arn:aws:s3:::${SrcBucket}/*
-                - !Sub arn:aws:s3:::${SrcBucket}
-      Environment:
-        Variables:
-          # Make table name accessible as environment variable from function code during execution
-          JOB_TABLE: !Ref JobTable
-          SRC_BUCKET: !Ref SrcBucket
-          EMAIL_QUEUE: !Ref SendEmailQueue
-      Events:
-        SQSQueueEvent:
-          Type: SQS
-          Properties:
-            Queue: !GetAtt FileZipQueue.Arn
-            BatchSize: 1
+  # FileCompress:
+  #   Type: AWS::Serverless::Function
+  #   Properties:
+  #     CodeUri: fileCompress/
+  #     Handler: app.lambda_handler
+  #     Runtime: python3.8
+  #     Timeout: 10
+  #     Policies:
+  #       - AWSLambdaBasicExecutionRole
+  #       - Version: 2012-10-17
+  #         Statement:
+  #           - Action: dynamodb:*
+  #             Effect: Allow
+  #             Resource:
+  #               - !GetAtt JobTable.Arn
+  #           - Action: cloudwatch:PutMetricData
+  #             Effect: Allow
+  #             Resource: "*"
+  #           - Action:
+  #               - sqs:*
+  #             Effect: Allow
+  #             Resource: "*"
+  #           - Action: s3:*
+  #             Effect: Allow
+  #             Resource:
+  #               - !Sub arn:aws:s3:::${SrcBucket}/*
+  #               - !Sub arn:aws:s3:::${SrcBucket}
+  #     Environment:
+  #       Variables:
+  #         # Make table name accessible as environment variable from function code during execution
+  #         JOB_TABLE: !Ref JobTable
+  #         SRC_BUCKET: !Ref SrcBucket
+  #         EMAIL_QUEUE: !Ref SendEmailQueue
+  #     Events:
+  #       SQSQueueEvent:
+  #         Type: SQS
+  #         Properties:
+  #           Queue: !GetAtt FileZipQueue.Arn
+  #           BatchSize: 1
 
   SendEmail:
     Type: AWS::Serverless::Function

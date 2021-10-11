@@ -12,7 +12,7 @@ export interface File {
 	orginalName:string;
 	type: string;
 	finishTime?: string;
-	fileStatus: FileStatus;
+	status: FileStatus;
 	resultCode?: number;
 	resultFileReference?: string;
 }
@@ -52,7 +52,7 @@ export const extensionToContentType: { [key:string] :string }  = {
 
 export const getFileType = (fileExtension:string):string => {
 	if (typeof extensionToContentType[fileExtension.toLowerCase()] == "undefined"){
-		throw Error("Invalid file extension");
+		throw Error(`Invalid file extension: ${fileExtension}`);
 	}
 	return extensionToContentType[fileExtension.toLowerCase()].split("/")[0] == "video"
 	? FileType.VIDEO : FileType.IMAGE

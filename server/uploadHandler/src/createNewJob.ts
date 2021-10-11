@@ -2,6 +2,7 @@
 import { v4 as uuidv4 } from "uuid"
 
 import { addFileToJob, createNewJobItem } from "./service/dynamodbService"
+import { handleNewEmailSes } from "./service/emailService"
 import {
   extensionToContentType,
   File,
@@ -9,7 +10,6 @@ import {
   getFileType,
 } from "./service/jobModel"
 import { getUploadURL } from "./service/S3Client"
-import { handleNewEmailSes } from "./service/sesService"
 
 export interface FileUploadResponseBody {
 	uploadUrls: {[key:string]:string};
