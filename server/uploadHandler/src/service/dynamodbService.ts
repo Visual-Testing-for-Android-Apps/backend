@@ -7,13 +7,12 @@ import {
   PutItemInput,
   UpdateItemInput,
 } from "aws-sdk/clients/dynamodb"
-import { table } from "console"
 
-import { EmailVerification, File, Job } from "../service/jobModel"
+import { EmailVerification, File, fileResult, Job } from "../service/jobModel"
 import { getItem, putItem, updateItem } from "./dynamodbClient"
 
 const tableName = process.env.JOB_TABLE as string;
-
+const mappingTableName = process.env.MAPPING_TABLE as string
 
 export const getJob = async (id:string): Promise<Job> => {
 	const getItemInput: GetItemInput = {
@@ -121,11 +120,6 @@ export const getEmail = async (id:string):Promise<string> => {
 	return Converter.unmarshall(ret.Item!).email;
 }
 
-export interface fileResult {
-	code?: string,
-	message: string,
-	outputKey?:string
-}
 
 export const saveFileProcessResult = async(jobID:string, fileIdx: integer, result:fileResult) =>{
 	const resultAtrr = Converter.marshall(result)
