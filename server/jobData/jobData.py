@@ -22,7 +22,7 @@ def getReportJson(event, context):
     TABLE_NAME = os.environ["JOB_TABLE"]
     BUCKET_NAME = os.environ["SRC_BUCKET"]
     LOOKUP_BATCH_ID = linkId # may lookup batch job id in another table using linkId for extra security
-    PRESIGNED_LINK_DURATION = 60*5 # 5 minutes in seconds
+    PRESIGNED_LINK_DURATION = 60*30 # 30 minutes in seconds
 
     # fetch from database
     table = boto3.resource("dynamodb").Table(TABLE_NAME)
