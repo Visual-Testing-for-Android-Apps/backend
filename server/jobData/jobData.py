@@ -2,6 +2,13 @@ import os
 import boto3
 import json
 
+CORS_HEADER = {
+	"Access-Control-Allow-Headers": "*",
+	"Access-Control-Allow-Origin": "*",
+	"Access-Control-Allow-Methods": "OPTIONS,POST,GET",
+	"content-type": "application/json",
+}
+
 def getReportJson(event, context):
     """
     Input: POST request where the body is a stringified json of the form:
@@ -34,6 +41,7 @@ def getReportJson(event, context):
     except KeyError:
         return {
             "statusCode": 404,  # job id not found
+            "headers": CORS_HEADER,
             "body": json.dumps(
 				{
 					"error": "Job id: " + (id) + " not found",
@@ -45,6 +53,7 @@ def getReportJson(event, context):
     if linkPassword != data["Item"]["password"]:
         return {
             "statusCode": 401, # unauthorised, incorrect password
+            "headers": CORS_HEADER,
             "body": json.dumps(
 				{
 					"error": "Unauthorised",
@@ -64,6 +73,7 @@ def getReportJson(event, context):
     
     return {
         "statusCode": 200,
+        "headers": CORS_HEADER,
         "body": json.dumps(
             {
                 "url": response,
