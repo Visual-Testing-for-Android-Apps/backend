@@ -128,6 +128,40 @@ This presigned URL gives the frontend access to a folder containing a file named
     ]
 }
 ```
+🔵 5. Retrive a file 
+
+```
+Post /job/file
+
+// sample request 
+{"filePath": "jobID/1231.jpg" }
+
+// sample response 
+{"url" : "downloadUrl"}
+```
+```
+GET downloadUrl
+```
+
+🔵 OR  get all job file at once  
+
+```
+Post /job/files
+
+// sample request 
+{"jobID": "4141" }
+
+// sample response 
+{
+    "4141/342.jpg":"downloadurl1",
+    "4141/result/342.jpg":"downloadurl1",
+    "4141/342.mp4":"downloadurl3",
+}
+```
+```
+GET downloadUrl
+```
+
 
 ### Single job
 

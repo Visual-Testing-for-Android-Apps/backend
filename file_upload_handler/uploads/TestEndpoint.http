@@ -43,3 +43,15 @@ content-type: application/json
 {"jobID": "1c2209d5-1ca6-42c7-a800-0eb80ac9ed84","email":"bche0026@studnet.monash.edu"}
 
 
+### get file 
+POST {{root_url}}/job/file HTTP/1.1
+content-type: application/json
+
+{"filePath":"439a1826-b0d1-4eb1-8810-301cd0fd7b01/7095807.jpg"}
+
+### get files
+POST {{root_url}}/job/files HTTP/1.1
+content-type: application/json
+
+{"jobID":"439a1826-b0d1-4eb1-8810-301cd0fd7b01"}
+
