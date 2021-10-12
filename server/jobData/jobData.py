@@ -44,7 +44,7 @@ def getReportJson(event, context):
             "headers": CORS_HEADER,
             "body": json.dumps(
 				{
-					"error": "Job id: " + (id) + " not found",
+					"error": "Job id: " + str(linkId) + " not found",
 				}
 			),
         }
