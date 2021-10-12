@@ -36,7 +36,7 @@ def getReportJson(event, context):
             "statusCode": 404,  # job id not found
             "body": json.dumps(
 				{
-					"error": "Job id: " + str(id) + " not found",
+					"error": "Job id: " + (id) + " not found",
 				}
 			),
         }
