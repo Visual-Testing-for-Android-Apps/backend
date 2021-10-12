@@ -1,8 +1,9 @@
 import { createNewJob, FileUploadResponseBody } from "./createNewJob"
 import { ApiGatewayEvent, ApiGatewayResponse } from "./service/apigateway"
 import { getEmail, getJob, updateEmail } from "./service/dynamodbService"
+import { getDownloadURL } from "./service/S3Client"
 import { checkVerificationCode, handleNewEmailSes } from "./service/sesService"
-import { modelTiggerSqsEvent, sendMessage } from "./service/sqsClient"
+import { sendMessage } from "./service/sqsClient"
 
 const CORS_HEADER = {
 	"Access-Control-Allow-Headers": "*",
@@ -34,6 +35,10 @@ export const handler = async (event: ApiGatewayEvent): Promise<ApiGatewayRespons
 				return await uploadDoneHandler(event)
 			case "/job/verify-code":
 				return await verifyCodeHandler(event)
+			case "/job/file":
+				return await getFilePreSignUrl(event)
+			case "/job/files":
+				return await getJobAllFiles(event)
 			default:
 				return {
 					statusCode: 404,
@@ -157,5 +162,48 @@ const verifyCodeHandler = async (event:ApiGatewayEvent): Promise<ApiGatewayRespo
 		}),
 	}
 	
+
+}
+
+const getFilePreSignUrl = async (event:ApiGatewayEvent): Promise<ApiGatewayResponse> =>{
+	const parsedBody = JSON.parse(event.body);
+	const filePath = parsedBody["filePath"];
+	// get preSign urls 
+	const url = await getDownloadURL(filePath)
+	return {
+		statusCode: 200 ,
+		headers: CORS_HEADER,
+		body: JSON.stringify({
+			url,
+			message:"file download url",
+		}),
+	}
+
+}
+
+const getJobAllFiles = async (event:ApiGatewayEvent): Promise<ApiGatewayResponse> =>{
+	const parsedBody = JSON.parse(event.body);
+	const jobID = parsedBody["jobID"];
+	// get job
+	const job = await getJob(jobID)
+	const ret: {[key: string]: string} = {}
+	// get preSign urls 
+	for (const file of job.files){
+		const url = await getDownloadURL(file.s3Key)
+		ret[file.s3Key] = url
+		if (file.result && file.result.outputKey){
+			const url = await getDownloadURL(file.result.outputKey)
+			ret[file.result.outputKey] = url
+		}
+	}
+	
+	return {
+		statusCode: 200 ,
+		headers: CORS_HEADER,
+		body: JSON.stringify({
+			...ret,
+			message:"file download url",
+		}),
+	}
 
 }

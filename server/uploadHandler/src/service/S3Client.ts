@@ -35,7 +35,7 @@ export const getDownloadURL = async (key: string):Promise<string> => {
 		Key: key,
 		Expires: URL_EXPIRATION_SECONDS,
 	};
-
+	console.log("s3params",s3Params)
 	return await s3bucket.getSignedUrlPromise("getObject", s3Params);
 };
 
