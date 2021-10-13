@@ -61,8 +61,11 @@ export const sendProcessingEmail = async (key: string): Promise<any> => {
         to: recipientEmail,
         subject: "Vision Job Status",
         text: "",
-        html:"<p>Hooray! Your Job is now processing.</p>" +
-        "<br><p>A report will be sent to you when finished.</p>",
+        html:'<p>Great news! Your ' +
+        '<a style="text-decoration:none;" href="https://afternoon-woodland-24079.herokuapp.com/">Vision</a>'+ 
+        ' Job is now processing.</p>' +
+        '<p>An email with a link to your results will be sent to you when completed. </p>' +
+        '<p>Thanks, <br>Vision Team</p>'
     });
     
     // log response
