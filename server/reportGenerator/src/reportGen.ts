@@ -1,7 +1,7 @@
 import { SQSEvent } from 'aws-lambda'
 import { S3 } from 'aws-sdk'
 import { getJob } from './service/dynamodbService'
-import { FileType, Job, JobStatus } from './service/jobModel'
+import { FileType, Job, JobStatus, ImgReturn } from './service/jobModel'
 import { sendEmail } from './sendEmail'
 
 /**
@@ -56,7 +56,7 @@ function generateImgReport (
   filePath: string,
   algResultPath: string,
   algMessage: string[]
-): Record<string, string> {
+): ImgReturn {
   const titles: string[] = ['Null value', 'Missing image', 'Component occlusion']
   const descs: string[] = [
     '"NULL" text is being displayed, instead of the correct information.',
@@ -76,7 +76,6 @@ function generateImgReport (
     })
   })
 
-  // TODO: update function return type, object like {string[], string[], string, string}
   return {
     titles: outputTitles,
     descs: outputDescs,
@@ -107,14 +106,14 @@ export const generateReport = async (event: SQSEvent, context: AWSLambda.Context
   const files = job.files
 
   // construct report contents as arrays
-  const image: Array<Record<string, string>> = []
+  const image: ImgReturn[] = []
   const video: Array<Record<string, string>> = []
 
   console.log(`Generating report for ${files.length} files...`)
   files.forEach((element) => {
     const fileRef = element.s3Key
     const fileType = element.type
-    const resultMessage = Array(element.result.message)
+    const resultMessage = element.result.message
     const resultCode = Number(element.result.code)
     const resultFileRef = element.result.outputKey
 
