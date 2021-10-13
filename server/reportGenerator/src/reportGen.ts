@@ -50,30 +50,36 @@ function generateVidReport (filePath: string, algResult: number): Record<string,
  * @param filePath - filepath to original image
  * @param algResultPath - filepath to heatmap outputted from OwlEyes algorithm
  * @param algResult - issue type code
- * @returns object containing image issue, description, image and heatmap path
+ * @returns object containing image issues, descriptions, image and heatmap path
  */
 function generateImgReport (
   filePath: string,
   algResultPath: string,
-  algResult: number
+  algMessage: string[]
 ): Record<string, string> {
-  const titles: string[] = [
-    'General issue heatmap',
-    'Null value',
-    'Missing image',
-    'Component occlusion'
-    // no models for blurred screen or text overlap, so no description is needed
-  ]
-  const desc: string[] = [
-    'Heatmap highlights all potential issues.',
+  const titles: string[] = ['Null value', 'Missing image', 'Component occlusion']
+  const descs: string[] = [
     '"NULL" text is being displayed, instead of the correct information.',
     'A placeholder "missing/broken image" symbol is displayed, instead of an intended image.',
     'Text is overlapped or obscured by other components.'
   ]
 
+  const outputTitles: string[] = []
+  const outputDescs: string[] = []
+
+  algMessage.forEach((message) => {
+    titles.forEach((title, index) => {
+      if (title === message) {
+        outputTitles.push(titles[index])
+        outputDescs.push(descs[index])
+      }
+    })
+  })
+
+  // TODO: update function return type, object like {string[], string[], string, string}
   return {
-    title: titles[algResult],
-    desc: desc[algResult],
+    titles: outputTitles,
+    descs: outputDescs,
     orig_image: filePath,
     heatmap_image: algResultPath
   }
@@ -108,13 +114,15 @@ export const generateReport = async (event: SQSEvent, context: AWSLambda.Context
   files.forEach((element) => {
     const fileRef = element.s3Key
     const fileType = element.type
+    const resultMessage = Array(element.result.message)
     const resultCode = Number(element.result.code)
     const resultFileRef = element.result.outputKey
-    if (fileType != null && fileRef != null && resultCode != null) {
-      if (fileType === FileType.IMAGE && resultFileRef != null) {
-        image.push(generateImgReport(fileRef, resultFileRef, +resultCode))
+
+    if (fileType != null && fileRef != null) {
+      if (fileType === FileType.IMAGE && resultFileRef != null && resultMessage != null) {
+        image.push(generateImgReport(fileRef, resultFileRef, resultMessage))
         console.log(`Image ${fileRef} added to report`)
-      } else if (fileType === FileType.VIDEO) {
+      } else if (fileType === FileType.VIDEO && resultCode != null) {
         video.push(generateVidReport(fileRef, +resultCode))
         console.log(`Video ${fileRef} added to report`)
       } else {
