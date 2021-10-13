@@ -119,8 +119,8 @@ This presigned URL gives the frontend access to a folder containing a file named
 {
     "images": [
         {
-            "title": "Image UI issue title",
-            "desc": "Image UI issue description",
+            "titles": ["List of image UI issue titles"],
+            "descs": ["List of image UI issue descriptions"],
             "orig_image": "pathToOriginalImage",
             "heatmap_image": "pathToHeatmapImage"
         }
@@ -134,40 +134,42 @@ This presigned URL gives the frontend access to a folder containing a file named
     ]
 }
 ```
-🔵 5. Retrive a file 
+
+🔵 5. Retrive a file
 
 ```
 Post /job/file
 
-// sample request 
+// sample request
 {"filePath": "jobID/1231.jpg" }
 
-// sample response 
+// sample response
 {"url" : "downloadUrl"}
 ```
+
 ```
 GET downloadUrl
 ```
 
-🔵 OR  get all job file at once  
+🔵 OR get all job file at once
 
 ```
 Post /job/files
 
-// sample request 
+// sample request
 {"jobID": "4141" }
 
-// sample response 
+// sample response
 {
     "4141/342.jpg":"downloadurl1",
     "4141/result/342.jpg":"downloadurl1",
     "4141/342.mp4":"downloadurl3",
 }
 ```
+
 ```
 GET downloadUrl
 ```
-
 
 ### Single job
 
