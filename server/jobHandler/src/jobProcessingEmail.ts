@@ -57,7 +57,7 @@ export const sendProcessingEmail = async (key: string): Promise<any> => {
     // send email with defined transport object
     console.log("sending email...");
     const info = await transporter.sendMail({
-        from: process.env.EMAIL,
+        from: '"Vision"<' + String(process.env.EMAIL)+'>',
         to: recipientEmail,
         subject: "Vision Job Status",
         text: "",

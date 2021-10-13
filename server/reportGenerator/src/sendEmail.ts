@@ -67,7 +67,7 @@ export const sendEmail = async (key: string): Promise<any> => {
 	// send email with defined transport object
 	console.log("sending email with url " + emailUrl);
 	const info = await transporter.sendMail({
-		from: process.env.EMAIL,
+		from: '"Vision"<' + String(process.env.EMAIL)+'>',
 		to: recipientEmail,
 		subject: "Vision Job Results",
 		text: "",
@@ -77,7 +77,7 @@ export const sendEmail = async (key: string): Promise<any> => {
 			'<a style="text-decoration:none;" href="' +
 			emailUrl +
 			'">Job Results</a> are now available.</p>' +
-			"<br><p>We hope you enjoyed using Vision!</p>" +
+			'<br><p>We hope you enjoyed using Vision!</p>' +
 			'<p>Thanks, <br>Vision Team</p>'
 	});
 
