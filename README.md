@@ -11,6 +11,7 @@ Uploaded 29/8/2021
 Front need to
 🔵 1. Send a POST request to get preSigned URLs for upload image/vidoe
 example request body
+
 ```
 POST /job/upload-request
 // Sample request body
@@ -18,35 +19,36 @@ POST /job/upload-request
     "email": "sample_email@gmail.com",
     "fileNames":["test.mp4", "test.jpg"]
 }
-// Sample response body 
+// Sample response body
 {
     "uploadUrls":
-                { 
+                {
                     "test.mp4" : "preSigned-url1",
                     "test.jpg" : "preSigned-url1"
                 }
     "jobID" : "jobId"
 }
 ```
-~~📧 At this point, you will receive a verification code in your email. However for now, the email service is in sendbox mode, can't send email to unverified email address. Let me (Rebecca) know if you want to be verified.  All verification codes are 6 digit numbers. You can still use unverified email for submiting jobs, then the verification is just skipped.~~
 
+~~📧 At this point, you will receive a verification code in your email. However for now, the email service is in sendbox mode, can't send email to unverified email address. Let me (Rebecca) know if you want to be verified. All verification codes are 6 digit numbers. You can still use unverified email for submiting jobs, then the verification is just skipped.~~
 
 🔵 2. (for each file) Send a PUT request on the preSigned URL with file
+
 ```
 PUT {uploadUrl returned from step 1}
 ```
 
-
-~~(skipped) 3. After the user entered the verification code 
+~~(skipped) 3. After the user entered the verification code
 missing verification only prevent the models to process the file, it doesn't stop you to upload. Verification code expires in 500 seconds (can be adjusted)~~
+
 ```
 POST /job/verify-code
 // Sample request body
 {
-    "verificationCode": "some 6 digt number", // can be anything code for now send 
+    "verificationCode": "some 6 digt number", // can be anything code for now send
     "jobID":"jobId returned from the first api call"
 }
-// Sample response body 
+// Sample response body
 {
     "jobID": "30ecd6ed-78ab-40d6-b3cd-79c2e3c4922e",
     "verified": true,
@@ -55,6 +57,7 @@ POST /job/verify-code
 ```
 
 ~~3.1 if user want to update their email (optional)~~
+
 ```
 POST /job/update-email
 // Sample request body
@@ -65,6 +68,7 @@ POST /job/update-email
 ```
 
 ~~3.2 resend verification code (optional)~~
+
 ```
 POST /job/resend-code
 // Sample request body
@@ -72,19 +76,21 @@ POST /job/resend-code
     "jobID":"jobid"
 }
 ```
-🔵 4. (after all file has been uploaded) send a Post request to notify finish 
+
+🔵 4. (after all file has been uploaded) send a Post request to notify finish
+
 ```
 POST /job/upload-done
 // Sample request body
 {
     "jobID":"jobid"
 }
-// Sample response 
+// Sample response
 statusCode = 200 -> start to process the job
 statusCode != 200 -> error
 ```
 
-🔵 5. Report display 
+🔵 5. Report display
 
 The user receives an email containing a link such as
 https://afternoon-woodland-24079.herokuapp.com/batchreportpage/publicKey?pwd=password
@@ -93,7 +99,7 @@ The frontend uses the publicKey and password from the link to sent a POST reques
 the presigned URL for the batch job. An example request body is given below.
 
 ```
-POST /jobData/
+POST /jobdata/
 
 // Sample request body
 {
