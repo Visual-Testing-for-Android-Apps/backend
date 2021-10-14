@@ -1,9 +1,9 @@
-import { SQSEvent } from "aws-lambda"
-import { S3 } from "aws-sdk"
+import { SQSEvent } from 'aws-lambda'
+import { S3 } from 'aws-sdk'
 
-import { sendEmail } from "./sendEmail"
-import { getJob } from "./service/dynamodbService"
-import { FileType, ImgReturn, Job, JobStatus } from "./service/jobModel"
+import { sendEmail } from './sendEmail'
+import { getJob } from './service/dynamodbService'
+import { FileType, ImgReturn, Job, JobStatus } from './service/jobModel'
 
 /**
  * Creates an object related to a given video issue
@@ -118,14 +118,14 @@ export const generateReport = async (event: SQSEvent, context: AWSLambda.Context
     const resultMessage = element.result.message
     const resultCode = Number(element.result.code)
     const resultFileRef = element.result.outputKey
-    if (fileType != null && fileRef != null && resultCode != null) {
-      if (fileType === FileType.IMAGE && resultFileRef != null) {
+    if (fileType != null && fileRef != null) {
+      if (fileType === FileType.IMAGE && resultFileRef != null && resultMessage != null) {
         image.push({
           ...generateImgReport(fileRef, resultFileRef, resultMessage),
           orginalName: element.orginalName
         })
         console.log(`Image ${fileRef} added to report`)
-      } else if (fileType === FileType.VIDEO) {
+      } else if (fileType === FileType.VIDEO && resultCode != null) {
         video.push({
           ...generateVidReport(fileRef, +resultCode),
           orginalName: element.orginalName
