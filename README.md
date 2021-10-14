@@ -129,6 +129,7 @@ This presigned URL gives the frontend access to a folder containing a file named
         {
             "title": "Video UI issue title",
             "desc": "Video UI issue description",
+            "classification": "Video UI issue code",
             "video": "pathToVideo"
         }
     ]
