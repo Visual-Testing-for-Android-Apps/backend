@@ -2,6 +2,13 @@ import os
 import boto3
 import json
 
+CORS_HEADER = {
+	"Access-Control-Allow-Headers": "*",
+	"Access-Control-Allow-Origin": "*",
+	"Access-Control-Allow-Methods": "OPTIONS,POST,GET",
+	"content-type": "application/json",
+}
+
 def getReportJson(event, context):
     """
     Input: POST request where the body is a stringified json of the form:
@@ -22,7 +29,7 @@ def getReportJson(event, context):
     TABLE_NAME = os.environ["JOB_TABLE"]
     BUCKET_NAME = os.environ["SRC_BUCKET"]
     LOOKUP_BATCH_ID = linkId # may lookup batch job id in another table using linkId for extra security
-    PRESIGNED_LINK_DURATION = 60*5 # 5 minutes in seconds
+    PRESIGNED_LINK_DURATION = 60*30 # 30 minutes in seconds
 
     # fetch from database
     table = boto3.resource("dynamodb").Table(TABLE_NAME)
@@ -34,9 +41,10 @@ def getReportJson(event, context):
     except KeyError:
         return {
             "statusCode": 404,  # job id not found
+            "headers": CORS_HEADER,
             "body": json.dumps(
 				{
-					"error": "Job id: " + str(id) + " not found",
+					"error": "Job id: " + str(linkId) + " not found",
 				}
 			),
         }
@@ -45,6 +53,7 @@ def getReportJson(event, context):
     if linkPassword != data["Item"]["password"]:
         return {
             "statusCode": 401, # unauthorised, incorrect password
+            "headers": CORS_HEADER,
             "body": json.dumps(
 				{
 					"error": "Unauthorised",
@@ -64,6 +73,7 @@ def getReportJson(event, context):
     
     return {
         "statusCode": 200,
+        "headers": CORS_HEADER,
         "body": json.dumps(
             {
                 "url": response,
