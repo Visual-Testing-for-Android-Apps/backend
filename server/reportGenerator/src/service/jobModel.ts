@@ -29,6 +29,7 @@ export interface ImgReturn {
   descs: string[]
   orig_image: string
   heatmap_image: string
+  orginalName?: string
 }
 
 export enum FileType {
