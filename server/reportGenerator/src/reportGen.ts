@@ -40,6 +40,7 @@ function generateVidReport (filePath: string, algResult: number): Record<string,
   return {
     title: titles[algResult],
     desc: desc[algResult],
+    classification: algResult.toString(),
     video: filePath
   }
 }
