@@ -62,7 +62,7 @@ export const modelTrigger = async (context: AWSLambda.Context, job: Job) => {
 	}
 };
 
-const getModelResponse = async (model: string, fileKey: string){
+const getModelResponse = async (model: string, fileKey: string) => {
 	const downloadURL = await getDownloadURL(fileKey);
 	console.log("download url", downloadURL);
 	const response = await axios.post(`${BASE_URL}/${model}`, {
