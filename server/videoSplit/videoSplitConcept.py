@@ -6,8 +6,8 @@ import os
 # Creates new directory for output files if no directory is set
 def create_new_target_directory(filename):
     print(__file__)
-    os.makedirs(os.path.dirname(__file__) + "/" + os.path.basename(filename), exist_ok=True)
-    return os.path.dirname(__file__) + "/" + os.path.basename(filename) + "/"
+    os.makedirs(os.path.join(os.path.dirname(__file__), os.path.basename(filename)), exist_ok=True)
+    return os.path.join(os.path.dirname(__file__), os.path.basename(filename))
 
 
 
@@ -143,12 +143,11 @@ def video_split(filename, video_threshold = 0.9, image_threshold = 0.97, min_vid
 
     # Extract individual image frames from video
     for frames in current_image_frames:
-        cv2.imwrite(target_file_destination + str(round(frames[1]/frames_per_second)) + ".jpg", frames[0])
+        cv2.imwrite(os.path.join(target_file_destination, str(round(frames[1]/frames_per_second)) + ".jpg"), frames[0])
 
     # Remove first video as it is included by default from the function and is unwanted
     current_video_frames.pop(0)
 
     # Extract smaller videos from uploaded video
     for frames in current_video_frames:
-        ffmpeg_extract_subclip(filename, frames[0]/frames_per_second, frames[1]/frames_per_second, targetname = target_file_destination + str(round(frames[0]/frames_per_second)) + "-" + str(round(frames[1]/frames_per_second)) + ".mp4")
-
+        ffmpeg_extract_subclip(filename, frames[0]/frames_per_second, frames[1]/frames_per_second, targetname = os.path.join(target_file_destination, str(round(frames[0]/frames_per_second)) + "-" + str(round(frames[1]/frames_per_second)) + ".mp4"))
