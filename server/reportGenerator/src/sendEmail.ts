@@ -73,11 +73,11 @@ export const sendEmail = async (key: string): Promise<any> => {
 		text: "",
 		html:
 			'<p>Hi there,</p>'+
-			'<p><br>Your ' +
+			'<p>Your ' +
 			'<a style="text-decoration:none;" href="' +
 			emailUrl +
 			'">Job Results</a> are now available.</p>' +
-			'<br><p>We hope you enjoyed using Vision!</p>' +
+			'<p>We hope you enjoyed using Vision!</p>' +
 			'<p>Thanks, <br>Vision Team</p>'
 	});
 
