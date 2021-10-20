@@ -1,6 +1,6 @@
 # Periodic File Removal
 
-This Lambda function checks all jobs in the database and remove any that are older than 30 days. The accompanying files in the S3 bucket will also be removed, as stated in our privacy policy.
+This Lambda function checks all jobs in the database and removes any that are older than 30 days. The accompanying files in the S3 bucket will also be removed, as stated in our privacy policy.
 
 ## Running the function
 
@@ -13,7 +13,7 @@ You can either add this though the AWS Console, or the function can be manually 
 1. Navigate to the Lambda function in your AWS Console.
 2. Select the dropdown next to the "Test" button, in the top-right.
 3. If this is your first time invoking this function then select the option "Configure test events", which will open a dialogue. Else skip to step 8.
-4. Select the "Create new test event", and leave the template selection as is.
+4. Select the "Create new test event" and leave the template selection as is.
 5. This Lambda function expects an event, so replace any example message with `{}`.
 6. Enter a name into "Event name", such as "EmptyEvent".
 7. Press the "Create" button, which will close the dialogue.
