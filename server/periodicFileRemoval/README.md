@@ -13,8 +13,8 @@ You can either add this though the AWS Console, or the function can be manually 
 1. Navigate to the Lambda function in your AWS Console.
 2. Select the dropdown next to the "Test" button, in the top-right.
 3. If this is your first time invoking this function then select the option "Configure test events", which will open a dialogue. Else skip to step 8.
-4. Select the "Create new test event" and leave the template selection as is.
-5. This Lambda function expects an event, so replace any example message with `{}`.
+4. Select the "Create new test event" bubble and leave the template selection as is.
+5. Replace the example message with `{}` as this Lambda function expects an event
 6. Enter a name into "Event name", such as "EmptyEvent".
 7. Press the "Create" button, which will close the dialogue.
 8. Ensure that the dropdown option now refers to the event you created.
