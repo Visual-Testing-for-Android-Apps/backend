@@ -34,7 +34,7 @@ def lambda_handler(event, context):
         items.extend(response["Items"])
 
     for item in items:
-        # Expects and ISO8601 datetime string
+        # Expects an ISO8601 datetime string
         time = datetime.strptime(item[Key.Creation], "%Y-%m-%dT%H:%M:%S.%f%z")
 
         # Remove timezone, as datetime.now() doesn't have one
