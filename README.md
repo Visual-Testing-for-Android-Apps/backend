@@ -2,11 +2,160 @@ Uploaded 29/8/2021
 
 # Visual testing Backend
 
-## Front end reads this section
+## Table of Content
+----
+- [Visual testing Backend](#visual-testing-backend)
+  - [## Table of Content](#-table-of-content)
+  - [## Tech stack](#-tech-stack)
+  - [## Architecture](#-architecture)
+    - [Diagram](#diagram)
+  - [## Want to contribute ?](#-want-to-contribute-)
+  - [## Dev Environment Set up](#-dev-environment-set-up)
+    - [Deploy on your own AWS account](#deploy-on-your-own-aws-account)
+  - [## CI/CD](#-cicd)
+    - [Pull requests](#pull-requests)
+    - [Continous deploy](#continous-deploy)
+- [Lambdas](#lambdas)
+  - [## UploadHandler](#-uploadhandler)
+    - [Job submission workflow](#job-submission-workflow)
+    - [Access files with UploadHandler](#access-files-with-uploadhandler)
+  - [JobHandler](#jobhandler)
+  - [ReportGen](#reportgen)
+  - [JobData](#jobdata)
+  - [OwlEye](#owleye)
+  - [Seenomaly](#seenomaly)
+- [Database Schema](#database-schema)
+- [S3 bucket structure](#s3-bucket-structure)
 
-### Batch job.
 
-#### Root URL : https://2fr7fj3ota.execute-api.ap-southeast-2.amazonaws.com/Prod/
+## Tech stack 
+----
+The backend uses two languages: Python and Typescript. 
+* Python: used in our machine learning models and some lambda function
+* Typescript: Most lambda are written in typescript
+
+The backend is hosted via AWS. 
+* Lambdas handles all the backend logics as well as hosting the machine learning model with the container support. API Gateways create accessing endpoints. SQS acts as glues for lambdas to trigger each other.  
+* Elastic Container Register is used to store the machine learning code, model and dependencies. 
+* S3 bucket stores the user uploaded files and result files 
+* DynamoDB stores the uploading infomations
+
+## Architecture 
+----
+
+All backend code are hosted on AWS lambdas. The lambdas can be categoried into two parts
+* model components - The machine learning models, owleye and seenomaly, located in `/model`.
+* server components - All other logics for handling batch job, including saving and retrieving `job` information, processing a `job` and etc. Located in `/server`. 
+
+These two parts are deployed separately. This is because deploying models is much slower than deploying other lambdas. Therefore, to speed up the deployment of `server components`, we create a new deployment pipeline for `models components` since they get changed less frequently. 
+
+**Model components** 
+
+`Owleye` and `seenomaly` are packed in to two lamdbas. Each of them are triggered by API gateway which allows access from frontend (for live jobs) and other server components (for batch jobs). 
+
+**Server components** 
+
+Then end to end processing for a batch job is supported by the following lambdas. Each of them has a dedicated folder. Here, just we give a high level decription for each of them. More detailed decription is at the bottom. 
+
+* UploadHandler - Triggered by frontend. Handle uploading files and save `job` information to database 
+
+* JobHandler - Triggered by UploadHander. Send image and videos to `Owleye` and `seenomaly` via their API endpoints, save the result to database and S3 bucket. This lambda is self-trigger to prevent having jobs unfinished due to lambda time out. 
+
+* ReportGenerator (ReportGen) - Triggered by JobHandler. Gather all information for a completed batch `job` to create the report in JSON format. Also, generate the access link and send it to the job uploader via email. 
+
+* JobData - Trigger by frontend. Retreive file from S3 bucket and send to front end. 
+
+### Diagram 
+The diagram below shows the model and server components. 
+
+<img src="./1.png" alt="drawing" width="350"/>
+
+
+## Want to contribute ? 
+----
+You can report a bug or feature suggestion as an issue to the reposity. To contribute to the codebase, create and pull request and link to the relavent issue. 
+## Dev Environment Set up 
+----
+Step 1: Install tools 
+
+- [ ] Install [aws-sam-cli](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html). 
+```
+# For mac user
+
+curl "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "awscli-bundle.zip"
+
+unzip awscli-bundle.zip
+
+sudo ./awscli-bundle/install -i /usr/local/aws -b /usr/local/bin/aws
+```
+
+- [ ] Download docker [here](https://docs.docker.com/get-docker/). 
+
+- [ ] Install [nvm](https://github.com/nvm-sh/nvm). And use nvm to install npm and node via nvm
+```
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
+
+export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
+```
+```
+nvm node
+nvm npm
+```
+
+
+Step 2: Install dependencies 
+
+- [ ] Install typescript globally
+```
+npm install -g typescript
+```
+- [ ] Install packages
+Do the following inside each folder of `./server/*`
+```
+npm install 
+```
+
+
+### Deploy on your own AWS account 
+**Deploy model components** 
+
+Create a ECR repository. Save the URI which is outputed to the terminal. The URI will be used when deploying. This is only needed for the first time of deployment. 
+```
+aws ecr create-repository --repository-name REPO_NAME --image-scanning-configuration scanOnPush=true
+```
+
+Build and deploy
+```
+cd ./models
+sam build
+sam deploy --guided # only need guided for the first time 
+```
+
+**Deploy server components** 
+```
+cd ./server
+sam build
+sam deploy --guided # only need guided for the first time 
+```
+## CI/CD
+----
+
+### Pull requests
+Pull request checks are made to ensure the code quality and correctness. This inludes lintings and pre-build and validation via aws-sam.
+
+### Continous deploy 
+The actual hosting is on one of our member's aws account. Build and deploy have been automated to her account upon merging to the `develop` branch for `server components`. Changes on `model components` require manual deployment by running the above sam commads by the account owner.
+
+
+# Lambdas 
+
+## UploadHandler
+---- 
+
+### Job submission workflow
+
+Root URL : https://2fr7fj3ota.execute-api.ap-southeast-2.amazonaws.com/Prod/
 
 Front need to
 🔵 1. Send a POST request to get preSigned URLs for upload image/vidoe
@@ -90,7 +239,56 @@ statusCode = 200 -> start to process the job
 statusCode != 200 -> error
 ```
 
-🔵 5. Report display
+### Access files with UploadHandler 
+
+🔵 Get one file via file reference
+
+```
+Post /job/file
+
+// sample request
+{"filePath": "jobID/1231.jpg" }
+
+// sample response
+{"url" : "downloadUrl"}
+```
+
+```
+GET downloadUrl
+```
+
+🔵 OR get all job file at once
+
+```
+Post /job/files
+
+// sample request
+{"jobID": "4141" }
+
+// sample response
+{
+    "4141/342.jpg":"downloadurl1",
+    "4141/result/342.jpg":"downloadurl1",
+    "4141/342.mp4":"downloadurl3",
+}
+```
+
+```
+GET downloadUrl
+```
+
+
+## JobHandler 
+Event schema 
+TODO
+
+
+## ReportGen 
+
+TODO
+
+## JobData
+
 
 The user receives an email containing a link such as
 https://afternoon-woodland-24079.herokuapp.com/batchreportpage/publicKey?pwd=password
@@ -136,49 +334,15 @@ This presigned URL gives the frontend access to a folder containing a file named
 }
 ```
 
-🔵 5. Retrive a file
-
-```
-Post /job/file
-
-// sample request
-{"filePath": "jobID/1231.jpg" }
-
-// sample response
-{"url" : "downloadUrl"}
-```
-
-```
-GET downloadUrl
-```
-
-🔵 OR get all job file at once
-
-```
-Post /job/files
-
-// sample request
-{"jobID": "4141" }
-
-// sample response
-{
-    "4141/342.jpg":"downloadurl1",
-    "4141/result/342.jpg":"downloadurl1",
-    "4141/342.mp4":"downloadurl3",
-}
-```
-
-```
-GET downloadUrl
-```
-
-### Single job
-
-Video Endpoint: POST https://u8iacl4gj0.execute-api.ap-southeast-2.amazonaws.com/Prod/Seenomaly
-
+## OwlEye
 Image Endpoint: POST https://u8iacl4gj0.execute-api.ap-southeast-2.amazonaws.com/Prod/owleye
 
-## Back end reads this section
+## Seenomaly
+Video Endpoint: POST https://u8iacl4gj0.execute-api.ap-southeast-2.amazonaws.com/Prod/Seenomaly
+
+
+
+# Database Schema 
 
 After step 1,2,3 a job will be created in the database, eg.
 
@@ -256,6 +420,7 @@ database looks like this ,
  "email": "beining0026@gmail.com"
 }
 ```
+# S3 bucket structure 
 
 S3 bucket looks like this,
 |-jobID
