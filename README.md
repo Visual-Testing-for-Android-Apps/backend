@@ -26,6 +26,7 @@
 - [7. Lambdas](#7-lambdas)
   - [7.1. UploadHandler](#71-uploadhandler)
     - [7.1.1. Job Submission Workflow](#711-job-submission-workflow)
+    - [Email verification feature 📧](#email-verification-feature-)
     - [7.1.2. Email Verification Feature](#712-email-verification-feature)
     - [7.1.3. Access Files with UploadHandler](#713-access-files-with-uploadhandler)
   - [7.2. JobHandler](#72-jobhandler)
@@ -259,6 +260,9 @@ example request body <br/>
 
 `POST /job/upload-done`
 
+🔵 3. (after all file has been uploaded) send a Post request to notify finish
+`POST /job/upload-done`
+
 ```
 // Sample request body
 {
@@ -268,6 +272,11 @@ example request body <br/>
 statusCode = 200 -> start to process the job
 statusCode != 200 -> error
 ```
+
+### Email verification feature 📧
+
+The Email verification feature is implemented but not yet integrated with the front end.
+Verification code expires in 500 seconds.
 
 ### 7.1.2. Email Verification Feature
 
@@ -285,6 +294,10 @@ Verify code:
 <br/>
 
 `POST /job/verify-code`
+
+Three API endpoints are built around email verification feature
+
+Verify code: `POST /job/verify-code`
 
 ```
 // Sample request body
@@ -446,14 +459,47 @@ Request body contains
 {"download_url”: “url to download the image"}
 ```
 
+Request body contains
+
+- the `raw binary` of the video, or
+- a `download_url` inside a json object
+
 ```
+// Sample json request body
+{"download_url":"url to download the video"}
+```
+
 // Sample return body
-    {
+{
 
         "original_img”: original_img , // this is the original image
         'res_img': res_image, // The base 64 encoded result image
         'bug_type': 'Null value ‘|’Missing image ‘|’Component occlusion'
     }
+
+```
+// Sample return body
+    {
+        "classification": error code,
+        "explanation": error description
+    }
+```
+
+Explanation contains one of
+
+```
+[
+        "Unknown",
+        "Pass through other material",
+        "Lack of scrimmed background",
+        "Snackbar blocks bottom app bar",
+        "Stack multiple banners",
+        "Flip card to reveal information",
+        "Move one card behind other card",
+        "Stack multiple snackbars",
+        "Lack of shadow",
+        "Invisible scrime of modal bottom sheet",
+]
 ```
 
 ## 7.6. Seenomaly
