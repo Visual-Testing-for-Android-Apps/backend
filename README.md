@@ -211,7 +211,7 @@ V4.13.4 -> V4.14.0
 
 ## 6.3. Patch
 
-A patch is one that is defined as a bug fix that is compatible with all previous versions of the same major version. For example, someone working with V4.13.2 deployment can assume that they may be able to use all features of previous V4 deployments. The patch version number should be incremented by 1 following the pull request of the patch.
+A patch is one that is defined as a bug fix or update that is compatible with all previous versions of the same major version. For example, someone working with V4.13.2 deployment can assume that they may be able to use all features of previous V4 deployments. Updates to documentation is also counted as a patch. The patch version number should be incremented by 1 following the pull request of the patch.
 
 #### 7.3.0.1. **Example** <!-- omit in toc -->
 
