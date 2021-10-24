@@ -1,0 +1,11 @@
+{
+  "tag": "2021-09-26_115021",
+  "event": {
+    "event_type": "intent",
+    "log_lines": null,
+    "intent": "am start com.example.ujsAutoClock/com.example.ujsAutoClock.MainActivity"
+  },
+  "start_state": "5a8114d01b38d31f993d62bc50771fdd",
+  "stop_state": "6870dc7173fc48637d81c39c5863bc17",
+  "event_str": "IntentEvent(intent='am start com.example.ujsAutoClock/com.example.ujsAutoClock.MainActivity')"
+}

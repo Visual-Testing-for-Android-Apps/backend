@@ -1,0 +1,11 @@
+{
+  "tag": "2021-09-26_115702",
+  "event": {
+    "event_type": "intent",
+    "log_lines": null,
+    "intent": "am start com.chessclock.android/com.chessclock.android.ChessClock"
+  },
+  "start_state": "37a2fa66f7174c8aa6b195157db98421",
+  "stop_state": "b18ea3ab3e75231742f46f7e5cdfa46d",
+  "event_str": "IntentEvent(intent='am start com.chessclock.android/com.chessclock.android.ChessClock')"
+}

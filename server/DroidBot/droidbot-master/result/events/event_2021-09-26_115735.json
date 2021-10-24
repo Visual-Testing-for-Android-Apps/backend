@@ -1,0 +1,49 @@
+{
+  "tag": "2021-09-26_115735",
+  "event": {
+    "event_type": "touch",
+    "log_lines": null,
+    "x": null,
+    "y": null,
+    "view": {
+      "package": "com.chessclock.android",
+      "visible": true,
+      "checkable": false,
+      "child_count": 0,
+      "editable": false,
+      "clickable": true,
+      "is_password": false,
+      "focusable": true,
+      "enabled": true,
+      "content_description": null,
+      "children": [],
+      "focused": false,
+      "bounds": [
+        [
+          0,
+          0
+        ],
+        [
+          1080,
+          891
+        ]
+      ],
+      "resource_id": "com.chessclock.android:id/Player1",
+      "checked": false,
+      "text": null,
+      "class": "android.widget.Button",
+      "scrollable": false,
+      "selected": false,
+      "long_clickable": false,
+      "parent": 6,
+      "temp_id": 7,
+      "size": "1080*891",
+      "signature": "[class]android.widget.Button[resource_id]com.chessclock.android:id/Player1[text]None[enabled,,]",
+      "view_str": "4d1454f7706d0ad874fd1173be785d02",
+      "content_free_signature": "[class]android.widget.Button[resource_id]com.chessclock.android:id/Player1"
+    }
+  },
+  "start_state": "9577e122ed0d2f4587652e4153e9a3b5",
+  "stop_state": "5cb579e716a841268f85aea6a97003c8",
+  "event_str": "TouchEvent(state=9577e122ed0d2f4587652e4153e9a3b5, view=4d1454f7706d0ad874fd1173be785d02(ChessClock/Button-))"
+}

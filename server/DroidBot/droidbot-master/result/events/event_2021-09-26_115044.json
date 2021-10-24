@@ -1,0 +1,49 @@
+{
+  "tag": "2021-09-26_115044",
+  "event": {
+    "event_type": "touch",
+    "log_lines": null,
+    "x": null,
+    "y": null,
+    "view": {
+      "package": "com.android.settings",
+      "visible": true,
+      "checkable": false,
+      "child_count": 0,
+      "editable": false,
+      "clickable": true,
+      "is_password": false,
+      "focusable": true,
+      "enabled": true,
+      "content_description": "Back",
+      "children": [],
+      "focused": false,
+      "bounds": [
+        [
+          0,
+          63
+        ],
+        [
+          147,
+          210
+        ]
+      ],
+      "resource_id": null,
+      "checked": false,
+      "text": null,
+      "class": "android.widget.ImageButton",
+      "scrollable": false,
+      "selected": false,
+      "long_clickable": false,
+      "parent": 4,
+      "temp_id": 5,
+      "size": "147*147",
+      "signature": "[class]android.widget.ImageButton[resource_id]None[text]None[enabled,,]",
+      "view_str": "ee89ed50957acadbb418e44695b9ffc8",
+      "content_free_signature": "[class]android.widget.ImageButton[resource_id]None"
+    }
+  },
+  "start_state": "6077dd50c11c71ec61e127d99f5df72c",
+  "stop_state": "6077dd50c11c71ec61e127d99f5df72c",
+  "event_str": "TouchEvent(state=6077dd50c11c71ec61e127d99f5df72c, view=ee89ed50957acadbb418e44695b9ffc8(MainActivity/ImageButton-))"
+}

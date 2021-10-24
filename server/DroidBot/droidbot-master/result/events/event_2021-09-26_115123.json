@@ -1,0 +1,49 @@
+{
+  "tag": "2021-09-26_115123",
+  "event": {
+    "event_type": "touch",
+    "log_lines": null,
+    "x": null,
+    "y": null,
+    "view": {
+      "package": "com.example.ujsAutoClock",
+      "visible": true,
+      "checkable": false,
+      "child_count": 0,
+      "editable": false,
+      "clickable": true,
+      "is_password": false,
+      "focusable": true,
+      "enabled": true,
+      "content_description": "Switch to clock mode for the time input.",
+      "children": [],
+      "focused": false,
+      "bounds": [
+        [
+          194,
+          1138
+        ],
+        [
+          321,
+          1265
+        ]
+      ],
+      "resource_id": "android:id/toggle_mode",
+      "checked": false,
+      "text": null,
+      "class": "android.widget.ImageButton",
+      "scrollable": false,
+      "selected": false,
+      "long_clickable": false,
+      "parent": 17,
+      "temp_id": 18,
+      "size": "127*127",
+      "signature": "[class]android.widget.ImageButton[resource_id]android:id/toggle_mode[text]None[enabled,,]",
+      "view_str": "8c5d2e94667fe16abbbe19f240c8aa5d",
+      "content_free_signature": "[class]android.widget.ImageButton[resource_id]android:id/toggle_mode"
+    }
+  },
+  "start_state": "cac6d55fb24b5249d4f2f334dd9e021d",
+  "stop_state": "59f57db6db15c304c9fcbf9ff1572867",
+  "event_str": "TouchEvent(state=cac6d55fb24b5249d4f2f334dd9e021d, view=8c5d2e94667fe16abbbe19f240c8aa5d(MainActivity/ImageButton-))"
+}

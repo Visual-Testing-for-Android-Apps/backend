@@ -1,0 +1,49 @@
+{
+  "tag": "2021-09-26_115105",
+  "event": {
+    "event_type": "touch",
+    "log_lines": null,
+    "x": null,
+    "y": null,
+    "view": {
+      "package": "com.example.ujsAutoClock",
+      "visible": true,
+      "checkable": false,
+      "child_count": 0,
+      "editable": false,
+      "clickable": true,
+      "is_password": false,
+      "focusable": true,
+      "enabled": true,
+      "content_description": null,
+      "children": [],
+      "focused": false,
+      "bounds": [
+        [
+          338,
+          429
+        ],
+        [
+          516,
+          639
+        ]
+      ],
+      "resource_id": "android:id/hours",
+      "checked": false,
+      "text": "00",
+      "class": "android.widget.TextView",
+      "scrollable": false,
+      "selected": false,
+      "long_clickable": false,
+      "parent": 8,
+      "temp_id": 9,
+      "size": "178*210",
+      "signature": "[class]android.widget.TextView[resource_id]android:id/hours[text]00[enabled,,]",
+      "view_str": "ac13cb108c9aabf20bf4819850b3c02c",
+      "content_free_signature": "[class]android.widget.TextView[resource_id]android:id/hours"
+    }
+  },
+  "start_state": "59f57db6db15c304c9fcbf9ff1572867",
+  "stop_state": "59f57db6db15c304c9fcbf9ff1572867",
+  "event_str": "TouchEvent(state=59f57db6db15c304c9fcbf9ff1572867, view=ac13cb108c9aabf20bf4819850b3c02c(MainActivity/TextView-00))"
+}

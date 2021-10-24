@@ -1,0 +1,117 @@
+Activity Resolver Table:
+  Non-Data Actions:
+      android.intent.action.MAIN:
+        acc2731 com.chessclock.android/.ChessClock filter dc3ce16
+          Action: "android.intent.action.MAIN"
+          Category: "android.intent.category.LAUNCHER"
+
+Key Set Manager:
+  [com.chessclock.android]
+      Signing KeySets: 55
+
+Packages:
+  Package [com.chessclock.android] (a23fd35):
+    userId=10173
+    pkg=Package{47725ca com.chessclock.android}
+    codePath=/data/app/~~1Uk9-sPl6CnP7vL7UQXPyw==/com.chessclock.android-BlT8sn-4BPpYqkibmbozqg==
+    resourcePath=/data/app/~~1Uk9-sPl6CnP7vL7UQXPyw==/com.chessclock.android-BlT8sn-4BPpYqkibmbozqg==
+    legacyNativeLibraryDir=/data/app/~~1Uk9-sPl6CnP7vL7UQXPyw==/com.chessclock.android-BlT8sn-4BPpYqkibmbozqg==/lib
+    primaryCpuAbi=null
+    secondaryCpuAbi=null
+    versionCode=21 minSdk=21 targetSdk=23
+    versionName=2.6.1
+    splits=[base]
+    apkSigningVersion=3
+    applicationInfo=ApplicationInfo{47725ca com.chessclock.android}
+    flags=[ HAS_CODE ALLOW_CLEAR_USER_DATA ALLOW_BACKUP ]
+    privateFlags=[ PRIVATE_FLAG_REQUEST_LEGACY_EXTERNAL_STORAGE PRIVATE_FLAG_ALLOW_NATIVE_HEAP_POINTER_TAGGING ]
+    forceQueryable=false
+    queriesPackages=[]
+    dataDir=/data/user/0/com.chessclock.android
+    supportsScreens=[small, medium, large, xlarge, resizeable, anyDensity]
+    usesLibraries:
+      android.test.base
+      org.apache.http.legacy
+    usesLibraryFiles:
+      /system/framework/android.test.base.jar
+      /system/framework/org.apache.http.legacy.jar
+    timeStamp=2021-09-26 11:56:56
+    firstInstallTime=2021-09-26 11:56:56
+    lastUpdateTime=2021-09-26 11:56:56
+    signatures=PackageSignatures{87ad33b version:3, signatures:[711f55f8], past signatures:[]}
+    installPermissionsFixed=true
+    pkgFlags=[ HAS_CODE ALLOW_CLEAR_USER_DATA ALLOW_BACKUP ]
+    requested permissions:
+      android.permission.WAKE_LOCK
+    install permissions:
+      android.permission.WAKE_LOCK: granted=true
+    User 0: ceDataInode=147574 installed=true hidden=false suspended=false distractionFlags=0 stopped=true notLaunched=true enabled=0 instant=false virtual=false
+      runtime permissions:
+
+Queries:
+  system apps queryable: false
+  queries via package name:
+  queries via intent:
+  queryable via interaction:
+    User 0:
+
+Package Changes:
+  Sequence number=636
+  User 0:
+    seq=0, package=com.google.android.permissioncontroller
+    seq=1, package=com.android.systemui
+    seq=4, package=com.google.android.inputmethod.latin
+    seq=118, package=com.google.android.sdksetup
+    seq=127, package=com.google.android.cellbroadcastreceiver
+    seq=129, package=com.google.android.apps.youtube.music
+    seq=145, package=com.google.android.apps.messaging
+    seq=234, package=com.google.android.apps.tachyon
+    seq=235, package=com.google.android.partnersetup
+    seq=420, package=com.google.android.youtube
+    seq=444, package=com.google.android.apps.docs
+    seq=454, package=com.google.android.googlequicksearchbox
+    seq=465, package=com.google.android.gsf
+    seq=468, package=com.android.camera2
+    seq=469, package=com.android.nfc
+    seq=470, package=com.android.stk
+    seq=472, package=com.android.traceur
+    seq=473, package=com.google.android.apps.maps
+    seq=477, package=com.google.android.apps.photos
+    seq=480, package=com.google.android.apps.wellbeing
+    seq=482, package=com.google.android.calendar
+    seq=501, package=com.google.android.projection.gearhead
+    seq=503, package=com.android.vending
+    seq=505, package=com.google.android.setupwizard
+    seq=510, package=com.google.android.videos
+    seq=514, package=com.google.android.gm
+    seq=576, package=com.google.android.syncadapters.contacts
+    seq=593, package=com.android.settings
+    seq=595, package=com.google.android.gms
+    seq=604, package=org.fdroid.fdroid
+    seq=629, package=net.ktnx.mobileledger
+    seq=633, package=com.example.ujsAutoClock
+    seq=634, package=io.github.ylimit.droidbotapp
+    seq=635, package=com.chessclock.android
+
+
+Dexopt state:
+  [com.chessclock.android]
+    path: /data/app/~~1Uk9-sPl6CnP7vL7UQXPyw==/com.chessclock.android-BlT8sn-4BPpYqkibmbozqg==/base.apk
+      x86: [status=speed-profile] [reason=install]
+
+
+Compiler stats:
+  [com.chessclock.android]
+     base.apk - 108
+
+APEX session state:
+
+Active APEX packages:
+
+
+Inactive APEX packages:
+
+
+Factory APEX packages:
+
+

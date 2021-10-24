@@ -1,0 +1,51 @@
+{
+  "tag": "2021-09-26_115035",
+  "event": {
+    "event_type": "touch",
+    "log_lines": null,
+    "x": null,
+    "y": null,
+    "view": {
+      "package": "com.example.ujsAutoClock",
+      "visible": true,
+      "checkable": false,
+      "child_count": 1,
+      "editable": false,
+      "clickable": true,
+      "is_password": false,
+      "focusable": false,
+      "enabled": true,
+      "content_description": null,
+      "children": [
+        4
+      ],
+      "focused": false,
+      "bounds": [
+        [
+          555,
+          95
+        ],
+        [
+          1070,
+          221
+        ]
+      ],
+      "resource_id": null,
+      "checked": false,
+      "text": null,
+      "class": "android.widget.LinearLayout",
+      "scrollable": false,
+      "selected": false,
+      "long_clickable": false,
+      "parent": 2,
+      "temp_id": 3,
+      "size": "515*126",
+      "signature": "[class]android.widget.LinearLayout[resource_id]None[text]None[enabled,,]",
+      "view_str": "cfb57db5c5d56e69b962dc90640e2ed0",
+      "content_free_signature": "[class]android.widget.LinearLayout[resource_id]None"
+    }
+  },
+  "start_state": "a8be3522f75e663b83ea6eec0853557b",
+  "stop_state": "7ff70b5d3960cb6c454f13a6fa884924",
+  "event_str": "TouchEvent(state=a8be3522f75e663b83ea6eec0853557b, view=cfb57db5c5d56e69b962dc90640e2ed0(MainActivity/LinearLayout-))"
+}

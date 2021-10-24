@@ -1,0 +1,124 @@
+Activity Resolver Table:
+  Non-Data Actions:
+      android.intent.action.MAIN:
+        45041cf com.example.ujsAutoClock/.MainActivity filter f53475c
+          Action: "android.intent.action.MAIN"
+          Category: "android.intent.category.LAUNCHER"
+
+Receiver Resolver Table:
+  Non-Data Actions:
+      com.example.ujsAutoClock.AUTODAKA:
+        d392beb com.example.ujsAutoClock/.AutoTimer filter f7b7d48
+          Action: "com.example.ujsAutoClock.AUTODAKA"
+      android.intent.action.BOOT_COMPLETED:
+        35b9a65 com.example.ujsAutoClock/.BootReceiver filter 629b33a
+          Action: "android.intent.action.BOOT_COMPLETED"
+
+Key Set Manager:
+  [com.example.ujsAutoClock]
+      Signing KeySets: 53
+
+Packages:
+  Package [com.example.ujsAutoClock] (10dcf8e):
+    userId=10171
+    pkg=Package{df2d3af com.example.ujsAutoClock}
+    codePath=/data/app/~~GICXrxCE92EREWNVCAtPgA==/com.example.ujsAutoClock-iuwu4q7AeefHiH7h0_gmRg==
+    resourcePath=/data/app/~~GICXrxCE92EREWNVCAtPgA==/com.example.ujsAutoClock-iuwu4q7AeefHiH7h0_gmRg==
+    legacyNativeLibraryDir=/data/app/~~GICXrxCE92EREWNVCAtPgA==/com.example.ujsAutoClock-iuwu4q7AeefHiH7h0_gmRg==/lib
+    primaryCpuAbi=null
+    secondaryCpuAbi=null
+    versionCode=2 minSdk=21 targetSdk=30
+    versionName=1.3γ
+    splits=[base]
+    apkSigningVersion=2
+    applicationInfo=ApplicationInfo{df2d3af com.example.ujsAutoClock}
+    flags=[ HAS_CODE ALLOW_CLEAR_USER_DATA ALLOW_BACKUP ]
+    privateFlags=[ PRIVATE_FLAG_ACTIVITIES_RESIZE_MODE_RESIZEABLE_VIA_SDK_VERSION ALLOW_AUDIO_PLAYBACK_CAPTURE PRIVATE_FLAG_ALLOW_NATIVE_HEAP_POINTER_TAGGING ]
+    forceQueryable=false
+    queriesPackages=[]
+    dataDir=/data/user/0/com.example.ujsAutoClock
+    supportsScreens=[small, medium, large, xlarge, resizeable, anyDensity]
+    timeStamp=2021-09-26 11:50:10
+    firstInstallTime=2021-09-26 11:50:10
+    lastUpdateTime=2021-09-26 11:50:10
+    signatures=PackageSignatures{53da3bc version:2, signatures:[fdae1c7e], past signatures:[]}
+    installPermissionsFixed=true
+    pkgFlags=[ HAS_CODE ALLOW_CLEAR_USER_DATA ALLOW_BACKUP ]
+    requested permissions:
+      android.permission.INTERNET
+      android.permission.SCHEDULE_EXACT_ALARM
+      android.permission.RECEIVE_BOOT_COMPLETED
+    install permissions:
+      android.permission.RECEIVE_BOOT_COMPLETED: granted=true
+      android.permission.INTERNET: granted=true
+    User 0: ceDataInode=147531 installed=true hidden=false suspended=false distractionFlags=0 stopped=true notLaunched=true enabled=0 instant=false virtual=false
+      gids=[3003]
+      runtime permissions:
+
+Queries:
+  system apps queryable: false
+  queries via package name:
+  queries via intent:
+  queryable via interaction:
+    User 0:
+
+Package Changes:
+  Sequence number=632
+  User 0:
+    seq=0, package=com.google.android.permissioncontroller
+    seq=1, package=com.android.systemui
+    seq=4, package=com.google.android.inputmethod.latin
+    seq=118, package=com.google.android.sdksetup
+    seq=127, package=com.google.android.cellbroadcastreceiver
+    seq=129, package=com.google.android.apps.youtube.music
+    seq=145, package=com.google.android.apps.messaging
+    seq=234, package=com.google.android.apps.tachyon
+    seq=235, package=com.google.android.partnersetup
+    seq=420, package=com.google.android.youtube
+    seq=444, package=com.google.android.apps.docs
+    seq=454, package=com.google.android.googlequicksearchbox
+    seq=465, package=com.google.android.gsf
+    seq=468, package=com.android.camera2
+    seq=469, package=com.android.nfc
+    seq=470, package=com.android.stk
+    seq=472, package=com.android.traceur
+    seq=473, package=com.google.android.apps.maps
+    seq=477, package=com.google.android.apps.photos
+    seq=480, package=com.google.android.apps.wellbeing
+    seq=482, package=com.google.android.calendar
+    seq=501, package=com.google.android.projection.gearhead
+    seq=503, package=com.android.vending
+    seq=505, package=com.google.android.setupwizard
+    seq=510, package=com.google.android.videos
+    seq=514, package=com.google.android.gm
+    seq=576, package=com.google.android.syncadapters.contacts
+    seq=593, package=com.android.settings
+    seq=595, package=com.google.android.gms
+    seq=604, package=org.fdroid.fdroid
+    seq=613, package=com.chessclock.android
+    seq=629, package=net.ktnx.mobileledger
+    seq=630, package=io.github.ylimit.droidbotapp
+    seq=631, package=com.example.ujsAutoClock
+
+
+Dexopt state:
+  [com.example.ujsAutoClock]
+    path: /data/app/~~GICXrxCE92EREWNVCAtPgA==/com.example.ujsAutoClock-iuwu4q7AeefHiH7h0_gmRg==/base.apk
+      x86: [status=run-from-apk] [reason=unknown]
+
+
+Compiler stats:
+  [com.example.ujsAutoClock]
+     base.apk - 526
+
+APEX session state:
+
+Active APEX packages:
+
+
+Inactive APEX packages:
+
+
+Factory APEX packages:
+
+

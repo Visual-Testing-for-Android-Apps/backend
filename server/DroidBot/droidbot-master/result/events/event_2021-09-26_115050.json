@@ -1,0 +1,49 @@
+{
+  "tag": "2021-09-26_115050",
+  "event": {
+    "event_type": "touch",
+    "log_lines": null,
+    "x": null,
+    "y": null,
+    "view": {
+      "package": "com.example.ujsAutoClock",
+      "visible": true,
+      "checkable": false,
+      "child_count": 0,
+      "editable": true,
+      "clickable": true,
+      "is_password": false,
+      "focusable": true,
+      "enabled": true,
+      "content_description": null,
+      "children": [],
+      "focused": false,
+      "bounds": [
+        [
+          321,
+          252
+        ],
+        [
+          1038,
+          370
+        ]
+      ],
+      "resource_id": "com.example.ujsAutoClock:id/input_username",
+      "checked": false,
+      "text": "\u672a\u8bbe\u7f6e",
+      "class": "android.widget.EditText",
+      "scrollable": false,
+      "selected": false,
+      "long_clickable": true,
+      "parent": 10,
+      "temp_id": 12,
+      "size": "717*118",
+      "signature": "[class]android.widget.EditText[resource_id]com.example.ujsAutoClock:id/input_username[text]\u672a\u8bbe\u7f6e[enabled,,]",
+      "view_str": "835572a53e0250dc5785f017e8f3da41",
+      "content_free_signature": "[class]android.widget.EditText[resource_id]com.example.ujsAutoClock:id/input_username"
+    }
+  },
+  "start_state": "6077dd50c11c71ec61e127d99f5df72c",
+  "stop_state": "6077dd50c11c71ec61e127d99f5df72c",
+  "event_str": "TouchEvent(state=6077dd50c11c71ec61e127d99f5df72c, view=835572a53e0250dc5785f017e8f3da41(MainActivity/EditText-\u672a\u8bbe\u7f6e))"
+}

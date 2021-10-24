@@ -1,0 +1,49 @@
+{
+  "tag": "2021-09-26_115116",
+  "event": {
+    "event_type": "touch",
+    "log_lines": null,
+    "x": null,
+    "y": null,
+    "view": {
+      "package": "com.example.ujsAutoClock",
+      "visible": true,
+      "checkable": false,
+      "child_count": 0,
+      "editable": true,
+      "clickable": true,
+      "is_password": false,
+      "focusable": true,
+      "enabled": true,
+      "content_description": null,
+      "children": [],
+      "focused": false,
+      "bounds": [
+        [
+          225,
+          937
+        ],
+        [
+          356,
+          1077
+        ]
+      ],
+      "resource_id": "android:id/input_hour",
+      "checked": false,
+      "text": "0",
+      "class": "android.widget.EditText",
+      "scrollable": false,
+      "selected": false,
+      "long_clickable": true,
+      "parent": 11,
+      "temp_id": 12,
+      "size": "131*140",
+      "signature": "[class]android.widget.EditText[resource_id]android:id/input_hour[text]0[enabled,,]",
+      "view_str": "91cd8b7b5e15b05c1096c787b5701d72",
+      "content_free_signature": "[class]android.widget.EditText[resource_id]android:id/input_hour"
+    }
+  },
+  "start_state": "cac6d55fb24b5249d4f2f334dd9e021d",
+  "stop_state": "cac6d55fb24b5249d4f2f334dd9e021d",
+  "event_str": "TouchEvent(state=cac6d55fb24b5249d4f2f334dd9e021d, view=91cd8b7b5e15b05c1096c787b5701d72(MainActivity/EditText-0))"
+}

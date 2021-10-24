@@ -1,0 +1,49 @@
+{
+  "tag": "2021-09-26_115127",
+  "event": {
+    "event_type": "touch",
+    "log_lines": null,
+    "x": null,
+    "y": null,
+    "view": {
+      "package": "com.example.ujsAutoClock",
+      "visible": true,
+      "checkable": false,
+      "child_count": 0,
+      "editable": false,
+      "clickable": true,
+      "is_password": false,
+      "focusable": true,
+      "enabled": true,
+      "content_description": null,
+      "children": [],
+      "focused": false,
+      "bounds": [
+        [
+          536,
+          1312
+        ],
+        [
+          718,
+          1438
+        ]
+      ],
+      "resource_id": "android:id/button2",
+      "checked": false,
+      "text": "CANCEL",
+      "class": "android.widget.Button",
+      "scrollable": false,
+      "selected": false,
+      "long_clickable": false,
+      "parent": 28,
+      "temp_id": 29,
+      "size": "182*126",
+      "signature": "[class]android.widget.Button[resource_id]android:id/button2[text]CANCEL[enabled,,]",
+      "view_str": "5b73ce32582c9db4bb3c565ae5e99cb4",
+      "content_free_signature": "[class]android.widget.Button[resource_id]android:id/button2"
+    }
+  },
+  "start_state": "59f57db6db15c304c9fcbf9ff1572867",
+  "stop_state": "6077dd50c11c71ec61e127d99f5df72c",
+  "event_str": "TouchEvent(state=59f57db6db15c304c9fcbf9ff1572867, view=5b73ce32582c9db4bb3c565ae5e99cb4(MainActivity/Button-CANCEL))"
+}
