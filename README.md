@@ -207,7 +207,7 @@ Before opening a PR:
 
 # 6. Versioning Strategy
 
-Moving forward, this repository will use a [Semantic Versioning](https://semver.org/) strategy of the Major.Minor.Patch format. A Git Tag of the new version **must** be included with each merge into the `develop` and `master` branch following a pull request. The merge of this iteration of the README will initiate V1.0.0.
+Moving forward, this repository will use a [Semantic Versioning](https://semver.org/) strategy of the Major.Minor.Patch format. A Git Tag of the new version **must** be included with each merge into the `develop` and `master` branch following a pull request. The _package.json_ version number should also be updated.
 
 ## 6.1. Major Change
 
