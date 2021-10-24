@@ -29,9 +29,9 @@ jobs:
           # Max commit message title length (Validates just the first line of the commit message)
           commit-message-title-max-length: 180 # optional, default is 72
           # Regex to validate the branch name
-          branch-name-regex: '[a-zA-Z0-9-_]+\/[a-zA-Z0-9-_]+\/[a-zA-Z0-9-_]+' # optional, default is .*
+          branch-name-regex: 'develop|[a-zA-Z0-9-_]+\/[a-zA-Z0-9-_]+\/[a-zA-Z0-9-_]+' # optional, default is .*
           # Min branch name length
-          branch-name-min-length: 10 # optional, default is 10
+          branch-name-min-length: 7 # optional, default is 10
           # Max branch name length
           branch-name-max-length: 72 # optional, default is 72
 
@@ -50,8 +50,20 @@ jobs:
         uses: github/super-linter@v3.15.5
         env:
           VALIDATE_ALL_CODEBASE: false
-          DEFAULT_BRANCH: master
+          DEFAULT_BRANCH: develop
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # VALIDATE_JAVASCRIPT_ES: true
+          VALIDATE_JAVASCRIPT_STANDARD: false
+          # VALIDATE_PYTHON_BLACK: true
+          VALIDATE_PYTHON_FLAKE8: false
+          VALIDATE_PYTHON_ISORT: false
+          VALIDATE_PYTHON_MYPY: false
+          VALIDATE_PYTHON_PYLINT: false
+          VALIDATE_MARKDOWN: false
+          VALIDATE_SQL: false
+          FILTER_REGEX_EXCLUDE: .*.husky.*
+          # Flag to have the linter complete with exit code 0 even if errors were detected.
+          # DISABLE_ERRORS: true
 
   build:
     name: Builds and test app
@@ -73,12 +85,11 @@ jobs:
       - name: Install npm dependencies
         run: npm ci
 
-      - name: Test
-        run: npm test
-
       - name: Build
         run: npm run build --if-present
 
+      # - name: Test
+      #   run: npm run test --if-present
 #   deploy:
 #     name: Deploy to heroku
 #     needs: build
