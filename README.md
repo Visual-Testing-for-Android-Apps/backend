@@ -201,11 +201,11 @@ Before opening a PR:
 
 # 6. Versioning Strategy
 
-Moving forward, this repository will use a versioning strategy of the Major.Minor.Patch format. A Git Tag of the new version **must** be included with each merge into the `develop` and `master` branch following a pull request. The merge of this iteration of the README will initiate V1.0.0.
+Moving forward, this repository will use a [Semantic Versioning](https://semver.org/) strategy of the Major.Minor.Patch format. A Git Tag of the new version **must** be included with each merge into the `develop` and `master` branch following a pull request. The merge of this iteration of the README will initiate V1.0.0.
 
 ## 6.1. Major Change
 
-A major change is one that is defined as causing a breaking change to the backend that will not be backwards compatible with previous versions. For example, someone working with V4 deployment cannot assume that they can use all of the features of the V1, V2 or V3 deployments, or that V5 would be a drop in replacement. This generally happens via removing functionality or changing funamental core concepts on how the code should work, disrupting the usual processes. **All major changes must be compatible with frontend integration.** The major version number should be incremented by 1 and the minor and patch version numbers should be reset to 0 with the merge following the pull request of the major change.
+A major change is one that is defined as causing a breaking change to the backend. This generally happens via removing functionality or changing funamental core concepts on how the code should work, disrupting the usual processes. The major version number should be incremented by 1 and the minor and patch version numbers should be reset to 0 with the merge following the pull request of the major change.
 
 #### **Example** <!-- omit in toc -->
 
@@ -214,7 +214,7 @@ V4.13.4 -> V5.0.0
 
 ## 6.2. Minor Change
 
-A minor change is one that is defined as non-breaking change to the backend, so is compatible with all previous versions of the same major version. For example, someone working with V4.13 deployment can assume that they may be able to use all features of previous V4 deployments. This generally happens by adding functionality or changing code for efficiency or effectiveness, not disrupting the usual processes. The minor version number should be incremented by 1 and the patch version number should be reset to 0 with the merge following the pull request of the minor change.
+A minor change is one that is defined as non-breaking change to the backend. This generally happens by adding functionality or changing code for efficiency or effectiveness, not disrupting the usual processes. The minor version number should be incremented by 1 and the patch version number should be reset to 0 with the merge following the pull request of the minor change.
 
 #### **Example** <!-- omit in toc -->
 
@@ -223,7 +223,7 @@ V4.13.4 -> V4.14.0
 
 ## 6.3. Patch
 
-A patch is one that is defined as a bug fix or update that is compatible with all previous versions of the same major version. For example, someone working with V4.13.2 deployment can assume that they may be able to use all features of previous V4 deployments. Updates to documentation is also counted as a patch. The patch version number should be incremented by 1 following the pull request of the patch.
+A patch is one that is defined as a bug fix or update that is compatible with all previous versions of the same major version. Updates to documentation is also counted as a patch. The patch version number should be incremented by 1 following the pull request of the patch.
 
 #### **Example** <!-- omit in toc -->
 
