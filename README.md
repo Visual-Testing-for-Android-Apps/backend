@@ -467,7 +467,17 @@ This presigned URL gives the frontend access to a folder containing a file named
 
 ## 7.4. ReportGen
 
-Gathers all information for a completed batch `job` to create the report in JSON format. Also, generates the access link and send it to the job uploader via email.
+`ReportGen` lambda is triggered by `jobHandler` through SQS after all images and videos are processes. 
+
+Sample SQS event:
+
+```
+{'jobKey': 'the job id in the database'}
+```
+It does two things
+* Gathers all information for a completed batch `job` to create the report in JSON format.
+* Generates the access link and send it to the job uploader via email.
+
 
 ## 7.5. OwlEyes
 
