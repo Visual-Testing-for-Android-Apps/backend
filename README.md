@@ -49,17 +49,17 @@
 
 # 1. Tech Stack
 
-The backend uses two languages: Python and TypeScript.
+The backend uses two languages: [Python](https://www.python.org/) and [TypeScript](https://www.typescriptlang.org/).
 
 - Python: Used in our machine learning models and some Lambda functions.
 - Typescript: Majority of Lambdas are written in TypeScript.
 
-The backend is hosted via AWS.
+The backend is hosted via [AWS](https://aws.amazon.com/console/).
 
-- Lambdas handles all the backend logic as well as hosting the machine learning models with container support. API Gateways create accessing endpoints. SQS acts as glues for Lambdas to trigger each other.
-- Elastic Container Register is used to store the machine learning code, model and dependencies.
-- S3 Bucket stores the user uploaded files and result files.
-- DynamoDB stores the uploading information.
+- [Lambdas](https://aws.amazon.com/lambda/) handles all the backend logic as well as hosting the machine learning models with [container support](https://aws.amazon.com/blogs/aws/new-for-aws-lambda-container-image-support/). [API Gateways](https://aws.amazon.com/api-gateway/) create accessing endpoints. [SQS](https://aws.amazon.com/sqs/) acts as glues for Lambdas to trigger each other.
+- [Elastic Container Register](https://aws.amazon.com/ecr/) is used to store the machine learning code, model and dependencies.
+- [S3 Bucket](https://aws.amazon.com/s3/) stores the user uploaded files and result files.
+- [DynamoDB](https://aws.amazon.com/dynamodb/) stores the uploading information.
 
 # 2. Architecture
 
@@ -133,6 +133,7 @@ nvm npm
 
 <br />
 
+- Install [python 3.8](https://www.python.org/downloads/)
 - Install typescript globally
 
 ```
@@ -478,6 +479,11 @@ It does two things
 * Gathers all information for a completed batch `job` to create the report in JSON format.
 * Generates the access link and send it to the job uploader via email.
 
+The sendEmail function creates a randomly generated password using uuidv4 and adds this to the url  i.e. https://afternoon-woodland-24079.herokuapp.com/batchreportpage/40guvdwi394f?pwd=d010ee16-0009-418b-bd13-a5ac13e43fa7, where: <br>
+* https://afternoon-woodland-24079.herokuapp.com/batchreportpage/ is the base url <br>
+* 40guvdwi394f? is the job id<br>
+* d010ee16-0009-418b-bd13-a5ac13e43fa7 is the password<br>
+*Note this is not a real job ID and password<br>
 
 ## 7.5. OwlEyes
 
