@@ -20,6 +20,7 @@
 - [4. CI/CD](#4-cicd)
   - [4.1. Pull Requests](#41-pull-requests)
   - [4.2. Continuous Deployment](#42-continuous-deployment)
+  - [4.3. Dependabot](#43-dependabot)
 - [5. Want to Contribute?](#5-want-to-contribute)
 - [6. Versioning Strategy](#6-versioning-strategy)
   - [6.1. Major Change](#61-major-change)
@@ -190,6 +191,10 @@ Pull request checks are made to ensure the code quality and correctness. This in
 ## 4.2. Continuous Deployment
 
 The actual hosting is currently on one of our member's AWS account. Building and deployment have been automated to their account upon merging to the `develop` branch for `server components`. Changes on `model components` require manual deployment by running the above SAM commands by the account owner.
+
+## 4.3. Dependabot
+
+GitHub offers a service to keep our dependencies up to date. This results in pull requests by Dependabot on this repository that will need to be review and merged. This requires adequate testing.
 
 # 5. Want to Contribute?
 
@@ -468,22 +473,25 @@ This presigned URL gives the frontend access to a folder containing a file named
 
 ## 7.4. ReportGen
 
-`ReportGen` lambda is triggered by `jobHandler` through SQS after all images and videos are processes. 
+`ReportGen` lambda is triggered by `jobHandler` through SQS after all images and videos are processes.
 
 Sample SQS event:
 
 ```
 {'jobKey': 'the job id in the database'}
 ```
-It does two things
-* Gathers all information for a completed batch `job` to create the report in JSON format.
-* Generates the access link and send it to the job uploader via email.
 
-The sendEmail function creates a randomly generated password using uuidv4 and adds this to the url  i.e. https://afternoon-woodland-24079.herokuapp.com/batchreportpage/40guvdwi394f?pwd=d010ee16-0009-418b-bd13-a5ac13e43fa7, where: <br>
-* https://afternoon-woodland-24079.herokuapp.com/batchreportpage/ is the base url <br>
-* 40guvdwi394f? is the job id<br>
-* d010ee16-0009-418b-bd13-a5ac13e43fa7 is the password<br>
-*Note this is not a real job ID and password<br>
+It does two things
+
+- Gathers all information for a completed batch `job` to create the report in JSON format.
+- Generates the access link and send it to the job uploader via email.
+
+The sendEmail function creates a randomly generated password using uuidv4 and adds this to the url i.e. https://afternoon-woodland-24079.herokuapp.com/batchreportpage/40guvdwi394f?pwd=d010ee16-0009-418b-bd13-a5ac13e43fa7, where: <br>
+
+- https://afternoon-woodland-24079.herokuapp.com/batchreportpage/ is the base url <br>
+- 40guvdwi394f? is the job id<br>
+- d010ee16-0009-418b-bd13-a5ac13e43fa7 is the password<br>
+  \*Note this is not a real job ID and password<br>
 
 ## 7.5. OwlEyes
 
