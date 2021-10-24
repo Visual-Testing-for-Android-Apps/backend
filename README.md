@@ -34,6 +34,7 @@
   - [7.4. JobData](#74-jobdata)
   - [7.5. OwlEyes](#75-owleyes)
   - [7.6. Seenomaly](#76-seenomaly)
+  - [7.7. DroidBot](#77-droidbot)
 - [8. Database Schema](#8-database-schema)
 - [9. S3 bucket structure](#9-s3-bucket-structure)
 
@@ -543,7 +544,24 @@ Explanation contains one of
         "Invisible scrim of modal bottom sheet",
 ]
 ```
+## 7.7. DroidBot
 
+The DroidBot has not been implemented yet and is not yet deployed on the AWS
+
+### How to run the droidbot
+
+Prerequisite
+
+1. `Python` (both 2 and 3 are supported) (Python3 will be better)
+2. `Java`
+3. `Android SDK`
+4. Add `platform_tools` directory in Android SDK to `PATH`
+
+
+
+```bash
+python start.py -a <xxx.apk> -o <output_dir> -count
+```
 # 8. Database Schema
 
 ```
