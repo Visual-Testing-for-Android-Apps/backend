@@ -13,52 +13,54 @@
     - [3.1.2. For Mac Users](#312-for-mac-users)
   - [3.2. Step 2: Install tools](#32-step-2-install-tools)
   - [3.3. Step 3: Install Dependencies](#33-step-3-install-dependencies)
-  - [3.4. Step 4. Deploy on Your Own AWS Account](#34-step-4-deploy-on-your-own-aws-account)
-    - [3.4.1. Deploy Model Vomponents](#341-deploy-model-vomponents)
-    - [3.4.2. Deploy Server Components](#342-deploy-server-components)
+  - [3.4. Step 4. Configure AWS CLI](#34-step-4-configure-aws-cli)
+  - [3.5. Step 5. Deploy on Your Own AWS Account](#35-step-5-deploy-on-your-own-aws-account)
+    - [3.5.1. Deploy Model Components](#351-deploy-model-components)
+    - [3.5.2. Deploy Server Components](#352-deploy-server-components)
 - [4. CI/CD](#4-cicd)
   - [4.1. Pull Requests](#41-pull-requests)
   - [4.2. Continuous Deployment](#42-continuous-deployment)
+  - [4.3. Dependabot](#43-dependabot)
 - [5. Want to Contribute?](#5-want-to-contribute)
 - [6. Versioning Strategy](#6-versioning-strategy)
   - [6.1. Major Change](#61-major-change)
   - [6.2. Minor Change](#62-minor-change)
   - [6.3. Patch](#63-patch)
-- [7. Lambdas](#7-lambdas)
+- [7. Active Lambdas](#7-active-lambdas)
   - [7.1. UploadHandler](#71-uploadhandler)
     - [7.1.1. Job Submission Workflow](#711-job-submission-workflow)
-    - [Email Verification Feature](#email-verification-feature)
     - [7.1.2. Email Verification Feature](#712-email-verification-feature)
-      - [7.1.2.1 Verify code](#7121-verify-code)
-      - [7.1.2.2 Update their email](#7122-update-their-email)
-      - [7.1.2.3 Resend verification code:](#7123-resend-verification-code)
     - [7.1.3. Access Files with UploadHandler](#713-access-files-with-uploadhandler)
-      - [Get one file via file reference](#get-one-file-via-file-reference)
-      - [OR get all job file at once](#or-get-all-job-file-at-once)
   - [7.2. JobHandler](#72-jobhandler)
   - [7.3. JobData](#73-jobdata)
   - [7.4. ReportGen](#74-reportgen)
   - [7.5. OwlEyes](#75-owleyes)
   - [7.6. Seenomaly](#76-seenomaly)
-  - [7.7. DroidBot](#77-droidbot)
-- [8. Database Schema](#8-database-schema)
-- [9. S3 bucket structure](#9-s3-bucket-structure)
+  - [7.7. PeriodicFileRemoval](#77-periodicfileremoval)
+    - [7.7.1. Running the function](#771-running-the-function)
+- [8. Unused Lambdas](#8-unused-lambdas)
+  - [8.1. FileCompress](#81-filecompress)
+  - [8.2. VideoSplit](#82-videosplit)
+  - [8.3. DroidBot](#83-droidbot)
+    - [8.3.1. How to run the droidbot](#831-how-to-run-the-droidbot)
+- [9. Database Schema](#9-database-schema)
+- [10. S3 bucket structure](#10-s3-bucket-structure)
 
 <br/>
 
-# 1. Tech Stack <!-- no toc -->
+# 1. Tech Stack
 
-The backend uses two languages: Python and TypeScript.
+The backend uses two languages: [Python](https://www.python.org/) and [TypeScript](https://www.typescriptlang.org/).
 
 - Python: Used in our machine learning models and some Lambda functions.
 - Typescript: Majority of Lambdas are written in TypeScript.
 
-The backend is hosted via AWS.
+The backend is hosted via [AWS](https://aws.amazon.com/console/).
 
-- Lambdas handles all the backend logic as well as hosting the machine learning models with container support. API Gateways create accessing endpoints. SQS acts as glues for Lambdas to trigger each other.
-- Elastic Container Register is used to store the machine learning code, model and dependencies.
-- S3 Bucket stores the user uploaded files and result files.
-- DynamoDB stores the uploading information.
+- [Lambdas](https://aws.amazon.com/lambda/) handles all the backend logic as well as hosting the machine learning models with [container support](https://aws.amazon.com/blogs/aws/new-for-aws-lambda-container-image-support/). [API Gateways](https://aws.amazon.com/api-gateway/) create accessing endpoints. [SQS](https://aws.amazon.com/sqs/) acts as glues for Lambdas to trigger each other.
+- [Elastic Container Register](https://aws.amazon.com/ecr/) is used to store the machine learning code, model and dependencies.
+- [S3 Bucket](https://aws.amazon.com/s3/) stores the user uploaded files and result files.
+- [DynamoDB](https://aws.amazon.com/dynamodb/) stores the uploading information.
 
 # 2. Architecture
 
@@ -107,9 +109,9 @@ Follow the official documentation linked above.
 
 ### 3.1.2. For Mac Users
 
-```
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" # install homebrew if you don't have it already
+Install [homebrew](https://brew.sh/).
 
+```
 brew tap aws/tap
 
 brew install awscli aws-sam-cli
@@ -132,6 +134,7 @@ nvm npm
 
 <br />
 
+- Install [python 3.8](https://www.python.org/downloads/)
 - Install typescript globally
 
 ```
@@ -145,9 +148,13 @@ npm install -g typescript
 npm install
 ```
 
-## 3.4. Step 4. Deploy on Your Own AWS Account
+## 3.4. Step 4. Configure AWS CLI
 
-### 3.4.1. Deploy Model Vomponents
+Please follow the official documentation linked [here](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html).
+
+## 3.5. Step 5. Deploy on Your Own AWS Account
+
+### 3.5.1. Deploy Model Components
 
 Create a ECR repository. Save the URI which is outputted to the terminal. The URI will be used when deploying. This is only needed for the first deployment.
 
@@ -163,7 +170,7 @@ sam build
 sam deploy --guided #only need guided for first deployment
 ```
 
-### 3.4.2. Deploy Server Components
+### 3.5.2. Deploy Server Components
 
 ```
 cd ./server
@@ -185,6 +192,10 @@ Pull request checks are made to ensure the code quality and correctness. This in
 
 The actual hosting is currently on one of our member's AWS account. Building and deployment have been automated to their account upon merging to the `develop` branch for `server components`. Changes on `model components` require manual deployment by running the above SAM commands by the account owner.
 
+## 4.3. Dependabot
+
+GitHub offers a service to keep our dependencies up to date. This results in pull requests by Dependabot on this repository that will need to be review and merged. This requires adequate testing.
+
 # 5. Want to Contribute?
 
 You can report a bug or suggest a feature by creating an issue in the GitHub repository. If you'd like to contribute code to the codebase, please read the [project guidelines](https://github.com/Visual-Testing-for-Android-Apps/Project-guidelines) before you get started.
@@ -201,7 +212,7 @@ Before opening a PR:
 
 # 6. Versioning Strategy
 
-Moving forward, this repository will use a [Semantic Versioning](https://semver.org/) strategy of the Major.Minor.Patch format. A Git Tag of the new version **must** be included with each merge into the `develop` and `master` branch following a pull request. The merge of this iteration of the README will initiate V1.0.0.
+Moving forward, this repository will use a [Semantic Versioning](https://semver.org/) strategy of the Major.Minor.Patch format. A Git Tag of the new version **must** be included with each merge into the `develop` and `master` branch following a pull request. The _package.json_ version number should also be updated.
 
 ## 6.1. Major Change
 
@@ -230,7 +241,7 @@ A patch is one that is defined as a bug fix or update that is compatible with al
 _Fixed random character in string bug_</br>
 V4.13.4 -> V4.13.5
 
-# 7. Lambdas
+# 7. Active Lambdas
 
 ## 7.1. UploadHandler
 
@@ -291,11 +302,6 @@ statusCode = 200 -> start to process the job
 statusCode != 200 -> error
 ```
 
-### Email Verification Feature
-
-The Email verification feature is implemented but not yet integrated with the front end.
-Verification code expires in 500 seconds.
-
 ### 7.1.2. Email Verification Feature
 
 The email verification feature is implemented but not yet integrated with the front end.
@@ -308,7 +314,7 @@ The module `sesService.ts` contains functionality which
 
 Three API endpoints are built around the email verification feature.
 
-#### 7.1.2.1 Verify code
+#### Verify code <!-- omit in toc -->
 
 Format:<br/>`POST /job/verify-code`
 
@@ -331,7 +337,7 @@ Sample response body
 }
 ```
 
-#### 7.1.2.2 Update their email
+#### Update their email <!-- omit in toc -->
 
 Format:<br/>`POST /job/update-email`
 <br/><br/>
@@ -344,7 +350,7 @@ Sample request body:
 }
 ```
 
-#### 7.1.2.3 Resend verification code:
+#### Resend verification code: <!-- omit in toc -->
 
 Format:<br/>`POST /job/update-email`
 <br/><br/>
@@ -359,7 +365,7 @@ Sample request body:
 
 ### 7.1.3. Access Files with UploadHandler
 
-#### Get one file via file reference
+#### Get one file via file reference <!-- omit in toc -->
 
 Format:<br/>`Post /job/file`
 <br/><br/>
@@ -381,7 +387,7 @@ Then:
 GET downloadUrl
 ```
 
-#### OR get all job file at once
+#### OR get all job file at once <!-- omit in toc -->
 
 Format:<br/>`Post /job/files`
 <br/><br/>
@@ -467,7 +473,25 @@ This presigned URL gives the frontend access to a folder containing a file named
 
 ## 7.4. ReportGen
 
-ReportGen has no public interface.
+`ReportGen` lambda is triggered by `jobHandler` through SQS after all images and videos are processes.
+
+Sample SQS event:
+
+```
+{'jobKey': 'the job id in the database'}
+```
+
+It does two things
+
+- Gathers all information for a completed batch `job` to create the report in JSON format.
+- Generates the access link and send it to the job uploader via email.
+
+The sendEmail function creates a randomly generated password using uuidv4 and adds this to the url i.e. https://afternoon-woodland-24079.herokuapp.com/batchreportpage/40guvdwi394f?pwd=d010ee16-0009-418b-bd13-a5ac13e43fa7, where: <br>
+
+- https://afternoon-woodland-24079.herokuapp.com/batchreportpage/ is the base url <br>
+- 40guvdwi394f? is the job id<br>
+- d010ee16-0009-418b-bd13-a5ac13e43fa7 is the password<br>
+  \*Note this is not a real job ID and password<br>
 
 ## 7.5. OwlEyes
 
@@ -481,54 +505,21 @@ Request body contains
 - the `raw binary` of the image, or
 - a `download_url` inside a json object
 
+Sample request body:
+
 ```
-// Sample json request body
 {"download_url”: “url to download the image"}
 ```
 
-Request body contains
-
-- the `raw binary` of the video, or
-- a `download_url` inside a json object
+Sample return body:
 
 ```
-// Sample json request body
-{"download_url":"url to download the video"}
-```
-
-```
-// Sample return body
 {
 
 	"original_img”: original_img , // this is the original image
 	'res_img': res_image, // The base 64 encoded result image
 	'bug_type': 'Null value ‘|’Missing image ‘|’Component occlusion'
 }
-```
-
-```
-// Sample return body
-{
-	"classification": error code,
-	"explanation": error description
-}
-```
-
-Explanation contains one of
-
-```
-[
-	"Unknown",
-	"Pass through other material",
-	"Lack of scrimmed background",
-	"Snackbar blocks bottom app bar",
-	"Stack multiple banners",
-	"Flip card to reveal information",
-	"Move one card behind other card",
-	"Stack multiple snackbars",
-	"Lack of shadow",
-	"Invisible scrime of modal bottom sheet",
-]
 ```
 
 ## 7.6. Seenomaly
@@ -543,40 +534,72 @@ Request body contains
 - the `raw binary` of the video, or
 - a `download_url` inside a json object
 
+Sample request body:
+
 ```
-// Sample json request body
 {"download_url”: “url to download the video"}
 ```
 
+Sample return body:
+
 ```
-// Sample return body
 {
 	"classification": error code,
 	"explanation": error description
 }
 ```
 
-Explanation contains one of
+Error codes correspond to the descriptions below: <br/>
 
-```
-[
-	"Unknown",
-	"Pass through other material",
-	"Lack of scrimmed background",
-	"Snackbar blocks bottom app bar",
-	"Stack multiple banners",
-	"Flip card to reveal information",
-	"Move one card behind other card",
-	"Stack multiple snackbars",
-	"Lack of shadow",
-	"Invisible scrim of modal bottom sheet",
-]
-```
-## 7.7. DroidBot
+- \[0] Unknown
+- \[1] Pass through other material
+- \[2] Lack of scrimmed background
+- \[3] Snackbar blocks bottom app bar
+- \[4] Stack multiple banners
+- \[5] Flip card to reveal information
+- \[6] Move one card behind other card
+- \[7] Stack multiple snackbars
+- \[8] Lack of shadow
+- \[9] Invisible scrim of modal bottom sheet
 
-The DroidBot has not been implemented yet and is not yet deployed on the AWS
+## 7.7. PeriodicFileRemoval
 
-### How to run the droidbot
+This Lambda function checks all jobs in the database and removes any that are older than 30 days. The accompanying files in the S3 bucket will also be removed, as stated in our privacy policy.
+
+### 7.7.1. Running the function
+
+Iterating over the entire database is quite costly so this function should not run continually. It is possible for it to be automatically triggered by AWS, say once per day, but this has not yet been added to our deployment file.
+
+You can either add this though the AWS Console, or the function can be manually invocated.
+
+#### Manual invocation <!-- omit in toc -->
+
+1. Navigate to the Lambda function in your AWS Console.
+2. Select the dropdown next to the "Test" button, in the top-right.
+3. If this is your first time invoking this function then select the option "Configure test events", which will open a dialogue. Else skip to step 8.
+4. Select the "Create new test event" bubble and leave the template selection as is.
+5. Replace the example message with `{}` as this Lambda function expects an event
+6. Enter a name into "Event name", such as "EmptyEvent".
+7. Press the "Create" button, which will close the dialogue.
+8. Ensure that the dropdown option now refers to the event you created.
+9. Hit test.
+
+# 8. Unused Lambdas
+
+## 8.1. FileCompress
+
+This fuction will take all files and results associated with a batch job and move them into a compressed zip folder, convenient for downlaoding. This removed the uncompressed files from the S3 bucket.
+
+This fuction is feature complete, but the supporting fuctionality is not yet implemented.
+
+## 8.2. VideoSplit
+
+This function receives an mp4 file and outputs smaller images and video from the video into a new directory.
+The directory will contain image files named with the second from which the image is taken, and video files named by the initial and final second contained in the video. This function can be used either as its own individual pipeline, alongside the live job and batch job, or long video files submitted to live and batch jobs can be inputted into this function to split the video into analysable subsets. Neither of these functionalities are currently integrated.
+
+## 8.3. DroidBot
+
+### 8.3.1. How to run the droidbot
 
 Prerequisite
 
@@ -585,12 +608,11 @@ Prerequisite
 3. `Android SDK`
 4. Add `platform_tools` directory in Android SDK to `PATH`
 
-
-
 ```bash
 python start.py -a <xxx.apk> -o <output_dir> -count
 ```
-# 8. Database Schema
+
+# 9. Database Schema
 
 ```
 {
@@ -624,7 +646,7 @@ python start.py -a <xxx.apk> -o <output_dir> -count
 - waiting for the file to be processed. -> In DynamoDB, jobStatus = PROCESSING, file.status = NEW
 - all file completed. -> In DynamoDB, jobStatus = GENERATING, file.status = DONE
 
-# 9. S3 bucket structure
+# 10. S3 bucket structure
 
 For a single jobs,
 
