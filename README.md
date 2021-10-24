@@ -8,13 +8,14 @@
   - [2.2. Server Components](#22-server-components)
   - [2.3. Diagram](#23-diagram)
 - [3. Dev Environment Set Up](#3-dev-environment-set-up)
-  - [3.1. Step 1: Install tools](#31-step-1-install-tools)
+  - [3.1. Step 1: Install AWS CLI](#31-step-1-install-aws-cli)
     - [3.1.1. For Windows and Linux Users](#311-for-windows-and-linux-users)
     - [3.1.2. For Mac Users](#312-for-mac-users)
-  - [3.2. Step 2: Install Dependencies](#32-step-2-install-dependencies)
-  - [3.3. Step 3. Deploy on Your Own AWS Account](#33-step-3-deploy-on-your-own-aws-account)
-    - [3.3.1. Deploy Model Vomponents](#331-deploy-model-vomponents)
-    - [3.3.2. Deploy Server Components](#332-deploy-server-components)
+  - [3.2. Step 2: Install tools](#32-step-2-install-tools)
+  - [3.3. Step 3: Install Dependencies](#33-step-3-install-dependencies)
+  - [3.4. Step 4. Deploy on Your Own AWS Account](#34-step-4-deploy-on-your-own-aws-account)
+    - [3.4.1. Deploy Model Vomponents](#341-deploy-model-vomponents)
+    - [3.4.2. Deploy Server Components](#342-deploy-server-components)
 - [4. CI/CD](#4-cicd)
   - [4.1. Pull Requests](#41-pull-requests)
   - [4.2. Continuous Deployment](#42-continuous-deployment)
@@ -26,12 +27,17 @@
 - [7. Lambdas](#7-lambdas)
   - [7.1. UploadHandler](#71-uploadhandler)
     - [7.1.1. Job Submission Workflow](#711-job-submission-workflow)
-    - [Email verification feature 📧](#email-verification-feature-)
+    - [Email Verification Feature](#email-verification-feature)
     - [7.1.2. Email Verification Feature](#712-email-verification-feature)
+      - [7.1.2.1 Verify code](#7121-verify-code)
+      - [7.1.2.2 Update their email](#7122-update-their-email)
+      - [7.1.2.3 Resend verification code:](#7123-resend-verification-code)
     - [7.1.3. Access Files with UploadHandler](#713-access-files-with-uploadhandler)
+      - [Get one file via file reference](#get-one-file-via-file-reference)
+      - [OR get all job file at once](#or-get-all-job-file-at-once)
   - [7.2. JobHandler](#72-jobhandler)
-  - [7.3. ReportGen](#73-reportgen)
-  - [7.4. JobData](#74-jobdata)
+  - [7.3. JobData](#73-jobdata)
+  - [7.4. ReportGen](#74-reportgen)
   - [7.5. OwlEyes](#75-owleyes)
   - [7.6. Seenomaly](#76-seenomaly)
   - [7.7. DroidBot](#77-droidbot)
@@ -89,13 +95,11 @@ The diagram below shows the model and server components.
 
 # 3. Dev Environment Set Up
 
-## 3.1. Step 1: Install tools
+## 3.1. Step 1: Install AWS CLI
 
-<br />
-
-- [ ] Install [aws-cli](https://aws.amazon.com/cli/) and [aws-sam-cli](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-command-reference.html).
-      Here are the official docs to install [aws-cli](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-install.html) and [aws-sam-cli](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html).
-      <br/>
+- Install [aws-cli](https://aws.amazon.com/cli/) and [aws-sam-cli](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-command-reference.html).
+  Here are the official docs to install [aws-cli](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-install.html) and [aws-sam-cli](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html).
+  <br/>
 
 ### 3.1.1. For Windows and Linux Users
 
@@ -111,42 +115,39 @@ brew tap aws/tap
 brew install awscli aws-sam-cli
 ```
 
-- [ ] Download docker [here](https://docs.docker.com/get-docker/).
+## 3.2. Step 2: Install tools
 
-- [ ] Install [nvm](https://github.com/nvm-sh/nvm). And use nvm to install npm and node via nvm
+- Download and install [docker](https://docs.docker.com/get-docker/).
 
-```
-curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
+- Install [nvm](https://github.com/nvm-sh/nvm), following their instructions in the _Installing and Updating_ section.
 
-export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
-```
+- After nvm is installed, install node and npm
 
 ```
 nvm node
 nvm npm
 ```
 
-## 3.2. Step 2: Install Dependencies
+## 3.3. Step 3: Install Dependencies
 
 <br />
 
-- [ ] Install typescript globally
+- Install typescript globally
 
 ```
 npm install -g typescript
 ```
 
-- [ ] Install packages
-      Do the following inside each folder of `./server/*`
+- Install packages
+  Do the following inside each folder of `./server/*`
 
 ```
 npm install
 ```
 
-## 3.3. Step 3. Deploy on Your Own AWS Account
+## 3.4. Step 4. Deploy on Your Own AWS Account
 
-### 3.3.1. Deploy Model Vomponents
+### 3.4.1. Deploy Model Vomponents
 
 Create a ECR repository. Save the URI which is outputted to the terminal. The URI will be used when deploying. This is only needed for the first deployment.
 
@@ -162,7 +163,7 @@ sam build
 sam deploy --guided #only need guided for first deployment
 ```
 
-### 3.3.2. Deploy Server Components
+### 3.4.2. Deploy Server Components
 
 ```
 cd ./server
@@ -186,37 +187,47 @@ The actual hosting is currently on one of our member's AWS account. Building and
 
 # 5. Want to Contribute?
 
-You can report a bug or suggest a feature by creating an issue in the GitHub repository. If you'd like to contribute code to the codebase, please read the [project guidelines](https://github.com/Visual-Testing-for-Android-Apps/Project-guidelines) before you get started. Then fork and clone the project repository create a branch within your forked repository with a descriptive name of your contribution e.g. _db_filename_string_bugix_. Work within this branch of your change and whenever you are ready to merge your branch, create a pull request from your head repository to the base repository. Members of the Vision team will review your pull request, and either send feedback on your changes or succesfully merge them!
+You can report a bug or suggest a feature by creating an issue in the GitHub repository. If you'd like to contribute code to the codebase, please read the [project guidelines](https://github.com/Visual-Testing-for-Android-Apps/Project-guidelines) before you get started.
+
+To begin fork and clone the project repository create a branch within your forked repository following the naming rules below. Work within this branch of your change and whenever you are ready to merge your branch, create a pull request from your head repository to the base repository. Members of the Vision team will review your pull request, and either send feedback on your changes or succesfully merge them!
+
+Before opening a PR:
+
+- Make sure that there isn't an active PR already open which makes the same changes
+- Check and link any issues related to your PR
+- Follow the [project guidlines](https://github.com/Visual-Testing-for-Android-Apps/Project-guidelines)
+- Make sure that your branch name follows `{type}/{name}/{description}`
+- Follow the PR template
 
 # 6. Versioning Strategy
 
-Moving forward, this repository will use a versioning strategy via a Major.Minor.Patch format. A Git Tag of the new version **must** be included with each merge into the `develop` and `master` branch following a pull request. The merge of this iteration of the README will initiate V1.0.0.
+Moving forward, this repository will use a versioning strategy of the Major.Minor.Patch format. A Git Tag of the new version **must** be included with each merge into the `develop` and `master` branch following a pull request. The merge of this iteration of the README will initiate V1.0.0.
 
 ## 6.1. Major Change
 
-A major change is one that is defined as causing a breaking change to the backend and will not be backwards compatible with previous major versions. For example, someone working with V4 deployment cannot assume that they may be able to use all of the features of the V1, V2 or V3 deployments. This generally happens via removing functionality or changing funamental core concepts on how the code should work, disrupting the usual processes. **All major changes must be compatible with frontend integration.** The major version number should be incremented by 1 and the minor and patch version numbers should be reset to 0 with the merge following the pull request of the major change.
+A major change is one that is defined as causing a breaking change to the backend that will not be backwards compatible with previous versions. For example, someone working with V4 deployment cannot assume that they can use all of the features of the V1, V2 or V3 deployments, or that V5 would be a drop in replacement. This generally happens via removing functionality or changing funamental core concepts on how the code should work, disrupting the usual processes. **All major changes must be compatible with frontend integration.** The major version number should be incremented by 1 and the minor and patch version numbers should be reset to 0 with the merge following the pull request of the major change.
 
-#### 7.1.0.1. **Example** <!-- omit in toc -->
+#### **Example** <!-- omit in toc -->
 
-Complete overhaul of the DynamoDB schema<br/>
+_Complete overhaul of the DynamoDB schema_<br/>
 V4.13.4 -> V5.0.0
 
 ## 6.2. Minor Change
 
-A minor change is one that is defined as non-breaking change to the backend that is compatible with all previous versions of the same major version. For example, someone working with V4.13 deployment can assume that they may be able to use all features of previous V4 deployments. This generally happens by adding functionality or changing code for efficiency or effectiveness, not disrupting the usual processes. The minor version number should be incremented by 1 and the patch version number should be reset to 0 with the merge following the pull request of the minor change.
+A minor change is one that is defined as non-breaking change to the backend, so is compatible with all previous versions of the same major version. For example, someone working with V4.13 deployment can assume that they may be able to use all features of previous V4 deployments. This generally happens by adding functionality or changing code for efficiency or effectiveness, not disrupting the usual processes. The minor version number should be incremented by 1 and the patch version number should be reset to 0 with the merge following the pull request of the minor change.
 
-#### 7.2.0.1. **Example** <!-- omit in toc -->
+#### **Example** <!-- omit in toc -->
 
-Added automatic video splitting functionality<br/>
+_Added automatic video splitting functionality_<br/>
 V4.13.4 -> V4.14.0
 
 ## 6.3. Patch
 
 A patch is one that is defined as a bug fix or update that is compatible with all previous versions of the same major version. For example, someone working with V4.13.2 deployment can assume that they may be able to use all features of previous V4 deployments. Updates to documentation is also counted as a patch. The patch version number should be incremented by 1 following the pull request of the patch.
 
-#### 7.3.0.1. **Example** <!-- omit in toc -->
+#### **Example** <!-- omit in toc -->
 
-Fixed random character in string bug<br/>
+_Fixed random character in string bug_</br>
 V4.13.4 -> V4.13.5
 
 # 7. Lambdas
@@ -229,18 +240,23 @@ Root URL: https://2fr7fj3ota.execute-api.ap-southeast-2.amazonaws.com/Prod/
 
 Front submit `job` via UploadHandler. There are `three steps` for job submission.
 
-🔵 1. Send a POST request to get presigned URLs for upload image/video
-example request body <br/>
-
-`POST /job/upload-request`
+1. Send a POST request to get presigned URLs for upload image/video
+   example request body
+   <br/><br/>
+   Format:<br/>`POST /job/upload-request`
+   <br/><br/>
+   Sample request body:
 
 ```
-// Sample request body
 {
     "email": "sample_email@gmail.com",
     "fileNames”: ["test.mp4", "test.jpg"]
 }
-// Sample response body
+```
+
+Sample response body
+
+```
 {
     "uploadUrls":
                 {
@@ -251,30 +267,31 @@ example request body <br/>
 }
 ```
 
-🔵 2. For each file, send a PUT request on the presigned URL with file
-<br/>
+2. For each file, send a PUT request on the presigned URL with file
+   <br/><br/>
+   Format:<br/>`PUT $preSigned-url-returned-from-step1`
 
-`PUT $preSigned-url-returned-from-step1`
-
-🔵 3. After all files have been uploaded, send a POST request to notify finish
-<br/>
-
-`POST /job/upload-done`
-
-🔵 3. (after all file has been uploaded) send a Post request to notify finish
-`POST /job/upload-done`
+3. (after all file has been uploaded) send a Post request to notify finish
+   <br/><br/>
+   Format:<br/>`POST /job/upload-done`
+   <br/><br/>
+   Sample request body:
 
 ```
-// Sample request body
 {
     "jobID”: “jobId"
 }
-// Sample response
+```
+
+<br/>
+Sample response:
+
+```
 statusCode = 200 -> start to process the job
 statusCode != 200 -> error
 ```
 
-### Email verification feature 📧
+### Email Verification Feature
 
 The Email verification feature is implemented but not yet integrated with the front end.
 Verification code expires in 500 seconds.
@@ -291,22 +308,22 @@ The module `sesService.ts` contains functionality which
 
 Three API endpoints are built around the email verification feature.
 
-Verify code:
-<br/>
+#### 7.1.2.1 Verify code
 
-`POST /job/verify-code`
+Format:<br/>`POST /job/verify-code`
 
-Three API endpoints are built around email verification feature
-
-Verify code: `POST /job/verify-code`
+Sample request body:
 
 ```
-// Sample request body
 {
     "verificationCode": "some 6-digit number", // can be anything code for now send
-    "jobID”: “jobId returned from the first API call"
+    "jobID": "jobId returned from the first API call"
 }
-// Sample response body
+```
+
+Sample response body
+
+```
 {
     "jobID": "30ecd6ed-78ab-40d6-b3cd-79c2e3c4922e",
     "verified": true,
@@ -314,26 +331,27 @@ Verify code: `POST /job/verify-code`
 }
 ```
 
-Update their email:
-<br/>
+#### 7.1.2.2 Update their email
 
-`POST /job/update-email`
+Format:<br/>`POST /job/update-email`
+<br/><br/>
+Sample request body:
 
 ```
-// Sample request body
 {
     "email": "new_email_address",
     "jobID”: “jobId returned from the first API call"
 }
 ```
 
-Resend verification code:
-<br/>
+#### 7.1.2.3 Resend verification code:
 
-`POST /job/update-email`
+Format:<br/>`POST /job/update-email`
+<br/><br/>
+Sample request body:
 
 ```
-// Sample request body
+//
 {
     "jobID”: “jobID"
 }
@@ -341,41 +359,49 @@ Resend verification code:
 
 ### 7.1.3. Access Files with UploadHandler
 
-Get one file via file reference
-<br/>
+#### Get one file via file reference
 
-`Post /job/file`
+Format:<br/>`Post /job/file`
+<br/><br/>
+Sample request:
 
 ```
-
-// sample request
 {"filePath": "jobID/1231.jpg”}
+```
 
-// sample response
+Sample response:
+
+```
 {"url”: "downloadUrl"}
 ```
+
+Then:
 
 ```
 GET downloadUrl
 ```
 
-OR get all job file at once
-<br/>
+#### OR get all job file at once
 
-`Post /job/files`
+Format:<br/>`Post /job/files`
+<br/><br/>
+Sample request:
 
 ```
-
-// sample request
 {"jobID": "4141”}
+```
 
-// sample response
+Sample response:
+
+```
 {
     "4141/342.jpg":"download_url1",
     "4141/result/342.jpg":"download_url1",
     "4141/342.mp4":"download_url3",
 }
 ```
+
+Then:
 
 ```
 GET downloadUrl
@@ -393,11 +419,7 @@ The JobHandler lambda receives a `jobKey` from the event. It is responsible for 
 
 <img src="./2.png" alt="drawing" width="200"/>
 
-## 7.3. ReportGen
-
-<span style="color: red">TODO</span>.
-
-## 7.4. JobData
+## 7.3. JobData
 
 The user receives an email containing a link such as
 https://afternoon-woodland-24079.herokuapp.com/batchreportpage/publicKey?pwd=password
@@ -443,6 +465,10 @@ This presigned URL gives the frontend access to a folder containing a file named
 }
 ```
 
+## 7.4. ReportGen
+
+ReportGen has no public interface.
+
 ## 7.5. OwlEyes
 
 Image Endpoint:
@@ -470,36 +496,38 @@ Request body contains
 {"download_url":"url to download the video"}
 ```
 
+```
 // Sample return body
 {
 
-        "original_img”: original_img , // this is the original image
-        'res_img': res_image, // The base 64 encoded result image
-        'bug_type': 'Null value ‘|’Missing image ‘|’Component occlusion'
-    }
+	"original_img”: original_img , // this is the original image
+	'res_img': res_image, // The base 64 encoded result image
+	'bug_type': 'Null value ‘|’Missing image ‘|’Component occlusion'
+}
+```
 
 ```
 // Sample return body
-    {
-        "classification": error code,
-        "explanation": error description
-    }
+{
+	"classification": error code,
+	"explanation": error description
+}
 ```
 
 Explanation contains one of
 
 ```
 [
-        "Unknown",
-        "Pass through other material",
-        "Lack of scrimmed background",
-        "Snackbar blocks bottom app bar",
-        "Stack multiple banners",
-        "Flip card to reveal information",
-        "Move one card behind other card",
-        "Stack multiple snackbars",
-        "Lack of shadow",
-        "Invisible scrime of modal bottom sheet",
+	"Unknown",
+	"Pass through other material",
+	"Lack of scrimmed background",
+	"Snackbar blocks bottom app bar",
+	"Stack multiple banners",
+	"Flip card to reveal information",
+	"Move one card behind other card",
+	"Stack multiple snackbars",
+	"Lack of shadow",
+	"Invisible scrime of modal bottom sheet",
 ]
 ```
 
@@ -522,26 +550,26 @@ Request body contains
 
 ```
 // Sample return body
-    {
-        "classification": error code,
-        "explanation": error description
-    }
+{
+	"classification": error code,
+	"explanation": error description
+}
 ```
 
 Explanation contains one of
 
 ```
 [
-        "Unknown",
-        "Pass through other material",
-        "Lack of scrimmed background",
-        "Snackbar blocks bottom app bar",
-        "Stack multiple banners",
-        "Flip card to reveal information",
-        "Move one card behind other card",
-        "Stack multiple snackbars",
-        "Lack of shadow",
-        "Invisible scrim of modal bottom sheet",
+	"Unknown",
+	"Pass through other material",
+	"Lack of scrimmed background",
+	"Snackbar blocks bottom app bar",
+	"Stack multiple banners",
+	"Flip card to reveal information",
+	"Move one card behind other card",
+	"Stack multiple snackbars",
+	"Lack of shadow",
+	"Invisible scrim of modal bottom sheet",
 ]
 ```
 ## 7.7. DroidBot
@@ -566,29 +594,29 @@ python start.py -a <xxx.apk> -o <output_dir> -count
 
 ```
 {
- "id": String,
- "emailVerified": Boolean,
- "emailVerification": {
-  "createdAt": String eg."2021-09-20T08:27:18.972Z",
-  "code": String eg."910695"
- },
- "files": [
-  {
-   "contentType": String "video/mp4"|"image/jpeg “|”image/png",
-   "orginalName": String e.g. "test_1.mp4",
-   "s3Key": String
-   "status": String "NEW"|"DONE",
-   "type": String "VIDEO"|"VIDEO"
-    "result": {
-    "message": String|String[] e.g.."Snackbar blocks bottom app bar",
-    "code": String? eg."3"
-    "outputKey": String?
-   },
-  },
- ],
- "createdAt": String eg."2021-09-20T08:25:40.984Z",
- "email": String e.g.."Example@gmail.com"
- "jobStatus": String? "PROCESSING"|"GENERATING"|"DONE",
+	"id": String,
+	"emailVerified": Boolean,
+	"emailVerification": {
+		"createdAt": String eg."2021-09-20T08:27:18.972Z",
+		"code": String eg."910695"
+	},
+	"files": [
+		{
+			"contentType": String "video/mp4"|"image/jpeg “|”image/png",
+			"orginalName": String e.g. "test_1.mp4",
+			"s3Key": String
+			"status": String "NEW"|"DONE",
+			"type": String "VIDEO"|"VIDEO"
+				"result": {
+					"message": String|String[] e.g.."Snackbar blocks bottom app bar",
+					"code": String? eg."3"
+					"outputKey": String?
+				},
+		},
+	],
+	"createdAt": String eg."2021-09-20T08:25:40.984Z",
+	"email": String e.g.."Example@gmail.com"
+	"jobStatus": String? "PROCESSING"|"GENERATING"|"DONE",
 }
 
 ```
