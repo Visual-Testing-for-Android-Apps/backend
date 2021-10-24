@@ -1,6 +1,6 @@
 {
-	"name": "visiondroid",
-	"version": "1.0.0",
+	"name": "Vision",
+	"version": "1.0.3",
 	"description": " Visual testing for android apps ",
 	"main": "index.js",
 	"scripts": {
