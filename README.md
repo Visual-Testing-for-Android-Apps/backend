@@ -194,7 +194,7 @@ The actual hosting is currently on one of our member's AWS account. Building and
 
 ## 4.3. Dependabot
 
-GitHub offers a service to keep our dependencies up to date. This results in pull requests by Dependabot on this repository that will need to be review and merged. This requires adequate testing.
+GitHub offers a service to keep our dependencies up to date. This results in pull requests by Dependabot on this repository that will need to be review and merged. This requires adequate testing as the changes it suggests may be breaking e.g. Seenomaly uses depracated functions wtihin Tensorflow 2.
 
 # 5. Want to Contribute?
 
