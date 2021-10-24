@@ -8,13 +8,14 @@
   - [2.2. Server Components](#22-server-components)
   - [2.3. Diagram](#23-diagram)
 - [3. Dev Environment Set Up](#3-dev-environment-set-up)
-  - [3.1. Step 1: Install tools](#31-step-1-install-tools)
+  - [3.1. Step 1: Install AWS CLI](#31-step-1-install-aws-cli)
     - [3.1.1. For Windows and Linux Users](#311-for-windows-and-linux-users)
     - [3.1.2. For Mac Users](#312-for-mac-users)
-  - [3.2. Step 2: Install Dependencies](#32-step-2-install-dependencies)
-  - [3.3. Step 3. Deploy on Your Own AWS Account](#33-step-3-deploy-on-your-own-aws-account)
-    - [3.3.1. Deploy Model Vomponents](#331-deploy-model-vomponents)
-    - [3.3.2. Deploy Server Components](#332-deploy-server-components)
+  - [3.2. Step 2: Install tools](#32-step-2-install-tools)
+  - [3.3. Step 3: Install Dependencies](#33-step-3-install-dependencies)
+  - [3.4. Step 4. Deploy on Your Own AWS Account](#34-step-4-deploy-on-your-own-aws-account)
+    - [3.4.1. Deploy Model Vomponents](#341-deploy-model-vomponents)
+    - [3.4.2. Deploy Server Components](#342-deploy-server-components)
 - [4. CI/CD](#4-cicd)
   - [4.1. Pull Requests](#41-pull-requests)
   - [4.2. Continuous Deployment](#42-continuous-deployment)
@@ -26,12 +27,17 @@
 - [7. Lambdas](#7-lambdas)
   - [7.1. UploadHandler](#71-uploadhandler)
     - [7.1.1. Job Submission Workflow](#711-job-submission-workflow)
-    - [Email verification feature 📧](#email-verification-feature-)
+    - [Email Verification Feature](#email-verification-feature)
     - [7.1.2. Email Verification Feature](#712-email-verification-feature)
+      - [7.1.2.1 Verify code](#7121-verify-code)
+      - [7.1.2.2 Update their email](#7122-update-their-email)
+      - [7.1.2.3 Resend verification code:](#7123-resend-verification-code)
     - [7.1.3. Access Files with UploadHandler](#713-access-files-with-uploadhandler)
+      - [Get one file via file reference](#get-one-file-via-file-reference)
+      - [OR get all job file at once](#or-get-all-job-file-at-once)
   - [7.2. JobHandler](#72-jobhandler)
-  - [7.3. ReportGen](#73-reportgen)
-  - [7.4. JobData](#74-jobdata)
+  - [7.3. JobData](#73-jobdata)
+  - [7.4. ReportGen](#74-reportgen)
   - [7.5. OwlEyes](#75-owleyes)
   - [7.6. Seenomaly](#76-seenomaly)
 - [8. Database Schema](#8-database-schema)
@@ -89,8 +95,6 @@ The diagram below shows the model and server components.
 # 3. Dev Environment Set Up
 
 ## 3.1. Step 1: Install AWS CLI
-
-<br />
 
 - Install [aws-cli](https://aws.amazon.com/cli/) and [aws-sam-cli](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-command-reference.html).
   Here are the official docs to install [aws-cli](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-install.html) and [aws-sam-cli](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html).
@@ -286,7 +290,7 @@ statusCode = 200 -> start to process the job
 statusCode != 200 -> error
 ```
 
-### Email verification feature 📧
+### Email Verification Feature
 
 The Email verification feature is implemented but not yet integrated with the front end.
 Verification code expires in 500 seconds.
