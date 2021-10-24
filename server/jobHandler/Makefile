@@ -6,8 +6,9 @@ build-JobHandler:
 	npm run fast-compile
 	npm prune --production
 ifeq ($(OS),Windows_NT)
-	Xcopy /E * $(ARTIFACTS_DIR)
+	Xcopy /E * "$(ARTIFACTS_DIR)"
 else
-	cp -r dist "$(ARTIFACTS_DIR)/"
+# cp -r dist "$(ARTIFACTS_DIR)/"
+	cp -R * $(ARTIFACTS_DIR)
 	
 endif

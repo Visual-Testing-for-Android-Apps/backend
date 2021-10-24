@@ -1,8 +1,9 @@
 import { createNewJob, FileUploadResponseBody } from "./createNewJob"
 import { ApiGatewayEvent, ApiGatewayResponse } from "./service/apigateway"
-import { getEmail, updateEmail } from "./service/dynamodbService"
+import { getEmail, getJob, updateEmail } from "./service/dynamodbService"
+import { getDownloadURL } from "./service/S3Client"
 import { checkVerificationCode, handleNewEmailSes } from "./service/sesService"
-import { modelTiggerSqsEvent, sendMessage } from "./service/sqsClient"
+import { sendMessage } from "./service/sqsClient"
 
 const CORS_HEADER = {
 	"Access-Control-Allow-Headers": "*",
@@ -21,20 +22,23 @@ const JOB_HANDLER_QUEUE = process.env.JOB_HANDLER_QUEUE
  * @returns {Object} object - Object containing the TodoItem stored.
  *
  */
-
 export const handler = async (event: ApiGatewayEvent): Promise<ApiGatewayResponse> => {
 	try {
 		switch (event.path){
-			case "/job":
-				return newJobHandler(event)
+			case "/job/upload-request":
+				return await newJobHandler(event)
 			case "/job/update-email":
-				return updateEmailHandler(event)
+				return await updateEmailHandler(event)
 			case "/job/resend-code":
-				return resendCodeHandler(event)
+				return await resendCodeHandler(event)
 			case "/job/upload-done":
-				return uploadDoneHandler(event)
+				return await uploadDoneHandler(event)
 			case "/job/verify-code":
-				return verifyCodeHandler(event)
+				return await verifyCodeHandler(event)
+			case "/job/file":
+				return await getFilePreSignUrl(event)
+			case "/job/files":
+				return await getJobAllFiles(event)
 			default:
 				return {
 					statusCode: 404,
@@ -46,7 +50,7 @@ export const handler = async (event: ApiGatewayEvent): Promise<ApiGatewayRespons
 				}
 		}
 	} catch (e) {
-		console.log(e);
+		console.error(e);
 		return {
 			statusCode: 502,
 			headers: CORS_HEADER,
@@ -64,7 +68,7 @@ const newJobHandler = async (event:ApiGatewayEvent): Promise<ApiGatewayResponse>
 		headers: CORS_HEADER,
 		body: JSON.stringify({
 			...returnBody,
-			message:"create new Job ...",
+			message:"Created new Job",
 		}),
 	};
 }
@@ -83,7 +87,7 @@ const updateEmailHandler = async (event:ApiGatewayEvent): Promise<ApiGatewayResp
 		body: JSON.stringify({
 			jobID,
 			newEmail,
-			message:"udpate email ... ",
+			message:"Udpated email",
 		}),
 	};
 }
@@ -92,7 +96,7 @@ const resendCodeHandler = async (event:ApiGatewayEvent): Promise<ApiGatewayRespo
 	const parsedBody = JSON.parse(event.body);
 	const jobID = parsedBody["jobID"];
 	if (!jobID){
-		throw Error("No jobID or new email provided");
+		throw Error("No jobID provided");
 	}
 
 	const email = await getEmail(jobID)
@@ -103,7 +107,7 @@ const resendCodeHandler = async (event:ApiGatewayEvent): Promise<ApiGatewayRespo
 		body: JSON.stringify({
 			jobID,
 			email,
-			message: "resend code...",
+			message: "Resent verification code",
 		}),
 	}
 
@@ -115,12 +119,17 @@ const uploadDoneHandler =  async (event:ApiGatewayEvent): Promise<ApiGatewayResp
 	if (!jobID) {
 		throw Error("No jobID provided");
 	}
-	//await modelTrigger(jobID);
 
 	//Push a request to our SQS queue for the next iteration
-	if (typeof JOB_HANDLER_QUEUE == "undefined"){
-		throw Error("missing env variable JOB_HANDLER_QUEUE")
+	if (JOB_HANDLER_QUEUE === undefined){
+		throw Error("Environment variable \"JOB_HANDLER_QUEUE\" is missing!")
 	}
+	// Check if verified
+	const job = await getJob(jobID)
+	if (!job.emailVerified ){
+		throw Error("email not verified")
+	}
+	
 	await sendMessage({jobKey: jobID}, JOB_HANDLER_QUEUE);
 
 	return {
@@ -128,7 +137,7 @@ const uploadDoneHandler =  async (event:ApiGatewayEvent): Promise<ApiGatewayResp
 		headers: CORS_HEADER,
 		body: JSON.stringify({
 			jobID,
-			message:"upload done, triggered job handler ...",
+			message:"Upload done, triggered job handler",
 		}),
 	}
 
@@ -149,9 +158,52 @@ const verifyCodeHandler = async (event:ApiGatewayEvent): Promise<ApiGatewayRespo
 		body: JSON.stringify({
 			jobID,
 			verified,
-			message:"verify code ...",
+			message:"Verified code",
 		}),
 	}
 	
+
+}
+
+const getFilePreSignUrl = async (event:ApiGatewayEvent): Promise<ApiGatewayResponse> =>{
+	const parsedBody = JSON.parse(event.body);
+	const filePath = parsedBody["filePath"];
+	// get preSign urls 
+	const url = await getDownloadURL(filePath)
+	return {
+		statusCode: 200 ,
+		headers: CORS_HEADER,
+		body: JSON.stringify({
+			url,
+			message:"file download url",
+		}),
+	}
+
+}
+
+const getJobAllFiles = async (event:ApiGatewayEvent): Promise<ApiGatewayResponse> =>{
+	const parsedBody = JSON.parse(event.body);
+	const jobID = parsedBody["jobID"];
+	// get job
+	const job = await getJob(jobID)
+	const ret: {[key: string]: string} = {}
+	// get preSign urls 
+	for (const file of job.files){
+		const url = await getDownloadURL(file.s3Key)
+		ret[file.s3Key] = url
+		if (file.result && file.result.outputKey){
+			const url = await getDownloadURL(file.result.outputKey)
+			ret[file.result.outputKey] = url
+		}
+	}
+	
+	return {
+		statusCode: 200 ,
+		headers: CORS_HEADER,
+		body: JSON.stringify({
+			...ret,
+			message:"file download url",
+		}),
+	}
 
 }

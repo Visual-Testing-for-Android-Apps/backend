@@ -7,13 +7,11 @@ import {
   PutItemInput,
   UpdateItemInput,
 } from "aws-sdk/clients/dynamodb"
-import { table } from "console"
 
-import { EmailVerification, File, Job } from "../service/jobModel"
+import { EmailVerification, File, fileResult, Job } from "../service/jobModel"
 import { getItem, putItem, updateItem } from "./dynamodbClient"
 
 const tableName = process.env.JOB_TABLE as string;
-
 
 export const getJob = async (id:string): Promise<Job> => {
 	const getItemInput: GetItemInput = {
@@ -32,13 +30,11 @@ export const createNewJobItem = async ( id: string,email: string) => {
 			"id": { S: id },
 			"email": { S: email },
 			"createdAt": { S: new Date().toISOString() },
-			"emailVerified": {BOOL:true}
+			"emailVerified": {BOOL:true} // initalise to true since we don't do email verification
 		},
-		ReturnValue:"UPDATED_NEW"
 	} as PutItemInput;
 	console.log("newJobItem",JSON.stringify(newJobItem))
-	const ret = await putItem(newJobItem);
-	console.log(JSON.stringify(ret))
+	await putItem(newJobItem);
 };
 
 
@@ -123,11 +119,6 @@ export const getEmail = async (id:string):Promise<string> => {
 	return Converter.unmarshall(ret.Item!).email;
 }
 
-export interface fileResult {
-	code?: string,
-	message: string,
-	outputKey?:string
-}
 
 export const saveFileProcessResult = async(jobID:string, fileIdx: integer, result:fileResult) =>{
 	const resultAtrr = Converter.marshall(result)

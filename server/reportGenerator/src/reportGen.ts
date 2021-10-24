@@ -1,15 +1,18 @@
 import { SQSEvent } from 'aws-lambda'
 import { S3 } from 'aws-sdk'
-import { getItem, GetItemInput, pushToQueue, SendMessageRequest } from './service/dynamodbClient'
+
+import { sendEmail } from './sendEmail'
+import { getJob } from './service/dynamodbService'
+import { FileType, ImgReturn, Job, JobStatus } from './service/jobModel'
 
 /**
- * Generates a html report for a given video issue
+ * Creates an object related to a given video issue
  *
- * @param index - index of original video in batch
+ * @param filePath - filepath to original video
  * @param algResult - issue type code
- * @returns html string containing image, heatmap, and description
+ * @returns object containing video issue, description and video file path
  */
-function generateVidReport (index: number, algResult: number): string {
+function generateVidReport (filePath: string, algResult: number): Record<string, string> {
   const titles: string[] = [
     'Cannot place image in space',
     'Pass through other material',
@@ -35,103 +38,111 @@ function generateVidReport (index: number, algResult: number): string {
     'UI elements behind a modal bottom sheet lack a visible scrim/filter whilst the bottom sheet is onscreen.  A visible scrim indicates to the user that these elements cannot be interacted with whilst the menu is displayed.'
   ]
 
-  let res = '    <h2>Item ' + index.toString() + '</h2>\n'
-  res += '    <p>' + titles[algResult] + '<br>' + desc[algResult] + '</p>\n'
-  return res
+  return {
+    title: titles[algResult],
+    desc: desc[algResult],
+    classification: algResult.toString(),
+    video: filePath
+  }
 }
 
 /**
- * Generates a html report for a given image issue
+ * Creates an object related to a given image issue
  *
- * @param index - index of original image in batch
  * @param filePath - filepath to original image
  * @param algResultPath - filepath to heatmap outputted from OwlEyes algorithm
  * @param algResult - issue type code
- * @returns html string containing image, heatmap, and description
+ * @returns object containing image issues, descriptions, image and heatmap path
  */
 function generateImgReport (
-  index: number,
   filePath: string,
   algResultPath: string,
-  algResult: number
-): string {
-  const titles: string[] = [
-    "General issue heatmap",
-    "Null value",
-    "Missing image",
-    "Component occlusion"
-    // no models for blurred screen or text overlap, so no description is needed
-  ]
-  const desc: string[] = [
-    "Heatmap highlights all potential issues.",
-    "'NULL' text is being displayed, instead of the correct information.",
-    "A placeholder 'missing/broken image' symbol is displayed, instead of an intended image.",
-    "Text is overlapped or obscured by other components."
+  algMessage: string[]
+): ImgReturn {
+  const titles: string[] = ['Null value', 'Missing image', 'Component occlusion']
+  const descs: string[] = [
+    '"NULL" text is being displayed, instead of the correct information.',
+    'A placeholder "missing/broken image" symbol is displayed, instead of an intended image.',
+    'Text is overlapped or obscured by other components.'
   ]
 
-  let res = "    <h2>Item " + index.toString() + "</h2>\n"
-  res += "    <image src='" + filePath + "'>\n"
-  res += "    <image src='" + algResultPath + "'>\n"
-  res += "    <p>" + titles[algResult] + ".<br>" + desc[algResult] + "</p>\n"
-  return res
+  const outputTitles: string[] = []
+  const outputDescs: string[] = []
+
+  algMessage.forEach((message) => {
+    titles.forEach((title, index) => {
+      if (title === message) {
+        outputTitles.push(titles[index])
+        outputDescs.push(descs[index])
+      }
+    })
+  })
+
+  return {
+    titles: outputTitles,
+    descs: outputDescs,
+    orig_image: filePath,
+    heatmap_image: algResultPath
+  }
 }
 
 /**
- * Adds html report for a batch to s3 bucket, then adds the batch to a queue for file zipping.
- * The report is saved in the bucket as <batch_id>/report.html
- * DynamoDB data about a batch is assumed to be in the format defined here: https://github.com/Visual-Testing-for-Android-Apps/backend/issues/15#issuecomment-898450609
- * with the exception of "batch_id" being "id" instead due to issues.
+ * Adds report contents as json for a batch to s3 bucket, then adds the batch to a queue for emailing the user.
+ * The report is saved in the bucket as <batch_id>/report.json
+ * DynamoDB data about a batch is assumed to be in the format defined in ./service/jobModel.ts
+ * NOT in the form here: https://github.com/Visual-Testing-for-Android-Apps/backend/issues/15#issuecomment-898450609
  *
  * @param event object containing information about the job. Its body attribute is a stringified json object containing a batch's id as jobKey
  * @param context object containing information about the invocation, function, and execution environment
- * @returns html string describing issues identified for each image and/or video
+ * @returns json object describing issues identified for each image and/or video
  */
 export const generateReport = async (event: SQSEvent, context: AWSLambda.Context): Promise<any> => {
   // fetch job results from database
   const key: string = JSON.parse(event.Records[0].body).jobKey // queue batchsize = 1, so Records[0].length = 1
-  const request: GetItemInput = {
-    TableName: process.env.JOB_TABLE as string,
-    Key: {
-      id: { S: key }
-    }
+  console.log(`Fetching info for job key ${key}...`)
+  const job: Job = await getJob(key)
+  if (job.jobStatus !== JobStatus.GENERATING) {
+    console.log(`job: ${key} not ready for report generation yet`)
+    return
   }
-  const dbRes = await getItem(request)
+  const files = job.files
 
-  // construct HTML report contents
-  let res = "<!DOCTYPE html><html lang='en'><head></head><body><div>\n"
-  if (dbRes.Item != null) {
-    const files = dbRes.Item.files
-    if (files.L != null) {
-      // Iterate through each file
-      files.L.forEach((element, index) => {
-        if (element.M != null) {
-          const fileRef = element.M.fileRef.S
-          const fileType = element.M.fileType.S
-          const resultCode = element.M.resultCode.N
-          const resultFileRef = element.M.resultFileReference.S
+  // construct report contents as arrays
+  const image: ImgReturn[] = []
+  const video: Array<Record<string, string>> = []
 
-          // Add image/vid string to overall report string
-          if (fileType != null && resultCode != null) {
-			res += "  <div>\n"
-            if (fileType === "image" && fileRef != null && resultFileRef != null) {
-              res += generateImgReport(index, fileRef, resultFileRef, +resultCode)
-            } else if (fileType === "video") {
-              res += generateVidReport(index, +resultCode)
-            }
-            res += "  </div><p><br><br></p>"
-          }
-        }
-      })
+  console.log(`Generating report for ${files.length} files...`)
+  files.forEach((element) => {
+    const fileRef = element.s3Key
+    const fileType = element.type
+    const resultMessage = element.result.message
+    const resultCode = Number(element.result.code)
+    const resultFileRef = element.result.outputKey
+    if (fileType != null && fileRef != null) {
+      if (fileType === FileType.IMAGE && resultFileRef != null && resultMessage != null) {
+        image.push({
+          ...generateImgReport(fileRef, resultFileRef, resultMessage),
+          orginalName: element.orginalName
+        })
+        console.log(`Image ${fileRef} added to report`)
+      } else if (fileType === FileType.VIDEO && resultCode != null) {
+        video.push({
+          ...generateVidReport(fileRef, +resultCode),
+          orginalName: element.orginalName
+        })
+        console.log(`Video ${fileRef} added to report`)
+      } else {
+        console.log(`File ${fileRef} of unknown filetype`)
+      }
     }
-  }
-  res += "</div></body></html>"
+  })
 
-  // Add html file to s3 bucket
-  const filepath = key + "/report.html"
+  // Add json file to s3 bucket
+  const filepath = key + '/report.json'
   const s3params = {
     Bucket: process.env.SRC_BUCKET as string,
     Key: filepath, // File name you want to save as in S3
-    Body: res
+    Body: JSON.stringify({ images: image, videos: video })
   }
 
   const s3 = new S3({
@@ -140,15 +151,10 @@ export const generateReport = async (event: SQSEvent, context: AWSLambda.Context
   })
 
   // need to await, otherwise if the lambda function terminates before the upload is finished, it won't complete
+  console.log('Uploading report to s3 bucket...')
   await s3.upload(s3params).promise()
+  console.log('JSON uploaded!')
 
-  // Add batch to file zip queue
-  const params: SendMessageRequest = {
-    MessageBody: '{ "jobKey": "' + String(key) + '" }',
-    // MessageBody: '{ "queryStringParameters": { "id": "' + String(key) + '" } }', // zipfile accesses event["queryStringParameters"]["id"]
-    QueueUrl: process.env.FILE_ZIP_QUEUE as string
-  }
-  await pushToQueue(params)
-
-  return res
+  // request to send email
+  await sendEmail(key)
 }

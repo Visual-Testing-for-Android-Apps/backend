@@ -13,8 +13,13 @@ export interface File {
 	type: string;
 	finishTime?: string;
 	status: FileStatus;
-	resultCode?: number;
-	resultFileReference?: string;
+	result?: fileResult
+}
+
+export interface fileResult {
+	code?: string,
+	message: string,
+	outputKey?:string
 }
 
 export interface EmailVerification {
@@ -37,6 +42,7 @@ export enum Models {
 	SEENOMALY = "Seenomaly",
 	OWLEYE = "owleye"
 }
+
 
 
 
